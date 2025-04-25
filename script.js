@@ -3168,7 +3168,7 @@ async function renderInvites() {
     inviteDiv.style.position = "relative";
     inviteDiv.style.overflow = "hidden";
 
-    // dodaj warstwę przyciemnienia jak w friend-entry
+    // przyciemnienie
     const overlay = document.createElement("div");
     overlay.style.position = "absolute";
     overlay.style.inset = "0";
@@ -3193,8 +3193,8 @@ async function renderInvites() {
         </div>
       </div>
       <div class="friend-card-bottom">
-        <button onclick="acceptInvite('${id}')">Akceptuj</button>
-        <button onclick="rejectInvite('${id}')">Odrzuć</button>
+        <button onclick="acceptInvite('${fromNick}')">Akceptuj</button>
+        <button onclick="rejectInvite('${fromNick}')">Odrzuć</button>
       </div>
     `;
 
