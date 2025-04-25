@@ -2435,11 +2435,10 @@ async function validateFriendsList() {
   if (!currentUser || !users[currentUser]) return;
 
   const me = users[currentUser];
-  const validIds = new Set(Object.values(users).map(u => u.id));
+  const validNicks = new Set(Object.keys(users)); // 🔥 zmienione z ID na nicki
 
-  // Przefiltruj znajomych – zostaw tylko istniejących
   const oldFriends = me.friends || [];
-  const newFriends = oldFriends.filter(fid => validIds.has(fid));
+  const newFriends = oldFriends.filter(nick => validNicks.has(nick)); // 🔥 zmienione na nicki
 
   if (oldFriends.length !== newFriends.length) {
     console.warn("⚠️ Wykryto nieistniejących znajomych – lista została poprawiona.");
