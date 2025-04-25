@@ -172,6 +172,62 @@ async function getProfile(nick) {
   return data.user;
 }
 
+// Wyślij zaproszenie do znajomego
+async function sendFriendRequestAPI(senderNick, receiverNick) {
+  const response = await fetch(`${API_BASE}/api/friends/request`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sender: senderNick, receiver: receiverNick })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Nie udało się wysłać zaproszenia: ${errText}`);
+  }
+}
+
+// Akceptuj zaproszenie od znajomego
+async function acceptFriendRequestAPI(senderNick, receiverNick) {
+  const response = await fetch(`${API_BASE}/api/friends/accept`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sender: senderNick, receiver: receiverNick })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Nie udało się zaakceptować zaproszenia: ${errText}`);
+  }
+}
+
+// Odrzuć zaproszenie od znajomego
+async function declineFriendRequestAPI(senderNick, receiverNick) {
+  const response = await fetch(`${API_BASE}/api/friends/decline`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sender: senderNick, receiver: receiverNick })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Nie udało się odrzucić zaproszenia: ${errText}`);
+  }
+}
+
+// Usuń znajomego
+async function removeFriendAPI(userNick, friendNick) {
+  const response = await fetch(`${API_BASE}/api/friends/remove`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user: userNick, friend: friendNick })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Nie udało się usunąć znajomego: ${errText}`);
+  }
+}
+
 async function saveProfileToServer(nick, profileData) {
   await fetch(`${API_BASE}/api/profile/save`, {
     method: 'POST',
