@@ -191,7 +191,8 @@ async function sendFriendRequest(targetNickOrId) {
 
 // Akceptuj zaproszenie od znajomego
 async function acceptFriendRequestAPI(senderNick, receiverNick) {
-console.log('API acceptFriendRequestAPI:', senderNick, receiverNick); // <-- to na pewno się wyświetli!
+  console.log('ACCEPT API PAYLOAD:', { sender: senderNick, receiver: receiverNick }); // <-- NOWE
+
   const response = await fetch(`${API_BASE}/api/friends/accept`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
