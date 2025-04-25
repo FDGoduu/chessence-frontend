@@ -3229,10 +3229,15 @@ async function acceptInvite(fromNick) {
 
   try {
     await acceptFriendRequestAPI(fromNick, myNick);
-    await refreshUsers();
-    renderFriendsList();
-    renderInvites();
-    showFloatingStatus("Dodano do znajomych!", "info");
+
+	// 🔥 Wyemituj event, żeby wysyłający zaproszenie się odświeżył
+	socket.emit('friendListUpdated', { friend: fromNick });
+	
+	await refreshUsers();
+	renderFriendsList();
+	renderInvites();
+	showFloatingStatus("Dodano do znajomych!", "info");
+
   } catch (error) {
     console.error(error);
     showFloatingStatus(error.message, "alert");
@@ -3654,6 +3659,12 @@ function updateTurnStatus() {
 function setOnlineStatus(msg) {
   document.getElementById("onlineStatus").innerText = msg;
 }
+
+socket.on('refreshFriends', async () => {
+  console.log("🔄 Odbieram refreshFriends");
+  await refreshUsers();
+  renderFriendsList();
+});
 
 if (socket) {
   socket.on("roomCreated", ({ roomCode }) => {
