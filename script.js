@@ -3162,13 +3162,11 @@ async function acceptInvite(fromId) {
   sender.pendingInvites = sender.pendingInvites?.filter(id => id !== me.id);
   
   await saveUsers(users);
-  
-  // ⚡ Wymuś reload po zaakceptowaniu zaproszenia:
-  setTimeout(() => location.reload(), 400);  
 
-  showFloatingStatus("Dodano do znajomych!", "info");
-  renderInvites();
+  // 🔥 Tylko odśwież widok – bez reloadowania całej strony
   renderFriendsList();
+  renderInvites();
+  showFloatingStatus("Dodano do znajomych!", "info");
 }
 
 // ✅ Odrzuć zaproszenie
