@@ -3203,11 +3203,20 @@ async function renderInvites() {
     inviteList.appendChild(inviteDiv);
   });
 }
+
 async function refreshUsers() {
   const response = await fetch(`${API_BASE}/api/users`);
   const { users } = await response.json();
-  localStorage.setItem("usersCache", JSON.stringify(users));
+  
+  // 🔥 Poprawne ustawienie usersCache po nickach
+  const usersByNick = {};
+  Object.entries(users).forEach(([nick, userData]) => {
+    usersByNick[nick] = userData;
+  });
+
+  localStorage.setItem("usersCache", JSON.stringify(usersByNick));
 }
+
 
 // ✅ Akceptuj zaproszenie
 async function acceptInvite(fromNick) {
