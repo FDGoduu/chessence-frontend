@@ -3203,6 +3203,11 @@ async function renderInvites() {
     inviteList.appendChild(inviteDiv);
   });
 }
+async function refreshUsers() {
+  const response = await fetch(`${API_BASE}/api/users`);
+  const { users } = await response.json();
+  localStorage.setItem("usersCache", JSON.stringify(users));
+}
 
 // ✅ Akceptuj zaproszenie
 async function acceptInvite(fromNick) {
@@ -3215,6 +3220,7 @@ async function acceptInvite(fromNick) {
 
   try {
     await acceptFriendRequestAPI(fromNick, myNick);
+    await refreshUsers();
     renderFriendsList();
     renderInvites();
     showFloatingStatus("Dodano do znajomych!", "info");
