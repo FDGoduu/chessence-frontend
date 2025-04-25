@@ -3080,37 +3080,37 @@ async function renderFriendsList() {
     return;
   }
 
-  current.friends.forEach(fid => {
-    const friend = Object.values(users).find(u => u.id === fid);
-    const friendNick = Object.keys(users).find(k => users[k].id === fid);
-    if (!friend || !friendNick) return;
+current.friends.forEach(friendNick => {
+  const friend = users[friendNick];
+  if (!friend) return;
 
-    const avatar = (friend.ui?.avatar) || "avatar1.png";
-    const frame = (friend.ui?.frame) || "default_frame";
+  const avatar = (friend.ui?.avatar) || "avatar1.png";
+  const frame = (friend.ui?.frame) || "default_frame";
 
-    const div = document.createElement("div");
-    div.className = "friend-entry";
-	div.style.backgroundImage = `url('img/backgrounds/${friend.ui?.background || "bg0.png"}')`;
-	div.innerHTML = `
-	  <div class="friend-card-top">
-		<div class="profile-avatar-wrapper">
-		  <img src="img/avatars/${avatar}" class="profile-avatar">
-		  <img src="img/frames/${frame}.png" class="profile-avatar-frame">
-		</div>
-		<div class="friend-info">
-		  <div class="nickname">${friendNick}</div>
-		  <div class="id-label">ID: ${friend.id}</div>
-		  <div class="level">Poziom: ${friend.level || 0}</div>
-		</div>
-	  </div>
-	  <div class="friend-card-bottom">
-		<button onclick="inviteToGame('${friend.id}')">Zaproś do gry</button>
-		<button onclick="viewFriendProfile('${friend.id}')">Profil</button>
-		<button onclick="removeFriend('${friend.id}')">Usuń</button>
-	  </div>
-	`;
-    container.appendChild(div);
-  });
+  const div = document.createElement("div");
+  div.className = "friend-entry";
+  div.style.backgroundImage = `url('img/backgrounds/${friend.ui?.background || "bg0.png"}')`;
+  div.innerHTML = `
+    <div class="friend-card-top">
+      <div class="profile-avatar-wrapper">
+        <img src="img/avatars/${avatar}" class="profile-avatar">
+        <img src="img/frames/${frame}.png" class="profile-avatar-frame">
+      </div>
+      <div class="friend-info">
+        <div class="nickname">${friendNick}</div>
+        <div class="id-label">ID: ${friend.id}</div>
+        <div class="level">Poziom: ${friend.level || 0}</div>
+      </div>
+    </div>
+    <div class="friend-card-bottom">
+      <button onclick="inviteToGame('${friend.id}')">Zaproś do gry</button>
+      <button onclick="viewFriendProfile('${friend.id}')">Profil</button>
+      <button onclick="removeFriend('${friendNick}')">Usuń</button>
+    </div>
+  `;
+  container.appendChild(div);
+});
+
 }
 
 // ✅ Dodaj zaproszenie do znajomych
