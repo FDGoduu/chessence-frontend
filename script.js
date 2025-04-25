@@ -3204,6 +3204,7 @@ async function renderInvites() {
 
 // ✅ Akceptuj zaproszenie
 async function acceptInvite(fromNick) {
+  console.log('Akceptacja zaproszenia: od', fromNick, 'dla', localStorage.getItem("currentUser"));
   const myNick = localStorage.getItem("currentUser");
   if (!myNick) {
     showFloatingStatus("Musisz być zalogowany", "alert");
