@@ -3229,6 +3229,7 @@ async function acceptInvite(fromNick) {
 
   try {
     await acceptFriendRequestAPI(fromNick, myNick);
+    socket.emit('friendListUpdated', { friend: fromNick });
 
 	// 🔥 Wyemituj event, żeby wysyłający zaproszenie się odświeżył
 	socket.emit('friendListUpdated', { friend: fromNick });
@@ -3878,6 +3879,7 @@ function showScreen(screenId) {
 }
 
 async function startGameWithUser(nick) {
+await refreshUsers();
   try {
     const user = await getProfile(nick);
 
@@ -3962,6 +3964,10 @@ document.getElementById("loginSubmit").addEventListener("click", async () => {
   try {
     await loginUser(nick, pass); // poprawne logowanie przez serwer
     await startGameWithUser(nick);
+	socket.emit('registerPlayer', {
+	  nick: nick,
+	  id: users[nick].id
+	});
   } catch (error) {
     console.error(error);
     alert("Logowanie nie powiodło się. Sprawdź dane.");
