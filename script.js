@@ -173,16 +173,19 @@ async function getProfile(nick) {
 }
 
 // Wyślij zaproszenie do znajomego
-async function sendFriendRequestAPI(senderNick, receiverNick) {
-  const response = await fetch(`${API_BASE}/api/friends/request`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sender: senderNick, receiver: receiverNick })
-  });
+async function sendFriendRequest(targetNickOrId) {
+  const myNick = localStorage.getItem("currentUser");
+  if (!myNick) {
+    showFloatingStatus("Musisz być zalogowany", "alert");
+    return;
+  }
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Nie udało się wysłać zaproszenia: ${errText}`);
+  try {
+    await sendFriendRequestAPI(myNick, targetNickOrId);
+    showFloatingStatus(`Zaproszenie do ${targetNickOrId} wysłane`, "info");
+  } catch (error) {
+    console.error(error);
+    showFloatingStatus(error.message, "alert");
   }
 }
 
@@ -3200,41 +3203,40 @@ async function renderInvites() {
 }
 
 // ✅ Akceptuj zaproszenie
-async function acceptInvite(fromId) {
-  const users = await getUsers();
+async function acceptInvite(fromNick) {
   const myNick = localStorage.getItem("currentUser");
-  const me = users[myNick];
-  const sender = Object.values(users).find(u => u.id === fromId);
-  if (!me || !sender) return;
+  if (!myNick) {
+    showFloatingStatus("Musisz być zalogowany", "alert");
+    return;
+  }
 
-  if (!me.friends) me.friends = [];
-  if (!sender.friends) sender.friends = [];
-
-  me.friends.push(fromId);
-  sender.friends.push(me.id);
-  
-  // Usuń zaproszenie po obu stronach
-  me.pendingInvites = me.pendingInvites.filter(id => id !== fromId);
-  sender.pendingInvites = sender.pendingInvites?.filter(id => id !== me.id);
-  
-  await saveUsers(users);
-
-  // 🔥 Tylko odśwież widok – bez reloadowania całej strony
-  renderFriendsList();
-  renderInvites();
-  showFloatingStatus("Dodano do znajomych!", "info");
+  try {
+    await acceptFriendRequestAPI(fromNick, myNick);
+    renderFriendsList();
+    renderInvites();
+    showFloatingStatus("Dodano do znajomych!", "info");
+  } catch (error) {
+    console.error(error);
+    showFloatingStatus(error.message, "alert");
+  }
 }
 
 // ✅ Odrzuć zaproszenie
-async function rejectInvite(fromId) {
-  const users = await getUsers();
+async function rejectInvite(fromNick) {
   const myNick = localStorage.getItem("currentUser");
-  const me = users[myNick];
-  if (!me) return;
+  if (!myNick) {
+    showFloatingStatus("Musisz być zalogowany", "alert");
+    return;
+  }
 
-  me.pendingInvites = me.pendingInvites.filter(id => id !== fromId);
-  await saveUsers(users);
-  renderInvites();
+  try {
+    await declineFriendRequestAPI(fromNick, myNick);
+    renderInvites();
+    showFloatingStatus("Zaproszenie odrzucone", "info");
+  } catch (error) {
+    console.error(error);
+    showFloatingStatus(error.message, "alert");
+  }
 }
 
 function inviteToGame(friendId) {
@@ -3242,19 +3244,21 @@ function inviteToGame(friendId) {
 }
 
 // ✅ Usuń znajomego
-async function removeFriend(friendId) {
-  const users = await getUsers();
+async function removeFriend(friendNick) {
   const myNick = localStorage.getItem("currentUser");
-  const me = users[myNick];
-  const friend = Object.values(users).find(u => u.id === friendId);
-  if (!me || !friend) return;
+  if (!myNick) {
+    showFloatingStatus("Musisz być zalogowany", "alert");
+    return;
+  }
 
-  me.friends = (me.friends || []).filter(id => id !== friendId);
-  friend.friends = (friend.friends || []).filter(id => id !== me.id);
-
-  await saveUsers(users);
-  renderFriendsList();
-  showFloatingStatus("Usunięto znajomego", "info");
+  try {
+    await removeFriendAPI(myNick, friendNick);
+    renderFriendsList();
+    showFloatingStatus("Usunięto znajomego", "info");
+  } catch (error) {
+    console.error(error);
+    showFloatingStatus(error.message, "alert");
+  }
 }
 
 function showFloatingStatus(text, type = "info") {
