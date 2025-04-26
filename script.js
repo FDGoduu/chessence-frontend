@@ -804,48 +804,64 @@ for (let sy = 0; sy < 8; sy++) {
   }
 }
 
-  // Logika komunikatów
-	if (inCheck && !hasLegalMove) {
-	  updateStatus("🔥 SZACH-MAT!");
-	  msg.classList.add("alert");
-	const mateOverlay = document.getElementById("mateOverlay");
-	mateOverlay.classList.remove("show-mate");
-	void mateOverlay.offsetWidth;
-	mateOverlay.style.display = "flex"; // <--- dodaj to jawnie
-	mateOverlay.classList.add("show-mate");
+// Logika komunikatów
+if (inCheck && !hasLegalMove) {
+  updateStatus("🔥 SZACH-MAT!");
+  msg.classList.add("alert");
 
-	setTimeout(() => {
-	  mateOverlay.classList.remove("show-mate");
-	  mateOverlay.style.display = "none"; // <--- to ukryje go po zakończeniu zanikania
-	}, 2500); // lub 3500 jeśli chcesz trochę więcej czasu na fade-out
-	  endScreen.style.display = "flex";
-	  endMessage.textContent = (currentTurn === 'w' ? "Czarne" : "Białe") + " wygrywają!";
-		if (gameMode === "pvb") {
-		  const playerWon = currentTurn !== playerColor;
-		window.xpPendingResult = playerWon ? "win" : "loss";
-		// 📌 Zapisz informacje do sprawdzenia Szewczyka
-		window.lastMoveLogLength = moveLog.length;
-		window.lastMoveLogFinalMove = moveLog.at(-1) ?? "";
+  const mateOverlay = document.getElementById("mateOverlay");
+  mateOverlay.classList.remove("show-mate");
+  void mateOverlay.offsetWidth;
+  mateOverlay.style.display = "flex";
+  mateOverlay.classList.add("show-mate");
 
-		// ZAMROŹ poziom bota tylko raz!
-		if (typeof window.xpBotLevelAtEnd === "undefined") {
-		  window.xpBotLevelAtEnd = getCurrentBotLevel();
-		}
-		}
-		window.hasLostPieceFinal = hasLostPiece;
-	  gameEnded = true;
-	}
-   else if (!inCheck && !hasLegalMove) {
-    updateStatus("🤝 PAT – REMIS");
-    msg.classList.add("alert");
-    endScreen.style.display = "block";
-    endMessage.textContent = "Partia zakończona remisem.";
-	if (gameMode === "pvb") {
-	  window.xpPendingResult = "draw"; // ⏳ zapisujemy, ale nie przyznajemy jeszcze
-	  window.xpBotLevelAtEnd = getCurrentBotLevel();
-	}
-	gameEnded = true;
-  } else if (inCheck && hasLegalMove) {
+  setTimeout(() => {
+    mateOverlay.classList.remove("show-mate");
+    mateOverlay.style.display = "none";
+  }, 2500);
+
+  // 🔥 Wynik gry PvB - wygrana/przegrana
+  if (gameMode === "pvb") {
+    const playerWon = currentTurn !== playerColor;
+    window.xpPendingResult = playerWon ? "win" : "loss";
+    window.xpBotLevelAtEnd = getCurrentBotLevel();
+  }
+
+  endScreen.style.display = "flex";
+  endMessage.textContent = (currentTurn === 'w' ? "Czarne" : "Białe") + " wygrywają!";
+  gameEnded = true;
+
+  // 🔥 Przyznanie XP (raz) po zakończeniu gry
+  if (gameMode === "pvb" && typeof window.xpPendingResult !== "undefined" && !hasAwardedXP) {
+    awardXP(window.xpPendingResult);
+    delete window.xpPendingResult;
+    hasAwardedXP = true;
+  }
+
+  window.hasLostPieceFinal = hasLostPiece;
+  
+} else if (!inCheck && !hasLegalMove) {
+  // 🔥 Remis - PAT
+  updateStatus("🤝 PAT – REMIS");
+  msg.classList.add("alert");
+
+  if (gameMode === "pvb") {
+    window.xpPendingResult = "draw";
+    window.xpBotLevelAtEnd = getCurrentBotLevel();
+  }
+
+  endScreen.style.display = "block";
+  endMessage.textContent = "Partia zakończona remisem.";
+  gameEnded = true;
+
+  // 🔥 Przyznanie XP (raz) po zakończeniu gry
+  if (gameMode === "pvb" && typeof window.xpPendingResult !== "undefined" && !hasAwardedXP) {
+    awardXP(window.xpPendingResult);
+    delete window.xpPendingResult;
+    hasAwardedXP = true;
+  }
+}
+    else if (inCheck && hasLegalMove) {
     updateStatus("🚨 SZACH dla " + (currentTurn === 'w' ? "białych" : "czarnych") + "!");
     msg.classList.add("alert");
     boardWrapper.classList.add("shake", "board-warning");
