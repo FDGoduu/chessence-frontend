@@ -494,10 +494,11 @@ function getPromotedPiece() {
   });
 }
 
-function tryMove(sx, sy, dx, dy, simulate = false, promotion = null, isRemote = false){
+async function tryMove(sx, sy, dx, dy, simulate = false, promotion = null, isRemote = false){
   const piece = boardState[sy][sx];
   const target = boardState[dy][dx];
-  
+  const users = await getUsers();
+
   
 if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
   const attacker = pieceColor(piece);
@@ -668,7 +669,7 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
           !isSquareAttacked(sx + 2, sy, isWhite ? 'b' : 'w')) {
 
         if (!simulate && gameMode === "pvb" && !achievements["castling"]) {
-          unlockAchievement("castling");
+          unlockAchievement("castling", users);
         }
 
         if (!simulate) {
@@ -701,7 +702,7 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
           !isSquareAttacked(sx - 2, sy, isWhite ? 'b' : 'w')) {
 
         if (!simulate && gameMode === "pvb" && !achievements["castling"]) {
-          unlockAchievement("castling");
+          unlockAchievement("castling", users);
         }
 
         if (!simulate) {
@@ -2301,7 +2302,9 @@ function isSquareAttacked(x, y, byColor) {
   return false;
 }
 
-function handlePromotionChoice(pieceCode, isWhite) {
+async function handlePromotionChoice(pieceCode, isWhite) {
+  const users = await getUsers();
+
   if (!promotionContext) return;
 
   const { sx, sy, dx, dy } = promotionContext;
@@ -2322,7 +2325,7 @@ function handlePromotionChoice(pieceCode, isWhite) {
     selected = null;
     legalMoves = [];
   
-    if (gameMode === "pvb") unlockAchievement("promotion");  
+    if (gameMode === "pvb") unlockAchievement("promotion", users);  
     return;
   }
 
@@ -2362,7 +2365,7 @@ function handlePromotionChoice(pieceCode, isWhite) {
 
   promotionContext = null;
 
-  if (gameMode === "pvb") unlockAchievement("promotion");
+  if (gameMode === "pvb") unlockAchievement("promotion", users);
 }
 
 // Przypisanie kliknięć
@@ -2794,7 +2797,8 @@ if (!user) return;
   }
 }
 
-function showPromotionModal(isWhite) {
+async function showPromotionModal(isWhite) {
+  const users = await getUsers();
   const modal = document.getElementById("promotionModal");
   modal.style.display = "block";
 
@@ -2805,7 +2809,7 @@ function showPromotionModal(isWhite) {
       const piece = btn.dataset.piece;
       handlePromotionChoice(piece, isWhite);
       modal.style.display = "none";
-	  if (gameMode === "pvb") unlockAchievement("promotion");
+	  if (gameMode === "pvb") unlockAchievement("promotion", users);
     };
   });
 }
