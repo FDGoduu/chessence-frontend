@@ -3954,7 +3954,7 @@ document.getElementById("registerSubmit").addEventListener("click", async () => 
   }
 });
 loginButton.addEventListener('click', async () => {
-  const nick = document.getElementById('loginNick').value.trim();
+  const nick = document.getElementById('loginNickname').value.trim();
   const pass = document.getElementById('loginPassword').value.trim();
 
   try {
