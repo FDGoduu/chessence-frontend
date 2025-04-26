@@ -2631,6 +2631,8 @@ async function openProfileScreen(friendId = null) {
 
 const isOwnProfile = !viewingFriendProfile;
 const users = await getUsers();
+await refreshFriends(); // 🔥 automatyczny refresh znajomych po wejściu w profil
+
 
 document.getElementById("resetProgressBtn").style.display = isOwnProfile ? "inline-block" : "none";
 document.querySelector('.profile-controls button[onclick="closeProfileScreen()"]').style.display = isOwnProfile ? "inline-block" : "none";
@@ -3178,7 +3180,6 @@ async function renderInvites() {
     inviteDiv.style.position = "relative";
     inviteDiv.style.overflow = "hidden";
 
-    // przyciemnienie
     const overlay = document.createElement("div");
     overlay.style.position = "absolute";
     overlay.style.inset = "0";
@@ -3919,6 +3920,7 @@ await refreshUsers();
     await validateUnlockedRewards();
     await enforceLocksByLevel();
     await validateFriendsList(); // 🛡️ sprawdzanie znajomych
+    await refreshFriends(); // 🔥 automatyczny refresh znajomych po zalogowaniu
   } catch (error) {
     console.error('Błąd logowania:', error);
   }
