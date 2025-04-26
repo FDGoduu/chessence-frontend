@@ -2822,12 +2822,12 @@ async function awardXP(resultType) {
   user.xp = user.xp || 0;
   user.stats = user.stats || { wins: 0 };
 
-  let xpGain = 0;
-
+  let xpGained = 0;
   const botLevel = window.xpBotLevelAtEnd ?? getCurrentBotLevel();
   const multipliers = [0.1, 0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 3, 4, 8];
   const multiplier = multipliers[botLevel] || 1;
 
+  // 📋 Osiągnięcia za WIN
   if (resultType === "win") {
     if (playerColor === 'w') unlockAchievement("win_white");
     if (playerColor === 'b') unlockAchievement("win_black");
@@ -2835,6 +2835,14 @@ async function awardXP(resultType) {
 
     xpGained = Math.floor(baseXP * multiplier);
     user.stats.wins++;
+
+    unlockAchievement("first_win");
+    if (user.stats.wins === 5) unlockAchievement("win_5");
+    if (user.stats.wins === 50) unlockAchievement("win_50");
+    if (user.stats.wins === 200) unlockAchievement("win_200");
+
+    unlockAchievement(`bot_${botLevel}`);
+
     let streak = parseInt(localStorage.getItem("winStreak") || "0");
     if (botLevel > 3) {
       streak++;
@@ -2845,75 +2853,68 @@ async function awardXP(resultType) {
     }
     localStorage.setItem("winStreak", streak);
 
-    unlockAchievement("first_win");
-	if (user.stats.wins === 5) unlockAchievement("win_5");
-	if (user.stats.wins === 50) unlockAchievement("win_50");
-	if (user.stats.wins === 200) unlockAchievement("win_200");
-
-    unlockAchievement(`bot_${botLevel}`);
     const lostTo = JSON.parse(localStorage.getItem("lostToBots") || "[]");
     if (lostTo.includes(botLevel)) {
       unlockAchievement("revenge");
       const updated = lostTo.filter(l => l !== botLevel);
       localStorage.setItem("lostToBots", JSON.stringify(updated));
     }
-	const finalLogLen = window.lastMoveLogLength ?? 0;
-	const finalMoveStr = window.lastMoveLogFinalMove ?? "";
-	const scholarsMoveCount = Math.ceil(finalLogLen / 2);
 
-	if (scholarsMoveCount <= 4 && finalMoveStr.endsWith("#")) {
-	  unlockAchievement("scholars_mate");
-	}
-  } else if (resultType === "draw") {
+    const moveLen = window.lastMoveLogLength ?? 0;
+    const lastMove = window.lastMoveLogFinalMove ?? "";
+    const moveCount = Math.ceil(moveLen / 2);
+    if (moveCount <= 4 && lastMove.endsWith("#")) {
+      unlockAchievement("scholars_mate");
+    }
+  }
+
+  // 📋 Osiągnięcia za DRAW
+  else if (resultType === "draw") {
     unlockAchievement("first_draw");
     xpGained = Math.floor(baseXP * multiplier * 0.5);
-  } else if (resultType === "loss") {
-	  unlockAchievement("first_loss");
-	  localStorage.setItem("winStreak", "0");
-	  const level = getCurrentBotLevel();
-	  const prev = JSON.parse(localStorage.getItem("lostToBots") || "[]");
-	  if (!prev.includes(level)) {
-		prev.push(level);
-		localStorage.setItem("lostToBots", JSON.stringify(prev));
-	  }
-	  return; // ⛔ zakończ bez XP
-	}
+    localStorage.setItem("winStreak", "0");
+  }
 
+  // 📋 Osiągnięcia za LOSS
+  else if (resultType === "loss") {
+    unlockAchievement("first_loss");
+    localStorage.setItem("winStreak", "0");
+    const prev = JSON.parse(localStorage.getItem("lostToBots") || "[]");
+    if (!prev.includes(botLevel)) {
+      prev.push(botLevel);
+      localStorage.setItem("lostToBots", JSON.stringify(prev));
+    }
+    return; // ⛔ zakończ bez XP
+  }
 
-let previousLevel = user.level ?? 0;
-let level = user.level ?? 0;
-let totalXP = user.xp + xpGained;
-console.log(`Gracz miał XP ${user.xp} / ${getXpThreshold(user.level)} przed dodaniem ${xpGained} XP`);
-window.previousLevelBeforeAward = previousLevel;
+  // 📋 XP i awans poziomu
+  let previousLevel = user.level ?? 0;
+  let level = user.level ?? 0;
+  let totalXP = user.xp + xpGained;
+  window.previousLevelBeforeAward = previousLevel;
 
+  while (true) {
+    const requiredXP = getXpThreshold(level);
+    if (totalXP < requiredXP) break;
+    totalXP -= requiredXP;
+    level++;
+    checkLevelRewards(level);
+    triggerLevelUpAnimation();
+    setTimeout(() => {
+      showLevelRewardsPopup(level);
+      enforceLocksByLevel();
+      updateProfileUI();
+    }, 2500);
+  }
 
-while (true) {
-  const requiredXP = getXpThreshold(level);
-  if (totalXP < requiredXP) break;
-  totalXP -= requiredXP;
-  level++;
-  checkLevelRewards(level);
-  triggerLevelUpAnimation();
-  setTimeout(() => {
-    showLevelRewardsPopup(level);
-    enforceLocksByLevel();
-    updateProfileUI();
-    if (document.getElementById("avatarSelector").style.display === "flex") openAvatarSelector();
-    if (document.getElementById("backgroundSelector").style.display === "flex") openBackgroundSelector();
-  }, 2500);
-}
-if (user) {
   user.xp = totalXP;
   user.level = level;
   await saveUsers(users);
+
+  await saveProfile();
+  updateProfileUI();
 }
 
-
-await saveProfile();
-updateProfileUI();
-
-  console.log(`XP PRZYZNAWANE: ${xpGained}, baseXP: ${baseXP}, botLevel: ${botLevel}, multiplier: ${multiplier}`);
-}
 
 function hasLostKeyPieceDuringGame() {
   return hasLostPiece;
