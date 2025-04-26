@@ -3198,23 +3198,25 @@ async function renderInvites() {
     content.style.position = "relative";
     content.style.zIndex = "1";
 
-    content.innerHTML = `
-      <div class="friend-card-top">
-        <div class="profile-avatar-wrapper">
-          <img src="img/avatars/${avatar}" class="profile-avatar" />
-          <img src="img/frames/${frame}.png" class="profile-avatar-frame" />
-        </div>
-        <div class="friend-info">
-          <div class="nickname">${fromNick}</div>
-          <div class="id-label">ID: ${fromUser.id}</div>
-          <div class="level">Poziom ${level}</div>
-        </div>
-      </div>
-      <div class="friend-card-bottom">
-        <button onclick="acceptInvite('${fromNick}')">Akceptuj</button>
-        <button onclick="rejectInvite('${fromNick}')">Odrzuć</button>
-      </div>
-    `;
+	content.innerHTML = `
+	  <div class="friend-card-top">
+	    <div class="profile-avatar-wrapper">
+	      <div class="profile-avatar-container">
+	        <img src="img/avatars/${avatar}" class="profile-avatar" />
+	      </div>
+	      <img src="img/frames/${frame}.png" class="profile-avatar-frame" />
+	    </div>
+	    <div class="friend-info">
+	      <div class="nickname">${fromNick}</div>
+	      <div class="id-label">ID: ${fromUser.id}</div>
+	      <div class="level">Poziom ${level}</div>
+	    </div>
+	  </div>
+	  <div class="friend-card-bottom">
+	    <button onclick="acceptInvite('${fromNick}')">Akceptuj</button>
+	    <button onclick="rejectInvite('${fromNick}')">Odrzuć</button>
+	  </div>
+	`;
 
     inviteDiv.appendChild(content);
     inviteList.appendChild(inviteDiv);
