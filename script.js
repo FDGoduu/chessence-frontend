@@ -856,7 +856,7 @@ if (inCheck && !hasLegalMove) {
     hasAwardedXP = true;
   }
 }
-
+}
 
 function updateStatus(newText) {
   const msg = document.getElementById("status");
