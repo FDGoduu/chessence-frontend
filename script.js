@@ -2920,17 +2920,20 @@ function hasLostKeyPieceDuringGame() {
   return hasLostPiece;
 }
 
-async function unlockAchievement(id) {
+async function unlockAchievement(id, usersOverride = null) {
   const currentUser = activeUserNick || localStorage.getItem("currentUser");
-  const users = await getUsers();
+  if (!currentUser) return;
 
-  if (!currentUser || !users[currentUser] || gameMode !== "pvb") return;
-  if (users[currentUser].achievements?.[id]) return;
+  const users = usersOverride || await getUsers();
+  if (!users[currentUser]) return;
+
+  if (users[currentUser].achievements?.[id]) return; // Już zdobyte
 
   users[currentUser].achievements = users[currentUser].achievements || {};
   users[currentUser].achievements[id] = true;
 
   achievements = users[currentUser].achievements;
+
   await saveUsers(users);
 
   const data = achievementsList.find(a => a.id === id);
