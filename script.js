@@ -494,23 +494,10 @@ function getPromotedPiece() {
   });
 }
 
-async function tryMove(sx, sy, dx, dy, simulate = false, promotion = null, isRemote = false){
+function tryMove(sx, sy, dx, dy, simulate = false, promotion = null, isRemote = false) {
   const piece = boardState[sy][sx];
   const target = boardState[dy][dx];
-  const users = await getUsers();
-
   
-if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
-  const attacker = pieceColor(piece);
-  const victim = pieceColor(target);
-
-  // Jeśli bot zbił figurę gracza
-  if (victim === playerColor && attacker !== playerColor) {
-    hasLostPiece = true;
-  }
-}
-
-
   if (!piece || (target && pieceColor(target) === pieceColor(piece))) return false;
   if (target && target.toLowerCase() === 'k') return false;
 
@@ -538,7 +525,6 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
           (gameMode === "online" && currentTurn === playerColor) ||
           (gameMode !== "online" && pieceColor(boardState[sy][sx]) === currentTurn)
         );
-      
         if (isOurPiece && !isBotTurn() && !isRemote) {
           promotionContext = { sx, sy, dx, dy, isWhite };
           showPromotionModal(isWhite);
@@ -552,7 +538,7 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
               : (isWhite ? 'Q' : 'q');
           }
         }
-      }                    
+      }
 
       if (dx === sx && dy - sy === direction && !target) {
         move(sy, sx, dy, dx, newPiece);
@@ -560,64 +546,46 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
         break;
       }
 
-      if (
-        sy === startRow &&
-        dx === sx &&
-        dy - sy === 2 * direction &&
-        !boardState[sy + direction][sx] &&
-        !boardState[dy][dx]
-      ) {
+      if (sy === startRow &&
+          dx === sx &&
+          dy - sy === 2 * direction &&
+          !boardState[sy + direction][sx] &&
+          !boardState[dy][dx]) {
         move(sy, sx, dy, dx, newPiece);
         if (!simulate) enPassantTarget = { x: dx, y: sy + direction };
         break;
       }
 
-	// BICIE PIONKIEM lub EN PASSANT
-	if (dxAbs === 1 && dy - sy === direction) {
-	  // Normalne bicie
-	if (target && pieceColor(target) !== pieceColor(piece)) {
-	  move(sy, sx, dy, dx, newPiece);
+      // Bicie pionkiem lub en passant
+      if (dxAbs === 1 && dy - sy === direction) {
+        // Normalne bicie
+        if (target && pieceColor(target) !== pieceColor(piece)) {
+          move(sy, sx, dy, dx, newPiece);
+          if (!simulate) enPassantTarget = null;
+          return true;
+        }
 
-	  // jeśli symulacja – sprawdź czy król nadal nie pod szachem
-	  if (simulate) {
-		const tempColor = pieceColor(piece);
-		const king = findKing(tempColor);
-		if (isSquareAttacked(king.x, king.y, tempColor === 'w' ? 'b' : 'w')) {
-		  return false;
-		}
-	  }
+        // En passant
+        if (
+          enPassantTarget &&
+          enPassantTarget.x === dx &&
+          enPassantTarget.y === dy &&
+          boardState[sy][dx] && 
+          pieceColor(boardState[sy][dx]) !== pieceColor(piece)
+        ) {
+          move(sy, sx, dy, dx, newPiece);
+          if (!simulate) {
+            boardState[sy][dx] = '';
+            enPassantTarget = null;
+            if (gameMode === "pvb" && !achievements["enpassant"]) {
+              window.enPassantCaptured = true;
+            }
+          }
+          return true;
+        }
+        return false;
+      }
 
-	  if (!simulate) enPassantTarget = null;
-	  return true;
-	}
-
-	  // En passant – tylko jeśli enPassantTarget zgadza się i bijesz pionka przeciwnika
-	if (
-	  enPassantTarget &&
-	  enPassantTarget.x === dx &&
-	  enPassantTarget.y === dy &&
-	  boardState[sy][dx] && 
-	  pieceColor(boardState[sy][dx]) !== pieceColor(piece)
-	) {
-	  move(sy, sx, dy, dx, newPiece);
-	  if (!simulate) {
-	    boardState[sy][dx] = '';
-	    enPassantTarget = null;
-	
-	    // 🏆 Osiągnięcie za en passant
-	    if (gameMode === "pvb" && !achievements["enpassant"]) {
-	      unlockAchievement("enpassant", users);
-	    }
-	  }
-	  return true;
-	}
-
-	  return false;
-	}
-	if (!simulate) {
-	  // blokuj dziwne stany (np. enPassantTarget na końcu tury)
-	  enPassantTarget = null;
-	}
       return false;
     }
 
@@ -674,7 +642,7 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
           !isSquareAttacked(sx + 2, sy, isWhite ? 'b' : 'w')) {
 
         if (!simulate && gameMode === "pvb" && !achievements["castling"]) {
-          unlockAchievement("castling", users);
+          window.castlingCaptured = true;
         }
 
         if (!simulate) {
@@ -707,7 +675,7 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
           !isSquareAttacked(sx - 2, sy, isWhite ? 'b' : 'w')) {
 
         if (!simulate && gameMode === "pvb" && !achievements["castling"]) {
-          unlockAchievement("castling", users);
+          window.castlingCaptured = true;
         }
 
         if (!simulate) {
@@ -732,18 +700,16 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
     }
   }
 
-	// 🔐 SZACH CHECK – symulacja: sprawdź, czy po ruchu nasz król nie jest pod szachem
-	if (simulate) {
-	  const tempColor = pieceColor(piece);
-	  const king = findKing(tempColor);
-	  if (isSquareAttacked(king.x, king.y, tempColor === 'w' ? 'b' : 'w')) {
-		return false;
-	  }
-	}
+  if (simulate) {
+    const tempColor = pieceColor(piece);
+    const king = findKing(tempColor);
+    if (isSquareAttacked(king.x, king.y, tempColor === 'w' ? 'b' : 'w')) {
+      return false;
+    }
+  }
 
   return true;
 }
-
 
 
 function isBotTurn() {
