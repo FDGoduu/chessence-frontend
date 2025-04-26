@@ -1,5 +1,5 @@
 const board = document.getElementById("board");
-const loginButton = document.getElementById("loginButton"); // 🔥 DODANE!
+const loginButton = document.getElementById("loginSubmit"); // 🔥 DODANE!
 let socket = null;
 const API_BASE = "https://chessence-backend.onrender.com";
 let activeUserNick = null; // 🧠 aktualnie zalogowany użytkownik w tej karcie
