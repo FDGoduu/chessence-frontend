@@ -750,8 +750,9 @@ function getCurrentBotLevel() {
 
 function updateGameStatus() {
   const msg = document.getElementById("status");
-	if (!msg) return;
-	msg.classList.remove("alert");
+  if (!msg) return;
+  msg.classList.remove("alert");
+  
   const endScreen = document.getElementById("endScreen");
   const endMessage = document.getElementById("endMessage");
   const boardWrapper = document.getElementById("board").parentElement;
@@ -777,90 +778,100 @@ function updateGameStatus() {
   const inCheck = isSquareAttacked(kingX, kingY, isWhite ? 'b' : 'w');
 
   // Czy ma jakikolwiek legalny ruch?
-let hasLegalMove = false;
+  let hasLegalMove = false;
+  outer:
+  for (let sy = 0; sy < 8; sy++) {
+    for (let sx = 0; sx < 8; sx++) {
+      const piece = boardState[sy][sx];
+      if (!piece || pieceColor(piece) !== currentTurn) continue;
 
-outer:
-for (let sy = 0; sy < 8; sy++) {
-  for (let sx = 0; sx < 8; sx++) {
-    const piece = boardState[sy][sx];
-    if (!piece || pieceColor(piece) !== currentTurn) continue;
+      for (let dy = 0; dy < 8; dy++) {
+        for (let dx = 0; dx < 8; dx++) {
+          const tempBoard = JSON.parse(JSON.stringify(boardState));
+          const tempEnPassant = enPassantTarget ? { ...enPassantTarget } : null;
 
-    for (let dy = 0; dy < 8; dy++) {
-      for (let dx = 0; dx < 8; dx++) {
-        const tempBoard = JSON.parse(JSON.stringify(boardState));
-        const tempEnPassant = enPassantTarget ? { ...enPassantTarget } : null;
+          if (tryMove(sx, sy, dx, dy, true)) {
+            boardState = tempBoard;
+            enPassantTarget = tempEnPassant;
+            hasLegalMove = true;
+            break outer;
+          }
 
-        if (tryMove(sx, sy, dx, dy, true)) {
           boardState = tempBoard;
           enPassantTarget = tempEnPassant;
-          hasLegalMove = true;
-          break outer;
         }
-
-        boardState = tempBoard;
-        enPassantTarget = tempEnPassant;
       }
     }
   }
-}
 
-// Logika komunikatów
-if (inCheck && !hasLegalMove) {
-  updateStatus("🔥 SZACH-MAT!");
-  msg.classList.add("alert");
+  // 🔥 Logika zakończenia gry
+  if (inCheck && !hasLegalMove) {
+    updateStatus("🔥 SZACH-MAT!");
+    msg.classList.add("alert");
 
-  // overlay animacja szach-matu
-  const mateOverlay = document.getElementById("mateOverlay");
-  mateOverlay.classList.remove("show-mate");
-  void mateOverlay.offsetWidth;
-  mateOverlay.style.display = "flex";
-  mateOverlay.classList.add("show-mate");
-
-  setTimeout(() => {
+    const mateOverlay = document.getElementById("mateOverlay");
     mateOverlay.classList.remove("show-mate");
-    mateOverlay.style.display = "none";
-  }, 2500);
+    void mateOverlay.offsetWidth;
+    mateOverlay.style.display = "flex";
+    mateOverlay.classList.add("show-mate");
 
-  if (gameMode === "pvb") {
-    const playerWon = currentTurn !== playerColor;
-    window.xpPendingResult = playerWon ? "win" : "loss";
-    window.xpBotLevelAtEnd = getCurrentBotLevel();
+    setTimeout(() => {
+      mateOverlay.classList.remove("show-mate");
+      mateOverlay.style.display = "none";
+    }, 2500);
+
+    endScreen.style.display = "flex";
+    endMessage.textContent = (currentTurn === 'w' ? "Czarne" : "Białe") + " wygrywają!";
+
+    if (gameMode === "pvb") {
+      const playerWon = currentTurn !== playerColor;
+      window.xpPendingResult = playerWon ? "win" : "loss";
+      window.lastMoveLogLength = moveLog.length;
+      window.lastMoveLogFinalMove = moveLog.at(-1) ?? "";
+
+      if (typeof window.xpBotLevelAtEnd === "undefined") {
+        window.xpBotLevelAtEnd = getCurrentBotLevel();
+      }
+
+      // 🔥 Przyznaj XP natychmiast po zakończeniu
+      awardXP(window.xpPendingResult);
+      delete window.xpPendingResult;
+    }
+
+    window.hasLostPieceFinal = hasLostPiece;
+    gameEnded = true;
+
+  } else if (!inCheck && !hasLegalMove) {
+    updateStatus("🤝 PAT – REMIS");
+    msg.classList.add("alert");
+
+    endScreen.style.display = "block";
+    endMessage.textContent = "Partia zakończona remisem.";
+
+    if (gameMode === "pvb") {
+      window.xpPendingResult = "draw";
+      window.xpBotLevelAtEnd = getCurrentBotLevel();
+
+      // 🔥 Przyznaj XP natychmiast po remisie
+      awardXP(window.xpPendingResult);
+      delete window.xpPendingResult;
+    }
+
+    gameEnded = true;
+
+  } else if (inCheck && hasLegalMove) {
+    updateStatus("🚨 SZACH dla " + (currentTurn === 'w' ? "białych" : "czarnych") + "!");
+    msg.classList.add("alert");
+    boardWrapper.classList.add("shake", "board-warning");
+    setTimeout(() => {
+      boardWrapper.classList.remove("shake", "board-warning");
+    }, 500);
+
+  } else {
+    updateStatus("Ruch: " + (currentTurn === 'w' ? "biały" : "czarny"));
   }
-
-  endScreen.style.display = "flex";
-  endMessage.textContent = (currentTurn === 'w' ? "Czarne" : "Białe") + " wygrywają!";
-
-  // 🔥 NA KONIEC: XP i zakończenie
-  if (gameMode === "pvb" && typeof window.xpPendingResult !== "undefined" && !hasAwardedXP) {
-    awardXP(window.xpPendingResult);
-    delete window.xpPendingResult;
-    hasAwardedXP = true;
-  }
-
-  window.hasLostPieceFinal = hasLostPiece;
-  gameEnded = true;
-
-} else if (!inCheck && !hasLegalMove) {
-  updateStatus("🤝 PAT – REMIS");
-  msg.classList.add("alert");
-
-  if (gameMode === "pvb") {
-    window.xpPendingResult = "draw";
-    window.xpBotLevelAtEnd = getCurrentBotLevel();
-  }
-
-  endScreen.style.display = "block";
-  endMessage.textContent = "Partia zakończona remisem.";
-
-  // 🔥 NA KONIEC: XP i zakończenie
-  if (gameMode === "pvb" && typeof window.xpPendingResult !== "undefined" && !hasAwardedXP) {
-    awardXP(window.xpPendingResult);
-    delete window.xpPendingResult;
-    hasAwardedXP = true;
-  }
-  gameEnded = true;
 }
-}
+
 
 function updateStatus(newText) {
   const msg = document.getElementById("status");
