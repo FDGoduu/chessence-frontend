@@ -809,6 +809,7 @@ if (inCheck && !hasLegalMove) {
   updateStatus("🔥 SZACH-MAT!");
   msg.classList.add("alert");
 
+  // overlay animacja szach-matu
   const mateOverlay = document.getElementById("mateOverlay");
   mateOverlay.classList.remove("show-mate");
   void mateOverlay.offsetWidth;
@@ -828,14 +829,16 @@ if (inCheck && !hasLegalMove) {
 
   endScreen.style.display = "flex";
   endMessage.textContent = (currentTurn === 'w' ? "Czarne" : "Białe") + " wygrywają!";
-  gameEnded = true;
-  window.hasLostPieceFinal = hasLostPiece;
 
+  // 🔥 NA KONIEC: XP i zakończenie
   if (gameMode === "pvb" && typeof window.xpPendingResult !== "undefined" && !hasAwardedXP) {
     awardXP(window.xpPendingResult);
     delete window.xpPendingResult;
     hasAwardedXP = true;
   }
+
+  window.hasLostPieceFinal = hasLostPiece;
+  gameEnded = true;
 
 } else if (!inCheck && !hasLegalMove) {
   updateStatus("🤝 PAT – REMIS");
@@ -848,13 +851,14 @@ if (inCheck && !hasLegalMove) {
 
   endScreen.style.display = "block";
   endMessage.textContent = "Partia zakończona remisem.";
-  gameEnded = true;
 
+  // 🔥 NA KONIEC: XP i zakończenie
   if (gameMode === "pvb" && typeof window.xpPendingResult !== "undefined" && !hasAwardedXP) {
     awardXP(window.xpPendingResult);
     delete window.xpPendingResult;
     hasAwardedXP = true;
   }
+  gameEnded = true;
 }
 }
 
