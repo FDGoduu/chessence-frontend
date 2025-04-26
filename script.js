@@ -3952,25 +3952,22 @@ document.getElementById("registerSubmit").addEventListener("click", async () => 
     alert("Rejestracja nie powiodła się. Być może nick już istnieje.");
   }
 });
-document.getElementById("loginSubmit").addEventListener("click", async () => {
-  const nick = document.getElementById("loginNickname").value.trim();
-  const pass = document.getElementById("loginPassword").value;
-
-  if (!nick || !pass) {
-    alert("Podaj nick i hasło.");
-    return;
-  }
+loginButton.addEventListener('click', async () => {
+  const nick = document.getElementById('loginNick').value.trim();
+  const pass = document.getElementById('loginPassword').value.trim();
 
   try {
     await loginUser(nick, pass); 
-	await refreshUsers(); // 🔥 dodaj odświeżenie usersCache!
-	await startGameWithUser(nick);
-	
-	const users = await getUsers(); // 🔥 teraz masz users dostępne
-	socket.emit('registerPlayer', {
-	  nick: nick,
-	  id: users[nick].id
-	});
+    await refreshUsers();   // 🔥 pobieramy users.json z serwera
+    const users = await getUsers(); // 🔥 musimy pobrać users z localStorage
+
+    await startGameWithUser(nick);
+
+    socket.emit('registerPlayer', {
+      nick: nick,
+      id: users[nick].id
+    });
+
   } catch (error) {
     console.error(error);
     alert("Logowanie nie powiodło się. Sprawdź dane.");
