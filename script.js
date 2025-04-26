@@ -3069,23 +3069,22 @@ async function renderFriendsList() {
   await refreshUsers(); // 🔥 pobieramy najnowsze users.json
   const container = document.getElementById("friendsList");
   container.innerHTML = "";
-  const users = await getUsers();
-  const nick = localStorage.getItem("currentUser");
-  const current = users[nick];
-  if (!current) return;
+const users = await getUsers();
+const currentUser = localStorage.getItem("currentUser");
+const myUser = users[currentUser];
 
+const container = document.getElementById("friendsList");
+container.innerHTML = "";
 
-  if (!current.friends || current.friends.length === 0) {
-    container.innerHTML = "<p>Brak znajomych.</p>";
-    return;
-  }
+// 🔥 Usuwamy duplikaty
+const uniqueFriends = [...new Set(myUser.friends)];
 
-current.friends.forEach(friendNick => {
+uniqueFriends.forEach(friendNick => {
   const friend = users[friendNick];
   if (!friend) return;
 
-  const avatar = (friend.ui?.avatar) || "avatar1.png";
-  const frame = (friend.ui?.frame) || "default_frame";
+  const avatar = friend.ui?.avatar || "avatar1.png";
+  const frame = friend.ui?.frame || "default_frame";
 
   const div = document.createElement("div");
   div.className = "friend-entry";
@@ -3109,9 +3108,8 @@ current.friends.forEach(friendNick => {
     </div>
   `;
   container.appendChild(div);
-});
+});}
 
-}
 
 // ✅ Dodaj zaproszenie do znajomych
 async function sendFriendRequest(targetNickOrId) {
