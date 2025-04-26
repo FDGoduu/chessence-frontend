@@ -3962,8 +3962,11 @@ document.getElementById("loginSubmit").addEventListener("click", async () => {
   }
 
   try {
-    await loginUser(nick, pass); // poprawne logowanie przez serwer
-    await startGameWithUser(nick);
+    await loginUser(nick, pass); 
+	await refreshUsers(); // 🔥 dodaj odświeżenie usersCache!
+	await startGameWithUser(nick);
+	
+	const users = await getUsers(); // 🔥 teraz masz users dostępne
 	socket.emit('registerPlayer', {
 	  nick: nick,
 	  id: users[nick].id
