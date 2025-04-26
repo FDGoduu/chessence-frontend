@@ -592,20 +592,25 @@ if (!simulate && target && "rnbq".includes(target.toLowerCase())) {
 	}
 
 	  // En passant – tylko jeśli enPassantTarget zgadza się i bijesz pionka przeciwnika
-	  if (
-		enPassantTarget &&
-		enPassantTarget.x === dx &&
-		enPassantTarget.y === dy &&
-		boardState[sy][dx] && // musi być pion do zbicia!
-		pieceColor(boardState[sy][dx]) !== pieceColor(piece)
-	  ) {
-		move(sy, sx, dy, dx, newPiece);
-		if (!simulate) {
-		  boardState[sy][dx] = '';
-		  enPassantTarget = null;
-		}
-		return true;
+	if (
+	  enPassantTarget &&
+	  enPassantTarget.x === dx &&
+	  enPassantTarget.y === dy &&
+	  boardState[sy][dx] && 
+	  pieceColor(boardState[sy][dx]) !== pieceColor(piece)
+	) {
+	  move(sy, sx, dy, dx, newPiece);
+	  if (!simulate) {
+	    boardState[sy][dx] = '';
+	    enPassantTarget = null;
+	
+	    // 🏆 Osiągnięcie za en passant
+	    if (gameMode === "pvb" && !achievements["enpassant"]) {
+	      unlockAchievement("enpassant", users);
+	    }
 	  }
+	  return true;
+	}
 
 	  return false;
 	}
