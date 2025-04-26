@@ -3066,9 +3066,7 @@ function showFriendsTab() {
 }
 
 async function renderFriendsList() {
-  await refreshUsers(); // 🔥 pobieramy najnowsze users.json
-  const container = document.getElementById("friendsList");
-  container.innerHTML = "";
+await refreshUsers(); // 🔥 pobieramy najnowsze users.json
 const users = await getUsers();
 const currentUser = localStorage.getItem("currentUser");
 const myUser = users[currentUser];
