@@ -820,7 +820,6 @@ if (inCheck && !hasLegalMove) {
     mateOverlay.style.display = "none";
   }, 2500);
 
-  // 🔥 Wynik gry PvB - wygrana/przegrana
   if (gameMode === "pvb") {
     const playerWon = currentTurn !== playerColor;
     window.xpPendingResult = playerWon ? "win" : "loss";
@@ -830,18 +829,15 @@ if (inCheck && !hasLegalMove) {
   endScreen.style.display = "flex";
   endMessage.textContent = (currentTurn === 'w' ? "Czarne" : "Białe") + " wygrywają!";
   gameEnded = true;
+  window.hasLostPieceFinal = hasLostPiece;
 
-  // 🔥 Przyznanie XP (raz) po zakończeniu gry
   if (gameMode === "pvb" && typeof window.xpPendingResult !== "undefined" && !hasAwardedXP) {
     awardXP(window.xpPendingResult);
     delete window.xpPendingResult;
     hasAwardedXP = true;
   }
 
-  window.hasLostPieceFinal = hasLostPiece;
-  
 } else if (!inCheck && !hasLegalMove) {
-  // 🔥 Remis - PAT
   updateStatus("🤝 PAT – REMIS");
   msg.classList.add("alert");
 
@@ -854,24 +850,13 @@ if (inCheck && !hasLegalMove) {
   endMessage.textContent = "Partia zakończona remisem.";
   gameEnded = true;
 
-  // 🔥 Przyznanie XP (raz) po zakończeniu gry
   if (gameMode === "pvb" && typeof window.xpPendingResult !== "undefined" && !hasAwardedXP) {
     awardXP(window.xpPendingResult);
     delete window.xpPendingResult;
     hasAwardedXP = true;
   }
 }
-    else if (inCheck && hasLegalMove) {
-    updateStatus("🚨 SZACH dla " + (currentTurn === 'w' ? "białych" : "czarnych") + "!");
-    msg.classList.add("alert");
-    boardWrapper.classList.add("shake", "board-warning");
-    setTimeout(() => {
-      boardWrapper.classList.remove("shake", "board-warning");
-    }, 500);
-  } else {
-    updateStatus("Ruch: " + (currentTurn === 'w' ? "biały" : "czarny"));
-  }
-}
+
 
 function updateStatus(newText) {
   const msg = document.getElementById("status");
