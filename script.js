@@ -2829,25 +2829,25 @@ async function awardXP(resultType) {
 
   // 📋 Osiągnięcia za WIN
   if (resultType === "win") {
-    if (playerColor === 'w') unlockAchievement("win_white");
-    if (playerColor === 'b') unlockAchievement("win_black");
-    if (!window.hasLostPieceFinal) unlockAchievement("no_piece_lost");
+    if (playerColor === 'w') unlockAchievement("win_white", users);
+    if (playerColor === 'b') unlockAchievement("win_black", users);
+    if (!window.hasLostPieceFinal) unlockAchievement("no_piece_lost", users);
 
     xpGained = Math.floor(baseXP * multiplier);
     user.stats.wins++;
 
-    unlockAchievement("first_win");
-    if (user.stats.wins === 5) unlockAchievement("win_5");
-    if (user.stats.wins === 50) unlockAchievement("win_50");
-    if (user.stats.wins === 200) unlockAchievement("win_200");
+    unlockAchievement("first_win", users);
+    if (user.stats.wins === 5) unlockAchievement("win_5", users);
+    if (user.stats.wins === 50) unlockAchievement("win_50", users);
+    if (user.stats.wins === 200) unlockAchievement("win_200", users);
 
-    unlockAchievement(`bot_${botLevel}`);
+    unlockAchievement(`bot_${botLevel}`, users);
 
     let streak = parseInt(localStorage.getItem("winStreak") || "0");
     if (botLevel > 3) {
       streak++;
-      if (streak === 3) unlockAchievement("win_streak_3");
-      if (streak === 5) unlockAchievement("win_streak_5");
+      if (streak === 3) unlockAchievement("win_streak_3", users);
+      if (streak === 5) unlockAchievement("win_streak_5", users);
     } else {
       streak = 0;
     }
@@ -2855,7 +2855,7 @@ async function awardXP(resultType) {
 
     const lostTo = JSON.parse(localStorage.getItem("lostToBots") || "[]");
     if (lostTo.includes(botLevel)) {
-      unlockAchievement("revenge");
+      unlockAchievement("revenge", users);
       const updated = lostTo.filter(l => l !== botLevel);
       localStorage.setItem("lostToBots", JSON.stringify(updated));
     }
@@ -2864,20 +2864,20 @@ async function awardXP(resultType) {
     const lastMove = window.lastMoveLogFinalMove ?? "";
     const moveCount = Math.ceil(moveLen / 2);
     if (moveCount <= 4 && lastMove.endsWith("#")) {
-      unlockAchievement("scholars_mate");
+      unlockAchievement("scholars_mate", users);
     }
   }
 
   // 📋 Osiągnięcia za DRAW
   else if (resultType === "draw") {
-    unlockAchievement("first_draw");
+    unlockAchievement("first_draw", users);
     xpGained = Math.floor(baseXP * multiplier * 0.5);
     localStorage.setItem("winStreak", "0");
   }
 
   // 📋 Osiągnięcia za LOSS
   else if (resultType === "loss") {
-    unlockAchievement("first_loss");
+    unlockAchievement("first_loss", users);
     localStorage.setItem("winStreak", "0");
     const prev = JSON.parse(localStorage.getItem("lostToBots") || "[]");
     if (!prev.includes(botLevel)) {
