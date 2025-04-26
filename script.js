@@ -2631,7 +2631,7 @@ async function openProfileScreen(friendId = null) {
 
 const isOwnProfile = !viewingFriendProfile;
 const users = await getUsers();
-await refreshFriends(); // 🔥 automatyczny refresh znajomych po wejściu w profil
+await renderFriendsList(); // 🔥 automatyczny refresh znajomych po wejściu w profil
 
 
 document.getElementById("resetProgressBtn").style.display = isOwnProfile ? "inline-block" : "none";
@@ -3080,48 +3080,55 @@ function showFriendsTab() {
 }
 
 async function renderFriendsList() {
-await refreshUsers(); // 🔥 pobieramy najnowsze users.json
-const users = await getUsers();
-const currentUser = localStorage.getItem("currentUser");
-const myUser = users[currentUser];
+  await refreshUsers(); // 🔥 pobieramy najnowsze users.json
+  const users = await getUsers();
+  const currentUser = localStorage.getItem("currentUser");
+  if (!currentUser || !users[currentUser]) return;
 
-const container = document.getElementById("friendsList");
-container.innerHTML = "";
+  const myUser = users[currentUser];
+  const container = document.getElementById("friendsList");
+  if (!container) return;
+  container.innerHTML = "";
 
-// 🔥 Usuwamy duplikaty
-const uniqueFriends = [...new Set(myUser.friends)];
+  const uniqueFriends = [...new Set(myUser.friends || [])]; // 🔥 upewniamy się, że istnieje lista
 
-uniqueFriends.forEach(friendNick => {
-  const friend = users[friendNick];
-  if (!friend) return;
+  uniqueFriends.forEach(friendNick => {
+    const friend = users[friendNick];
+    if (!friend) return;
 
-  const avatar = friend.ui?.avatar || "avatar1.png";
-  const frame = friend.ui?.frame || "default_frame";
+    const avatar = friend.ui?.avatar || "avatar1.png";
+    const frame = friend.ui?.frame || "default_frame";
+    const background = friend.ui?.background || "bg0.png";
+    const level = typeof friend.level === "number" ? friend.level : 0;
 
-  const div = document.createElement("div");
-  div.className = "friend-entry";
-  div.style.backgroundImage = `url('img/backgrounds/${friend.ui?.background || "bg0.png"}')`;
-  div.innerHTML = `
-    <div class="friend-card-top">
-      <div class="profile-avatar-wrapper">
-        <img src="img/avatars/${avatar}" class="profile-avatar">
-        <img src="img/frames/${frame}.png" class="profile-avatar-frame">
+    const div = document.createElement("div");
+    div.className = "friend-entry";
+    div.style.backgroundImage = `url('img/backgrounds/${background}')`;
+    div.style.backgroundSize = "cover";
+    div.style.backgroundPosition = "center";
+
+    div.innerHTML = `
+      <div class="friend-card-top">
+        <div class="profile-avatar-wrapper">
+          <img src="img/avatars/${avatar}" class="profile-avatar">
+          <img src="img/frames/${frame}.png" class="profile-avatar-frame">
+        </div>
+        <div class="friend-info">
+          <div class="nickname">${friendNick}</div>
+          <div class="id-label">ID: ${friend.id}</div>
+          <div class="level">Poziom ${level}</div>
+        </div>
       </div>
-      <div class="friend-info">
-        <div class="nickname">${friendNick}</div>
-        <div class="id-label">ID: ${friend.id}</div>
-        <div class="level">Poziom: ${friend.level || 0}</div>
+      <div class="friend-card-bottom">
+        <button onclick="inviteToGame('${friend.id}')">Zaproś do gry</button>
+        <button onclick="viewFriendProfile('${friend.id}')">Profil</button>
+        <button onclick="removeFriend('${friendNick}')">Usuń</button>
       </div>
-    </div>
-    <div class="friend-card-bottom">
-      <button onclick="inviteToGame('${friend.id}')">Zaproś do gry</button>
-      <button onclick="viewFriendProfile('${friend.id}')">Profil</button>
-      <button onclick="removeFriend('${friendNick}')">Usuń</button>
-    </div>
-  `;
-  container.appendChild(div);
-});}
+    `;
 
+    container.appendChild(div);
+  });
+}
 
 // ✅ Dodaj zaproszenie do znajomych
 async function sendFriendRequest(targetNickOrId) {
@@ -3671,8 +3678,8 @@ function setOnlineStatus(msg) {
   document.getElementById("onlineStatus").innerText = msg;
 }
 
-socket.on('refreshFriends', async () => {
-  console.log("🔄 Odbieram refreshFriends");
+socket.on('renderFriendsList', async () => {
+  console.log("🔄 Odbieram renderFriendsList");
   await refreshUsers();
   renderFriendsList();
 });
@@ -3920,7 +3927,7 @@ await refreshUsers();
     await validateUnlockedRewards();
     await enforceLocksByLevel();
     await validateFriendsList(); // 🛡️ sprawdzanie znajomych
-    await refreshFriends(); // 🔥 automatyczny refresh znajomych po zalogowaniu
+    await renderFriendsList(); // 🔥 automatyczny refresh znajomych po zalogowaniu
   } catch (error) {
     console.error('Błąd logowania:', error);
   }
