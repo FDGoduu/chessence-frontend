@@ -3986,28 +3986,28 @@ document.getElementById("deleteAccountBtn").addEventListener("click", async () =
   if (!pass) return;
 
   const currentUser = activeUserNick || localStorage.getItem("currentUser");
-  const users = await getUsers();
 
-  if (!users[currentUser]) return alert("Błąd: użytkownik nie istnieje.");
-  if (users[currentUser].password !== pass) return alert("Nieprawidłowe hasło.");
-
-  if (confirm("Na pewno chcesz USUNĄĆ swoje konto? Tej operacji nie można cofnąć.")) {
-    delete users[currentUser];
-    await saveUsers(users);
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("selectedAvatar");
-    localStorage.removeItem("selectedBackground");
-    localStorage.removeItem("selectedFrame");
-    localStorage.setItem("winStreak", "0");
-    localStorage.setItem("lostToBots", "[]");
-    localStorage.setItem("playerStats", JSON.stringify({ wins: 0 }));
-    Object.keys(localStorage).forEach(k => {
-      if (k.startsWith("unlocked_")) localStorage.removeItem(k);
+  try {
+    const response = await fetch(`${API_BASE}/api/users/delete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nick: currentUser, password: pass })
     });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || "Błąd serwera");
+    }
+
     alert("Twoje konto zostało usunięte.");
+    localStorage.clear();
     showScreen("registerScreen");
+  } catch (error) {
+    console.error(error);
+    alert("Nie udało się usunąć konta: " + error.message);
   }
 });
+
 document.getElementById("resetProgressBtn").addEventListener("click", resetProfile);
 document.getElementById("profileAvatar").addEventListener("click", () => {
   openAvatarSelector();
