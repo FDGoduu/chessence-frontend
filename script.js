@@ -14,11 +14,19 @@ try {
 } catch (e) {
   console.warn("🔴 Nie można połączyć z serwerem socket.io (tryb online wyłączony)");
 }
+
 socket.on('refreshFriends', async () => {
   await refreshUsers();
-  await renderFriendsList();
-  await renderInvites();
+
+  if (document.getElementById("friendsTab")?.style.display === "block") {
+    await renderFriendsList();
+  }
+
+  if (document.getElementById("invitesTab")?.style.display === "block") {
+    await renderInvites();
+  }
 });
+
 
 let currentRoomCode = null;
 let lastSentMove = null;
