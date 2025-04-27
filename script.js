@@ -3884,19 +3884,22 @@ if (socket) {
     setOnlineStatus(`❌ Błąd: ${message}`);
   });
 
-  socket.on("startGame", ({ colorMap }) => {
-    const myColor = colorMap[socket.id];
-    startGameOnline(myColor);
-  
-    // ⬇️ ZAPISZ KOD POKOJU JEŚLI JESZCZE NIE MA
-    if (!currentRoomCode) {
-      currentRoomCode = document.getElementById("roomCodeInput").value.trim().toUpperCase();
-      console.log("📝 currentRoomCode ustawione na podstawie inputa:", currentRoomCode);
-    }
-  
-    document.getElementById("startGame").click();
-  });
-  
+socket.on("startGame", ({ colorMap, roomCode }) => {
+  const myColor = colorMap[socket.id];
+  startGameOnline(myColor);
+
+  // ✅ Ustaw roomCode na podstawie danych od serwera
+  currentRoomCode = roomCode;
+  console.log("📝 currentRoomCode ustawione na podstawie servera:", currentRoomCode);
+
+  // ✅ Jeśli jesteś w widoku profilu – zamknij profil
+  if (viewingFriendProfile) {
+    closeProfileScreen();
+  }
+
+  // ✅ Rozpocznij grę
+  document.getElementById("startGame").click();
+});
 
   socket.on("opponentMove", ({ from, to, promotion, senderId, newTurn }) => {
     console.log("📥 Otrzymano opponentMove:", { from, to, promotion, senderId, newTurn });
