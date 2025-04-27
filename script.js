@@ -3175,24 +3175,24 @@ async function updateAchievementsUI() {
 function openProfileTab(tabName) {
   document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('.profile-tab-content').forEach(tab => {
-    tab.style.display = 'none';
-    tab.classList.remove('fade-in', 'fade-out');
+    tab.style.opacity = 0;
+    tab.style.pointerEvents = 'none';
   });
 
   const targetButton = document.getElementById(`tab-${tabName}`);
   const targetContent = document.getElementById(`tabContent-${tabName}`);
-  
+
   if (targetButton) targetButton.classList.add('active');
 
   if (targetContent) {
     targetContent.style.display = 'block';
-    targetContent.classList.add('fade-in');
     setTimeout(() => {
-      targetContent.classList.remove('fade-in');
-    }, 300); // czas trwania fade
+      targetContent.style.opacity = 1;
+      targetContent.style.pointerEvents = 'auto';
+    }, 50);
   }
 
-  // 🔥 Jeśli przechodzimy na zakładkę friends – wtedy odświeżamy listy
+  // Jeśli friends, odśwież listy
   if (tabName === "friends") {
     refreshUsers().then(() => {
       renderFriendsList();
