@@ -2791,10 +2791,6 @@ async function openProfileScreen(friendId = null) {
   requestAnimationFrame(() =>
     requestAnimationFrame(() => openProfileTab("achievements"))
   );
-document.querySelectorAll(".profile-tab-content").forEach(tab => {
-  tab.style.display = "none";
-});
-document.getElementById("tabContent-achievements").style.display = "block"; // default na start
 }
 
 
@@ -3172,33 +3168,35 @@ async function updateAchievementsUI() {
   }
 }
 
+
 function openProfileTab(tabName) {
+const content = document.getElementById("profileContent");
+
+// 🔥 UWAGA: jeśli wchodzimy na "friends" to NIE rób fade-out na całym profileContent
+if (tabName !== "friends") {
+  content.classList.add("fade-out");
+}
+
+setTimeout(() => {
+  // zmiana treści
   document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.profile-tab-content').forEach(tab => {
-    tab.style.opacity = 0;
-    tab.style.pointerEvents = 'none';
+  document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
+    tab.style.display = 'none';
+    tab.classList.remove('fade-in');
   });
 
   const targetButton = document.getElementById(`tab-${tabName}`);
   const targetContent = document.getElementById(`tabContent-${tabName}`);
-
   if (targetButton) targetButton.classList.add('active');
-
   if (targetContent) {
     targetContent.style.display = 'block';
-    setTimeout(() => {
-      targetContent.style.opacity = 1;
-      targetContent.style.pointerEvents = 'auto';
-    }, 50);
+    targetContent.classList.add('fade-in');
   }
 
-  // Jeśli friends, odśwież listy
-  if (tabName === "friends") {
-    refreshUsers().then(() => {
-      renderFriendsList();
-      renderInvites();
-    });
-  }
+  content.classList.remove("fade-out");
+  content.classList.add("fade-in");
+  setTimeout(() => content.classList.remove("fade-in"), 250);
+}, 200);
 }
 
 async function showFriendsTab() {
@@ -4208,7 +4206,6 @@ function initBackToOwnProfileBtn() {
 document.addEventListener("DOMContentLoaded", () => {
   initBackToOwnProfileBtn(); // będzie dostępne po załadowaniu DOM
 });
-
 
 
 
