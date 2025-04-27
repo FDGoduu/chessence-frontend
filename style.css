@@ -2890,15 +2890,53 @@ body {
 
 .buttons-column {
   width: 15%;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.25);
   padding: 20px;
   border-radius: 14px;
   height: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  overflow-y: auto;
+  gap: 15px;
+}
+
+.profile-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ccc;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.2s;
+}
+
+.profile-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.friend-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.friend-input::placeholder {
+  color: #888;
+}
+
+.friend-input:focus {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #888;
+  color: #fff;
 }
 
 /* Scroll listy znajomych i zaproszeń */
