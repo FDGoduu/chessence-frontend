@@ -2860,50 +2860,58 @@ body {
 
 .friends-layout {
   display: flex;
-  flex-direction: row;
-  justify-content: center; /* ✨ centrujemy */
+  justify-content: center;
   align-items: flex-start;
-  gap: 40px;
+  gap: 30px;
   width: 100%;
   max-width: 1600px;
   margin: 30px auto 0 auto;
-  flex-wrap: nowrap;
 }
 
-/* Kolumny znajomych i zaproszeń */
 .friends-column {
-  width: 70%;
+  width: 65%;
   background: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: 14px;
-  min-height: 400px;
-  max-height: 600px;
+  height: 600px;
   display: flex;
   flex-direction: column;
 }
 
 .invites-column {
-  width: 30%;
+  width: 20%;
   background: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: 14px;
-  min-height: 400px;
-  max-height: 600px;
+  height: 600px;
   display: flex;
   flex-direction: column;
 }
 
+.buttons-column {
+  width: 15%;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 14px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  overflow-y: auto;
+}
+
 /* Scroll listy znajomych i zaproszeń */
 .friends-list, .invite-list {
+  flex-grow: 1;
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.15);
   border-radius: 12px;
-  padding: 0px;
+  padding: 10px;
   margin-top: 10px;
-  min-height: 150px;
   display: flex;
-  flex-direction: column; /* 🔥 ZAMIANA! */
-  gap: 20px; /* 🔥 estetyczna odległość między znajomymi */
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* Styl scrolla */
