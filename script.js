@@ -3168,35 +3168,42 @@ async function updateAchievementsUI() {
   }
 }
 
-
 function openProfileTab(tabName) {
-const content = document.getElementById("profileContent");
+  const content = document.getElementById("profileContent");
 
-// 🔥 UWAGA: jeśli wchodzimy na "friends" to NIE rób fade-out na całym profileContent
-if (tabName !== "friends") {
-  content.classList.add("fade-out");
-}
-
-setTimeout(() => {
-  // zmiana treści
-  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
-    tab.style.display = 'none';
-    tab.classList.remove('fade-in');
-  });
-
-  const targetButton = document.getElementById(`tab-${tabName}`);
-  const targetContent = document.getElementById(`tabContent-${tabName}`);
-  if (targetButton) targetButton.classList.add('active');
-  if (targetContent) {
-    targetContent.style.display = 'block';
-    targetContent.classList.add('fade-in');
+  // Jeśli wchodzimy na friends, to NIE robimy fade-out na całym profileContent
+  if (tabName !== "friends") {
+    content.classList.add("fade-out");
   }
 
-  content.classList.remove("fade-out");
-  content.classList.add("fade-in");
-  setTimeout(() => content.classList.remove("fade-in"), 250);
-}, 200);
+  setTimeout(async () => {
+    // zmiana treści
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
+      tab.style.display = 'none';
+      tab.classList.remove('fade-in');
+    });
+
+    const targetButton = document.getElementById(`tab-${tabName}`);
+    const targetContent = document.getElementById(`tabContent-${tabName}`);
+    if (targetButton) targetButton.classList.add('active');
+    if (targetContent) {
+      targetContent.style.display = 'block';
+      targetContent.classList.add('fade-in');
+    }
+
+    content.classList.remove("fade-out");
+    content.classList.add("fade-in");
+    setTimeout(() => content.classList.remove("fade-in"), 250);
+
+    // 🔥 DODANE TUTAJ: od razu po przełączeniu na friends renderuj listy
+    if (tabName === "friends") {
+      await refreshUsers();
+      await renderFriendsList();
+      await renderInvites();
+    }
+
+  }, 200);
 }
 
 async function showFriendsTab() {
