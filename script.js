@@ -2657,12 +2657,14 @@ async function openProfileScreen(friendId = null) {
     console.warn("Brak aktywnej sesji. Powrót do ekranu logowania.");
     showScreen("loginScreen");
     return;
-  }  
+  }
 
   viewingFriendProfile = !!friendId;
-  viewingFriendId = friendId;  
+  viewingFriendId = friendId;
 
   const isOwnProfile = !viewingFriendProfile;
+
+  await refreshUsers();
   const users = await getUsers();
   await renderFriendsList();
 
@@ -2675,24 +2677,15 @@ async function openProfileScreen(friendId = null) {
     ? Object.keys(users).find(k => users[k].id === friendId)
     : currentNick;
 
-  let userData = users[dataKey];
-
-  // 🔥 Jeśli userData nie znalezione w users, próbuj z localStorage!
-  if (!userData && isOwnProfile) {
-    const userDataJSON = localStorage.getItem("currentUserData");
-    if (userDataJSON) {
-      userData = JSON.parse(userDataJSON);
-    }
-  }
-
+  const userData = users[dataKey];
   if (!userData) {
     console.error("Nie znaleziono danych użytkownika dla profilu.");
+    alert("Nie można załadować danych profilu.");
     return;
   }
 
   currentlyViewedUser = viewingFriendProfile ? userData : null;
 
-  // Wyświetlanie ekranu profilu
   const screen = document.getElementById("profileScreen");
   if (screen) screen.style.display = "block";
   document.getElementById("startScreen").style.display = "none";
@@ -2709,7 +2702,6 @@ async function openProfileScreen(friendId = null) {
     }
   });
 
-  // Wczytywanie danych UI
   const avatar = userData.ui?.avatar || "avatar1.png";
   const background = userData.ui?.background || "bg0.png";
   const frame = userData.ui?.frame || "default_frame";
@@ -3274,12 +3266,11 @@ async function renderInvites() {
 
 async function refreshUsers() {
   try {
-    const res = await fetch(`${API_BASE}/api/users`);
-    const data = await res.json();
-    localStorage.setItem("users", JSON.stringify(data));
-    window.cachedUsers = data; // 🔥 Dodajemy cache użytkowników w RAM
+    const response = await fetch(`${API_BASE}/api/users`);
+    const data = await response.json();
+    window.cachedUsers = data.users; // zawsze aktualizuj globalnie
   } catch (error) {
-    console.error("Błąd pobierania użytkowników:", error);
+    console.error("❌ Błąd pobierania użytkowników:", error);
   }
 }
 
@@ -3961,15 +3952,22 @@ function showScreen(screenId) {
 
 async function startGameWithUser(nick) {
   try {
-    const user = await getProfile(nick); // 🔥 najpierw pobierz profil
+    // 🔥 Najpierw na pewno pobierz aktualnych użytkowników
+    await refreshUsers();
+
+    // 🔥 Pobierz dane gracza z aktualnych users
+    const users = await getUsers();
+    const user = users[nick];
 
     if (!user) {
-      throw new Error('Nie znaleziono użytkownika.');
+      console.error('Nie znaleziono użytkownika w users po zalogowaniu.');
+      alert("Błąd ładowania danych użytkownika. Spróbuj zalogować się ponownie.");
+      showScreen("loginScreen");
+      return;
     }
 
     activeUserNick = nick;
     localStorage.setItem("currentUser", nick);
-    localStorage.setItem("currentUserData", JSON.stringify(user));
 
     document.getElementById("playerNickname").textContent = nick;
 
@@ -3992,15 +3990,15 @@ async function startGameWithUser(nick) {
     await validateFriendsList();
     await renderFriendsList();
 
-    await refreshUsers(); // 🔥 nadal odświeżenie users dla znajomych itp.
-
     socket.emit('registerPlayer', {
       nick: nick,
-      id: user.id // <-- użyj ID z getProfile bezpośrednio
+      id: user.id
     });
 
   } catch (error) {
-    console.error('❌ Błąd logowania:', error);
+    console.error('❌ Błąd startu gry:', error);
+    alert("Wystąpił błąd podczas uruchamiania gry.");
+    showScreen("loginScreen");
   }
 }
 
