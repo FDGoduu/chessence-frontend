@@ -2817,6 +2817,43 @@ body {
     transform: scale(0.85) translateY(-1vh);
   }
 }
+.friends-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.friends-column, .invites-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: #1f1f1f;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.4);
+  flex: 1 1 400px;
+  max-width: 600px;
+}
+
+.scrollable-list {
+  max-height: 500px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-right: 8px;
+}
+
+/* Responsywność – kolumny jedna pod drugą na węższych ekranach */
+@media (max-width: 1100px) {
+  .friends-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+}
 
 
 
