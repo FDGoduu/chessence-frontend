@@ -2966,5 +2966,13 @@ body {
   justify-content: center;
   flex-wrap: wrap;
 }
+.empty-placeholder {
+  text-align: center;
+  color: #aaa;
+  font-size: 16px;
+  padding: 40px 10px;
+  font-style: italic;
+  opacity: 0.8;
+}
 
 
