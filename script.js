@@ -2520,7 +2520,7 @@ async function saveProfile() {
   const selectedAvatar = localStorage.getItem("selectedAvatar") || "avatar1.png";
   const selectedBackground = localStorage.getItem("selectedBackground") || "bg0.png";
   const selectedFrame = localStorage.getItem("selectedFrame") || "default_frame";
-
+  
   const profileData = {
     ui: {
       avatar: selectedAvatar,
@@ -2529,7 +2529,13 @@ async function saveProfile() {
     }
   };
 
-  await saveProfileToServer(currentUser, profileData);
+  const nick = localStorage.getItem("currentUser"); // <-- pobieramy nick
+  if (!nick) {
+    showNotification("Nie jesteś zalogowany!");
+    return;
+  }
+
+  await saveProfileToServer(nick, profileData);
 
   showNotification("Zapisano zmiany profilu!");
 }
