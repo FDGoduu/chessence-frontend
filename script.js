@@ -3170,36 +3170,33 @@ async function updateAchievementsUI() {
 
 
 function openProfileTab(tabName) {
-  const content = document.getElementById("profileContent");
-  if (!content) return;
+const content = document.getElementById("profileContent");
 
+// 🔥 UWAGA: jeśli wchodzimy na "friends" to NIE rób fade-out na całym profileContent
+if (tabName !== "friends") {
   content.classList.add("fade-out");
+}
 
-  setTimeout(() => {
-    // ⛔ Usuń klasę "active" z wszystkich przycisków
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+setTimeout(() => {
+  // zmiana treści
+  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
+    tab.style.display = 'none';
+    tab.classList.remove('fade-in');
+  });
 
-    // ⛔ Ukryj wszystkie treści zakładek
-    document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
-      tab.style.display = 'none';
-      tab.classList.remove('fade-in');
-    });
+  const targetButton = document.getElementById(`tab-${tabName}`);
+  const targetContent = document.getElementById(`tabContent-${tabName}`);
+  if (targetButton) targetButton.classList.add('active');
+  if (targetContent) {
+    targetContent.style.display = 'block';
+    targetContent.classList.add('fade-in');
+  }
 
-    // ✅ Aktywuj odpowiedni przycisk i zakładkę
-    const targetButton = document.getElementById(`tab-${tabName}`);
-    const targetContent = document.getElementById(`tabContent-${tabName}`);
-    if (targetButton) targetButton.classList.add('active');
-    if (targetContent) {
-      targetContent.style.display = 'block';
-      targetContent.classList.add('fade-in');
-    }
-	if (tabName === "invites") {
-		renderInvites();
-	}
-    content.classList.remove("fade-out");
-    content.classList.add("fade-in");
-    setTimeout(() => content.classList.remove("fade-in"), 250);
-  }, 200);
+  content.classList.remove("fade-out");
+  content.classList.add("fade-in");
+  setTimeout(() => content.classList.remove("fade-in"), 250);
+}, 200);
 }
 
 async function showFriendsTab() {
