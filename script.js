@@ -3247,7 +3247,7 @@ async function renderInvites() {
     if (!receiver) return;
 
     const simpleDiv = document.createElement("div");
-    simpleDiv.className = "invite-entry";
+    simpleDiv.className = "simple-invite";
     simpleDiv.style.background = "#222";
     simpleDiv.style.color = "#fff";
     simpleDiv.style.padding = "16px";
