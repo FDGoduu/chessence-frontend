@@ -3193,64 +3193,75 @@ async function renderInvites() {
   const nick = localStorage.getItem("currentUser");
   const me = users[nick];
 
-  if (!me || !me.pendingInvites || me.pendingInvites.length === 0) {
+  if (!me) {
+    inviteList.innerHTML = "<div class='friend-status-text'>Błąd ładowania danych.</div>";
+    return;
+  }
+
+  const incoming = me.pendingFriends || [];  // odebrane zaproszenia
+  const outgoing = me.pendingInvites || [];  // wysłane zaproszenia
+
+  if (incoming.length === 0 && outgoing.length === 0) {
     inviteList.innerHTML = "<div class='friend-status-text'>Brak zaproszeń</div>";
     return;
   }
 
   inviteList.innerHTML = "";
 
-  me.pendingInvites.forEach(id => {
-    const fromUser = Object.values(users).find(u => u.id === id);
-    const fromNick = Object.keys(users).find(n => users[n].id === id);
-    if (!fromUser || !fromNick) return;
+  // 🔵 Odebrane zaproszenia — pełna karta
+  incoming.forEach(senderNick => {
+    const sender = users[senderNick];
+    if (!sender) return;
 
-    const avatar = fromUser.ui?.avatar || "avatar1.png";
-    const frame = fromUser.ui?.frame || "default_frame";
-    const background = fromUser.ui?.background || "bg0.png";
-    const level = typeof fromUser.level === "number" ? fromUser.level : 0;
+    const avatar = sender.ui?.avatar || "avatar1.png";
+    const frame = sender.ui?.frame || "default_frame";
+    const background = sender.ui?.background || "bg0.png";
+    const level = sender.level || 0;
 
     const inviteDiv = document.createElement("div");
     inviteDiv.className = "invite-entry styled-invite";
     inviteDiv.style.backgroundImage = `url('img/backgrounds/${background}')`;
-    inviteDiv.style.backgroundSize = "cover";
-    inviteDiv.style.backgroundPosition = "center";
-    inviteDiv.style.position = "relative";
-    inviteDiv.style.overflow = "hidden";
-
-    const overlay = document.createElement("div");
-    overlay.style.position = "absolute";
-    overlay.style.inset = "0";
-    overlay.style.background = "rgba(0,0,0,0.5)";
-    overlay.style.zIndex = "0";
-    inviteDiv.appendChild(overlay);
-
-    const content = document.createElement("div");
-    content.style.position = "relative";
-    content.style.zIndex = "1";
-
-	content.innerHTML = `
-	  <div class="friend-card-top">
-	    <div class="profile-avatar-wrapper">
-	      <div class="profile-avatar-container">
-	        <img src="img/avatars/${avatar}" class="profile-avatar" />
-	      </div>
-	      <img src="img/frames/${frame}.png" class="profile-avatar-frame" />
-	    </div>
-	    <div class="friend-info">
-	      <div class="nickname">${fromNick}</div>
-	      <div class="id-label">ID: ${fromUser.id}</div>
-	      <div class="level">Poziom ${level}</div>
-	    </div>
-	  </div>
-	  <div class="friend-card-bottom">
-	    <button onclick="acceptInvite('${fromNick}')">Akceptuj</button>
-	    <button onclick="rejectInvite('${fromNick}')">Odrzuć</button>
-	  </div>
-	`;
-
-    inviteDiv.appendChild(content);
+    inviteDiv.innerHTML = `
+      <div class="friend-card-top">
+        <div class="profile-avatar-wrapper">
+          <img src="img/avatars/${avatar}" class="profile-avatar">
+          <img src="img/frames/${frame}.png" class="profile-avatar-frame">
+        </div>
+        <div class="friend-info">
+          <div class="nickname">${senderNick}</div>
+          <div class="id-label">ID: ${sender.id}</div>
+          <div class="level">Poziom: ${level}</div>
+        </div>
+      </div>
+      <div class="friend-card-bottom">
+        <button onclick="acceptInvite('${senderNick}')">Akceptuj</button>
+        <button onclick="rejectInvite('${senderNick}')">Odrzuć</button>
+      </div>
+    `;
     inviteList.appendChild(inviteDiv);
+  });
+
+  // 🟡 Wysłane zaproszenia — uproszczona informacja
+  outgoing.forEach(receiverNick => {
+    const receiver = users[receiverNick];
+    if (!receiver) return;
+
+    const simpleDiv = document.createElement("div");
+    simpleDiv.className = "invite-entry";
+    simpleDiv.style.background = "#222";
+    simpleDiv.style.color = "#fff";
+    simpleDiv.style.padding = "16px";
+    simpleDiv.style.borderRadius = "12px";
+    simpleDiv.style.textAlign = "center";
+    simpleDiv.style.marginBottom = "12px";
+
+    simpleDiv.innerHTML = `
+      <div class="friend-status-text">
+        Wysłano zaproszenie do <strong>${receiverNick}</strong>
+      </div>
+    `;
+
+    inviteList.appendChild(simpleDiv);
   });
 }
 
