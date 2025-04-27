@@ -15,11 +15,17 @@ try {
   console.warn("🔴 Nie można połączyć z serwerem socket.io (tryb online wyłączony)");
 }
 socket.on('refreshFriends', async () => {
-  console.log("🔄 Otrzymano refreshFriends od serwera!");
   await refreshUsers();
   await renderFriendsList();
   await renderInvites();
+
+  // 🔥 Jeśli jesteśmy na ekranie profilu, przerysuj też profil!
+  const isProfileScreenVisible = document.getElementById("profileScreen")?.style.display === "block";
+  if (isProfileScreenVisible) {
+    openProfileScreen(); // 🔥 Odśwież profil!
+  }
 });
+
 let currentRoomCode = null;
 let lastSentMove = null;
 let socketId = null;
