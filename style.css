@@ -1021,6 +1021,23 @@ body {
   color: #ccc;
 }
 
+/* Wygląd uproszczonych wysłanych zaproszeń */
+.simple-invite {
+  background: #2a2a2a;
+  color: #f0f0f0;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: background 0.3s;
+}
+
+.simple-invite:hover {
+  background: #3a3a3a;
+}
+
 .styled-invite .friend-card-top {
   display: flex;
   align-items: center;
