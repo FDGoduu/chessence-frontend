@@ -3830,7 +3830,6 @@ function updateTurnStatus() {
 function setOnlineStatus(msg) {
   document.getElementById("onlineStatus").innerText = msg;
 }
-let currentGameInvite = null; // zapamiętaj dane zaproszenia
 
 // 🔵 Odbiór zaproszenia do gry
 socket.on('incomingGameInvite', ({ fromNick, roomCode }) => {
