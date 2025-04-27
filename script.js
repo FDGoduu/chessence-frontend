@@ -3901,9 +3901,9 @@ socket.on("startGame", ({ colorMap, roomCode }) => {
   console.log("📝 currentRoomCode ustawione na podstawie servera:", currentRoomCode);
 
   // ✅ Jeśli jesteś w profilu – zamknij profil
-  if (viewingFriendProfile) {
+ if (document.getElementById("profileScreen").style.display === "block") {
     closeProfileScreen();
-  }
+}
 
   // ✅ Przejdź do gry
   document.getElementById("startGame").click();
