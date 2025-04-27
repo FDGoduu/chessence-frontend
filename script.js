@@ -2791,6 +2791,10 @@ async function openProfileScreen(friendId = null) {
   requestAnimationFrame(() =>
     requestAnimationFrame(() => openProfileTab("achievements"))
   );
+document.querySelectorAll(".profile-tab-content").forEach(tab => {
+  tab.style.display = "none";
+});
+document.getElementById("tabContent-achievements").style.display = "block"; // default na start
 }
 
 
@@ -3179,10 +3183,10 @@ function openProfileTab(tabName) {
   setTimeout(async () => {
     // zmiana treści
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
-      tab.style.display = 'none';
-      tab.classList.remove('fade-in');
-    });
+	document.querySelectorAll('.profile-tab-content').forEach(tab => {
+	  tab.style.display = 'none';
+	  tab.classList.remove('fade-in');
+	});
 
     const targetButton = document.getElementById(`tab-${tabName}`);
     const targetContent = document.getElementById(`tabContent-${tabName}`);
