@@ -2832,14 +2832,22 @@ if (tabFriends) tabFriends.style.display = isOwnProfile ? "inline-block" : "none
 
 
 function closeProfileScreen() {
+  const isStartingOnlineGame = gameMode === "online" || pvpSubmode === "online";
+
   document.getElementById("profileScreen").style.display = "none";
-  document.getElementById("gameScreen").style.display = "none";
+
+  if (isStartingOnlineGame) {
+    document.getElementById("gameScreen").style.display = "block"; // 🔥 przełącz na grę!
+    document.getElementById("startScreen").style.display = "none";
+  } else {
+    document.getElementById("gameScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
+  }
+
   document.getElementById("endScreen").style.display = "none";
-  document.getElementById("startScreen").style.display = "flex";
-  saveProfile();
-  validateUnlockedRewards();
-  enforceLocksByLevel();  // 🛡 sprawdź zgodność z poziomem
-  currentlyViewedUser = null;
+
+  viewingFriendProfile = false;
+  viewingFriendId = null;
 }
 
 async function validateUnlockedRewards() {
