@@ -320,12 +320,18 @@
   <button id="logoutBtn" class="profile-button logout-button fixed-corner">Wyloguj</button>
 </div>
 <!-- 🔥 Popup zaproszenia do gry -->
-<div id="gameInvitePopup" class="popup-overlay" style="display: none;">
-  <div class="popup-content">
-    <p id="inviteMessage">Gracz XYZ zaprasza Cię do gry!</p>
-    <div class="popup-buttons">
-      <button id="acceptInviteBtn">✅ Akceptuj</button>
-      <button id="declineInviteBtn">❌ Odrzuć</button>
+<!-- 🔥 Ulepszony popup zaproszenia do gry -->
+<div id="gameInvitePopup" class="game-invite-overlay" style="display: none;">
+  <div class="game-invite-box">
+    <div class="game-invite-header">
+      📩 Zaproszenie do gry
+    </div>
+    <div class="game-invite-body">
+      <p id="inviteMessage">Gracz XYZ zaprasza Cię do gry!</p>
+    </div>
+    <div class="game-invite-buttons">
+      <button id="acceptInviteBtn" class="accept-btn">✅ Akceptuj</button>
+      <button id="declineInviteBtn" class="decline-btn">❌ Odrzuć</button>
     </div>
   </div>
 </div>
