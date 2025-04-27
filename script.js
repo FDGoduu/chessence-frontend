@@ -208,9 +208,27 @@ async function sendFriendRequest(targetNick) {
     return;
   }
 
-  // 🔥 BLOKADA: Jeśli targetNick jest już w friends
+  // 🔥 BLOKADA 1: Próba dodania siebie
+  if (myNick === targetNick) {
+    showFloatingStatus("Nie możesz dodać siebie do znajomych.", "alert");
+    return;
+  }
+
+  // 🔥 BLOKADA 2: Target już jest na liście znajomych
   if (currentUserData.friends?.includes(targetNick)) {
     showFloatingStatus(`Użytkownik ${targetNick} jest już na Twojej liście znajomych.`, "alert");
+    return;
+  }
+
+  // 🔥 BLOKADA 3: Zaproszenie już wysłane (pendingInvites)
+  if (currentUserData.pendingInvites?.includes(targetNick)) {
+    showFloatingStatus(`Wysłałeś już zaproszenie do ${targetNick}.`, "alert");
+    return;
+  }
+
+  // 🔥 BLOKADA 4: Zaproszenie już czeka od tamtej osoby (pendingFriends)
+  if (currentUserData.pendingFriends?.includes(targetNick)) {
+    showFloatingStatus(`Użytkownik ${targetNick} już wysłał Ci zaproszenie!`, "alert");
     return;
   }
 
