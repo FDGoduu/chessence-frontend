@@ -2886,6 +2886,94 @@ body {
   padding: 10px;
   margin-top: 10px;
 }
+.friends-layout {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.friends-column {
+  flex: 0 0 70%;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.invites-column {
+  flex: 0 0 28%;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.friends-controls-top {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.friends-list, .invite-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* Styl scrolla */
+.friends-list::-webkit-scrollbar,
+.invite-list::-webkit-scrollbar {
+  width: 8px;
+}
+.friends-list::-webkit-scrollbar-thumb,
+.invite-list::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+.friends-list::-webkit-scrollbar-track,
+.invite-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Styl inputa i guzika */
+.add-friend-wrapper input[type="text"] {
+  background: #222;
+  color: #ddd;
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+}
+
+.add-friend-wrapper button {
+  background: #3a3a3a;
+  color: #fff;
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.add-friend-wrapper button:hover {
+  background: #4b4b4b;
+}
+
+/* Styl przycisków u góry */
+.profile-btn.small {
+  padding: 6px 14px;
+  font-size: 14px;
+}
 
 
 
