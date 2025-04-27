@@ -16,7 +16,9 @@ try {
 }
 
 socket.on('refreshFriends', async () => {
-  await refreshUsers();
+  window.cachedUsers = null; // ❗ Invalidate lokalny cache
+
+  await refreshUsers(); // ❗ Pobierz świeżych użytkowników z serwera
 
   if (document.getElementById("friendsTab")?.style.display === "block") {
     await renderFriendsList();
