@@ -3986,19 +3986,11 @@ async function startGameWithUser(nick) {
     await validateFriendsList();
     await renderFriendsList();
 
-    await refreshUsers(); // 🔥 dopiero teraz odświeżamy listę users
-
-    const users = await getUsers();
-    const currentUser = users[nick];
-
-    if (!currentUser) {
-      console.error('Nie znaleziono użytkownika po zalogowaniu.');
-      return;
-    }
+    await refreshUsers(); // 🔥 nadal odświeżenie users dla znajomych itp.
 
     socket.emit('registerPlayer', {
       nick: nick,
-      id: currentUser.id
+      id: user.id // <-- użyj ID z getProfile bezpośrednio
     });
 
   } catch (error) {
