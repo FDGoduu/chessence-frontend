@@ -3104,7 +3104,7 @@ function openProfileTab(tabName) {
   }, 200);
 }
 
-function showFriendsTab() {
+async function showFriendsTab() {
   document.querySelectorAll(".profile-tab-content").forEach(el => el.style.display = "none");
   document.getElementById("friendsTab").style.display = "block";
   await refreshUsers()
@@ -3967,7 +3967,6 @@ async function startGameWithUser(nick) {
     await validateUnlockedRewards();
     await enforceLocksByLevel();
     await validateFriendsList();
-    await refreshUsers()
     await renderFriendsList();
 
     socket.emit('registerPlayer', {
