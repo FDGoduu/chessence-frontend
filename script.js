@@ -18,12 +18,6 @@ socket.on('refreshFriends', async () => {
   await refreshUsers();
   await renderFriendsList();
   await renderInvites();
-
-  // 🔥 Jeśli jesteśmy na ekranie profilu, przerysuj też profil!
-  const isProfileScreenVisible = document.getElementById("profileScreen")?.style.display === "block";
-  if (isProfileScreenVisible) {
-    openProfileScreen(); // 🔥 Odśwież profil!
-  }
 });
 
 let currentRoomCode = null;
