@@ -3951,9 +3951,8 @@ function showScreen(screenId) {
 }
 
 async function startGameWithUser(nick) {
-  await refreshUsers();
   try {
-    const user = await getProfile(nick);
+    const user = await getProfile(nick); // 🔥 Najpierw pobierz profil!
 
     if (!user) {
       throw new Error('Nie znaleziono użytkownika.');
@@ -3983,7 +3982,9 @@ async function startGameWithUser(nick) {
     await validateFriendsList();
     await renderFriendsList();
 
-    // 🔥 Teraz na końcu rejestracja socketowa!
+    // 🔥 Dopiero TERAZ odśwież listę użytkowników
+    await refreshUsers();
+
     const users = await getUsers();
     const currentUser = users[nick];
 
@@ -4001,6 +4002,7 @@ async function startGameWithUser(nick) {
     console.error('Błąd logowania:', error);
   }
 }
+
 
 window.addEventListener("DOMContentLoaded", () => {
   // wymuś logowanie
