@@ -2871,7 +2871,7 @@ body {
 
 /* Kolumny znajomych i zaproszeń */
 .friends-column {
-  width: 900px;
+  width: 1200px;
   background: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: 14px;
