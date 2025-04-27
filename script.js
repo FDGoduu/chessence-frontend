@@ -208,6 +208,12 @@ async function sendFriendRequest(targetNick) {
     return;
   }
 
+  // 🔥 NOWA BLOKADA: czy istnieje gracz do którego wysyłasz zaproszenie
+  if (!targetUserData) {
+    showFloatingStatus(`Użytkownik ${targetNick} nie istnieje.`, "alert");
+    return;
+  }
+	
   // 🔥 BLOKADA 1: Próba dodania siebie
   if (myNick === targetNick) {
     showFloatingStatus("Nie możesz dodać siebie do znajomych.", "alert");
