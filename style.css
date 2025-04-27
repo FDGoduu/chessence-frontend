@@ -2895,7 +2895,6 @@ body {
 
 /* Scroll listy znajomych i zaproszeń */
 .friends-list, .invite-list {
-  flex-grow: 1;
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.15);
   border-radius: 12px;
@@ -2982,13 +2981,13 @@ body {
 }
 
 .friends-list, .invite-list {
-  flex-grow: 1;
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.15);
   border-radius: 12px;
   padding: 10px;
   margin-top: 10px;
   min-height: 150px; /* 🔥 to dodajemy! */
+  max-height: 100%;
 }
 .friend-entry, .friend-card {
   width: 100%;
