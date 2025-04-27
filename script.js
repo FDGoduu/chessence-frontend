@@ -4047,16 +4047,23 @@ loginButton.addEventListener('click', async () => {
     return;
   }
 
+  let loggedUser = null;
   try {
-    const loggedUser = await loginUser(nick, pass); // <-- zapisz użytkownika
-    await refreshUsers();
-    await startGameWithUser(loggedUser.nick); // <-- użyj nicka z serwera
+    loggedUser = await loginUser(nick, pass); // <-- próbuj się zalogować
   } catch (error) {
     console.error(error);
     alert("Logowanie nie powiodło się. Sprawdź dane.");
+    return; // ⛔ KONIEC — nie idź dalej
   }
-});
 
+  if (!loggedUser) {
+    alert("Nie udało się zalogować. Spróbuj ponownie.");
+    return;
+  }
+
+  await refreshUsers();
+  await startGameWithUser(loggedUser.nick); // <-- tylko jeśli login się udał
+});
 
 document.getElementById("openProfileBtn").addEventListener("click", () => {
   viewingFriendProfile = false;
