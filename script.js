@@ -3173,41 +3173,32 @@ async function updateAchievementsUI() {
 }
 
 function openProfileTab(tabName) {
-  const content = document.getElementById("profileContent");
+  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.profile-tab-content').forEach(tab => {
+    tab.style.display = 'none';
+    tab.classList.remove('fade-in', 'fade-out');
+  });
 
-  // Jeśli wchodzimy na friends, to NIE robimy fade-out na całym profileContent
-  if (tabName !== "friends") {
-    content.classList.add("fade-out");
+  const targetButton = document.getElementById(`tab-${tabName}`);
+  const targetContent = document.getElementById(`tabContent-${tabName}`);
+  
+  if (targetButton) targetButton.classList.add('active');
+
+  if (targetContent) {
+    targetContent.style.display = 'block';
+    targetContent.classList.add('fade-in');
+    setTimeout(() => {
+      targetContent.classList.remove('fade-in');
+    }, 300); // czas trwania fade
   }
 
-  setTimeout(async () => {
-    // zmiana treści
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-	document.querySelectorAll('.profile-tab-content').forEach(tab => {
-	  tab.style.display = 'none';
-	  tab.classList.remove('fade-in');
-	});
-
-    const targetButton = document.getElementById(`tab-${tabName}`);
-    const targetContent = document.getElementById(`tabContent-${tabName}`);
-    if (targetButton) targetButton.classList.add('active');
-    if (targetContent) {
-      targetContent.style.display = 'block';
-      targetContent.classList.add('fade-in');
-    }
-
-    content.classList.remove("fade-out");
-    content.classList.add("fade-in");
-    setTimeout(() => content.classList.remove("fade-in"), 250);
-
-    // 🔥 DODANE TUTAJ: od razu po przełączeniu na friends renderuj listy
-    if (tabName === "friends") {
-      await refreshUsers();
-      await renderFriendsList();
-      await renderInvites();
-    }
-
-  }, 200);
+  // 🔥 Jeśli przechodzimy na zakładkę friends – wtedy odświeżamy listy
+  if (tabName === "friends") {
+    refreshUsers().then(() => {
+      renderFriendsList();
+      renderInvites();
+    });
+  }
 }
 
 async function showFriendsTab() {
