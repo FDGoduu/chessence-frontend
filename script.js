@@ -3888,16 +3888,16 @@ socket.on("startGame", ({ colorMap, roomCode }) => {
   const myColor = colorMap[socket.id];
   startGameOnline(myColor);
 
-  // ✅ Ustaw roomCode na podstawie danych od serwera
+  // ✅ Ustaw currentRoomCode na podstawie danych od serwera
   currentRoomCode = roomCode;
   console.log("📝 currentRoomCode ustawione na podstawie servera:", currentRoomCode);
 
-  // ✅ Jeśli jesteś w widoku profilu – zamknij profil
+  // ✅ Jeśli jesteś w profilu – zamknij profil
   if (viewingFriendProfile) {
     closeProfileScreen();
   }
 
-  // ✅ Rozpocznij grę
+  // ✅ Przejdź do gry
   document.getElementById("startGame").click();
 });
 
