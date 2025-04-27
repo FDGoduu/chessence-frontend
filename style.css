@@ -1088,14 +1088,6 @@ body {
   color: #ccc;
 }
 
-.friends-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  margin-top: 20px;
-}
-
 .add-friend-box {
   background: #1f1f1f;
   padding: 16px 20px;
@@ -2803,21 +2795,6 @@ body {
   .start-button-wrapper {
     transform: scale(0.85) translateY(-1vh);
   }
-}
-.friends-section {
-  display: flex;
-  gap: 24px;
-  padding: 20px;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.friends-left, .friends-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
-  overflow: hidden;
 }
 
 .add-friend-box {
