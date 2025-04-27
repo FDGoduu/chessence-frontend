@@ -14,6 +14,12 @@ try {
 } catch (e) {
   console.warn("🔴 Nie można połączyć z serwerem socket.io (tryb online wyłączony)");
 }
+socket.on('refreshFriends', async () => {
+  console.log("🔄 Otrzymano refreshFriends od serwera!");
+  await refreshUsers();
+  await renderFriendsList();
+  await renderInvites();
+});
 let currentRoomCode = null;
 let lastSentMove = null;
 let socketId = null;
