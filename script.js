@@ -200,20 +200,33 @@ async function sendFriendRequest(targetNick) {
     return;
   }
 
+  const users = await getUsers();
+  const currentUserData = users[myNick];
+
+  if (!currentUserData) {
+    showFloatingStatus("Brak danych użytkownika.", "alert");
+    return;
+  }
+
+  // 🔥 BLOKADA: Jeśli targetNick jest już w friends
+  if (currentUserData.friends?.includes(targetNick)) {
+    showFloatingStatus(`Użytkownik ${targetNick} jest już na Twojej liście znajomych.`, "alert");
+    return;
+  }
+
   try {
     socket.emit('sendFriendRequest', {
       from: myNick,
       to: targetNick
     });
 
-    showFloatingStatus(`Zaproszenie do ${targetNick} wysłane`, "info");
+    showFloatingStatus(`Zaproszenie do ${targetNick} wysłane.`, "info");
 
-    // 🔥 Opcjonalnie: możesz odświeżyć znajomych po jakimś czasie
     setTimeout(async () => {
       await refreshUsers();
       await renderFriendsList();
       await renderInvites();
-    }, 500); // małe opóźnienie, żeby serwer zdążył przetworzyć zaproszenie
+    }, 500);
   } catch (error) {
     console.error(error);
     showFloatingStatus(error.message || "Błąd wysyłania zaproszenia", "alert");
