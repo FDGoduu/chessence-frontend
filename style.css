@@ -2861,7 +2861,7 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: center; /* 🔥 */
-  width: 100%;
+  width: auto; /* NIE 100%! */
   max-width: 1600px;
   margin-top: 30px;
   gap: 40px;
@@ -2869,7 +2869,7 @@ body {
 
 /* Kolumny znajomych i zaproszeń */
 .friends-column {
-  flex: 0 0 68%;
+  width: 900px;
   background: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: 14px;
@@ -2880,7 +2880,7 @@ body {
 }
 
 .invites-column {
-  flex: 0 0 30%;
+  width: 400px;
   background: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: 14px;
