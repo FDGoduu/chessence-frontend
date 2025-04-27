@@ -1328,6 +1328,9 @@ function handleClick(x, y) {
 
   const attackerPiece = boardState[sy][sx];
   const victimPiece = boardState[y][x];
+  if (victimPiece && pieceColor(victimPiece) === playerColor && victimPiece.toLowerCase() !== 'p') {
+  hasLostPiece = true; // 🔥 straciłeś figurę (ale nie pionka)
+  }
 
 // 🔄 ONLINE – zanim wyślemy, spraadź czy promocja
 if (gameMode === "online") {
@@ -1552,6 +1555,9 @@ function runAIMove() {
       const movedPiece = boardState[dy][dx];
       const attackerPiece = boardState[sy][sx]; // po ruchu już będzie puste – użyj kopii z tempBoard!
       const victimPiece = tempBoard[dy][dx];
+      if (victimPiece && pieceColor(victimPiece) === playerColor && victimPiece.toLowerCase() !== 'p') {
+      hasLostPiece = true; // 🔥 bot zbił Twoją figurę (ale nie pionka)
+      }
       const captured = victimPiece && pieceColor(victimPiece) !== pieceColor(attackerPiece) ? victimPiece : '';
       
       if (victimPiece && victimPiece.toLowerCase() !== 'k') {
