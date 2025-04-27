@@ -2857,12 +2857,15 @@ body {
   font-size: 14px;
 }
 
-/* Layout znajomych */
 .friends-layout {
   display: flex;
+  flex-direction: row;
   gap: 30px;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Kolumny znajomych i zaproszeń */
