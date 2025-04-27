@@ -3358,12 +3358,12 @@ async function removeFriendAPI(myNick, friendNick) {
   const response = await fetch(`${API_BASE}/api/friends/remove`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ myNick, friendNick })
+    body: JSON.stringify({ user: myNick, friend: friendNick }) // 🔥 tutaj zmiana
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Błąd usuwania znajomego.");
+    const errorText = await response.text();
+    throw new Error(errorText || "Błąd usuwania znajomego.");
   }
 }
 
