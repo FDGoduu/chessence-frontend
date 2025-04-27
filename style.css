@@ -2942,13 +2942,13 @@ body {
     width: 90%;
   }
 }
-#tabContent-friends .friends-layout {
+#tabContent-friends {
   display: flex;
-  flex-direction: row;
-  gap: 30px;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
-
 
 
