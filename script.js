@@ -3423,7 +3423,11 @@ async function removeFriendAPI(myNick, friendNick) {
 }
 
 function inviteToGame(friendId) {
-  alert("Funkcja zaproszenia do gry zostanie dodana później.");
+  const myNick = localStorage.getItem("currentUser");
+  if (!myNick || !friendId) return;
+
+  // Tworzysz pokój i wysyłasz zaproszenie
+  socket.emit('createGameInvite', { fromNick: myNick, toFriendId: friendId });
 }
 
 // ✅ Usuń znajomego
