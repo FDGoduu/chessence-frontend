@@ -3425,8 +3425,13 @@ async function removeFriend(friendNick) {
 
   try {
     await removeFriendAPI(myNick, friendNick);
-    await refreshUsers()
-    renderFriendsList();
+
+    // 🔥 Emisja socketowa po usunięciu znajomego
+    socket.emit('friendListUpdated', { friend: friendNick });
+
+    // ❌ NIE rób lokalnego refreshUsers/renderFriendsList tutaj.
+    // Poczekaj aż przyjdzie socket.on('refreshFriends')
+
     showFloatingStatus("Usunięto znajomego", "info");
   } catch (error) {
     console.error(error);
