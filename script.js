@@ -2478,6 +2478,7 @@ async function validateFriendsList() {
     console.warn("⚠️ Wykryto nieistniejących znajomych – lista została poprawiona.");
     me.friends = newFriends;
     await saveUsers(users);
+    await refreshUsers()
     renderFriendsList();
   }
 }
@@ -2565,6 +2566,7 @@ async function saveProfile() {
 
 
 function logout() {
+  window.cachedUsers = null;
   activeUserNick = null; // 🧠 wyczyść sesję w pamięci
   localStorage.removeItem("currentUser");
   showScreen("loginScreen");
@@ -3105,6 +3107,7 @@ function openProfileTab(tabName) {
 function showFriendsTab() {
   document.querySelectorAll(".profile-tab-content").forEach(el => el.style.display = "none");
   document.getElementById("friendsTab").style.display = "block";
+  await refreshUsers()
   renderFriendsList();
   renderInvites(); // ⬅️ TO DODAJ!
 }
@@ -3158,32 +3161,6 @@ async function renderFriendsList() {
 
     container.appendChild(div);
   });
-}
-
-// ✅ Dodaj zaproszenie do znajomych
-async function sendFriendRequest(targetNickOrId) {
-  const users = await getUsers();
-  const myNick = localStorage.getItem("currentUser");
-  const me = users[myNick];
-  if (!me) return;
-
-  const entry = Object.entries(users).find(([nick, user]) => nick === targetNickOrId || user.id === targetNickOrId);
-  if (!entry) return showFloatingStatus("Nie znaleziono gracza", "alert");
-
-  const [targetNick, targetUser] = entry;
-
-  if (targetUser.id === me.id) return showFloatingStatus("Nie możesz dodać samego siebie", "alert");
-  if (me.friends?.includes(targetUser.id)) return showFloatingStatus("Ten gracz jest już Twoim znajomym", "info");
-  if (targetUser.pendingInvites?.includes(me.id)) return showFloatingStatus("Zaproszenie już wysłane", "info");
-
-  if (!targetUser.pendingInvites) targetUser.pendingInvites = [];
-  if (!users[targetNick]) users[targetNick] = targetUser;
-	users[targetNick].pendingInvites = users[targetNick].pendingInvites || [];
-	if (!users[targetNick].pendingInvites.includes(me.id)) {
-	  users[targetNick].pendingInvites.push(me.id);
-	}
-  await saveUsers(users);
-  showFloatingStatus(`Wysłano zaproszenie do ${targetNick}`, "info");
 }
 
 async function renderInvites() {
@@ -3337,6 +3314,7 @@ async function removeFriend(friendNick) {
 
   try {
     await removeFriendAPI(myNick, friendNick);
+    await refreshUsers()
     renderFriendsList();
     showFloatingStatus("Usunięto znajomego", "info");
   } catch (error) {
@@ -3396,6 +3374,7 @@ async function addFriend() {
 
   current.friends.push(friend.id);
   await saveUsers(users);
+  await refreshUsers()
   renderFriendsList();
   status.textContent = `Dodano: ${foundNick}`;
   input.value = "";
@@ -3988,6 +3967,7 @@ async function startGameWithUser(nick) {
     await validateUnlockedRewards();
     await enforceLocksByLevel();
     await validateFriendsList();
+    await refreshUsers()
     await renderFriendsList();
 
     socket.emit('registerPlayer', {
