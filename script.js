@@ -3965,7 +3965,7 @@ function showScreen(screenId) {
 }
 
 async function startGameWithUser(nick) {
-await refreshUsers();
+  await refreshUsers();
   try {
     const user = await getProfile(nick);
 
@@ -3973,10 +3973,9 @@ await refreshUsers();
       throw new Error('Nie znaleziono użytkownika.');
     }
 
-    activeUserNick = nick; // 🧠 zapisz zalogowanego użytkownika w pamięci karty
-    localStorage.setItem("currentUser", nick); // (dla kompatybilności, ale nie polegamy na tym!)
+    activeUserNick = nick;
+    localStorage.setItem("currentUser", nick);
 
-    // Zapisz dane użytkownika lokalnie
     document.getElementById("playerNickname").textContent = nick;
 
     showScreen("startScreen");
@@ -3995,13 +3994,27 @@ await refreshUsers();
 
     await validateUnlockedRewards();
     await enforceLocksByLevel();
-    await validateFriendsList(); // 🛡️ sprawdzanie znajomych
-    await renderFriendsList(); // 🔥 automatyczny refresh znajomych po zalogowaniu
+    await validateFriendsList();
+    await renderFriendsList();
+
+    // 🔥 Teraz na końcu rejestracja socketowa!
+    const users = await getUsers();
+    const currentUser = users[nick];
+
+    if (!currentUser) {
+      console.error('Nie znaleziono użytkownika po zalogowaniu.');
+      return;
+    }
+
+    socket.emit('registerPlayer', {
+      nick: nick,
+      id: currentUser.id
+    });
+
   } catch (error) {
     console.error('Błąd logowania:', error);
   }
 }
-
 
 window.addEventListener("DOMContentLoaded", () => {
   // wymuś logowanie
@@ -4043,23 +4056,22 @@ loginButton.addEventListener('click', async () => {
   const nick = document.getElementById('loginNickname').value.trim();
   const pass = document.getElementById('loginPassword').value.trim();
 
+  if (!nick) {
+    showFloatingStatus("Podaj nazwę użytkownika", "alert");
+    return;
+  }
+
   try {
-    await loginUser(nick, pass); 
-    await refreshUsers();   // 🔥 pobieramy users.json z serwera
-    const users = await getUsers(); // 🔥 musimy pobrać users z localStorage
-
-    await startGameWithUser(nick);
-
-    socket.emit('registerPlayer', {
-      nick: nick,
-      id: users[nick].id
-    });
+    await loginUser(nick); // 🔥 logowanie na konto (w przyszłości możemy dodać hasło)
+    await refreshUsers();  // 🔥 pobranie users.json z serwera
+    await startGameWithUser(nick); // 🔥 teraz startGameWithUser zadba o socket.emit
 
   } catch (error) {
     console.error(error);
     alert("Logowanie nie powiodło się. Sprawdź dane.");
   }
 });
+
 
 document.getElementById("openProfileBtn").addEventListener("click", () => {
   viewingFriendProfile = false;
