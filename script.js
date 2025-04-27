@@ -887,7 +887,7 @@ function updateGameStatus() {
       // 🔥 Przyznaj XP natychmiast po zakończeniu
       awardXP(window.xpPendingResult);
 	if (window.xpPendingResult === "win") {
-  	await updateStatsOnWin();
+  	updateStatsOnWin();
         }
 
       delete window.xpPendingResult;
