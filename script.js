@@ -2658,30 +2658,39 @@ async function openProfileScreen(friendId = null) {
     showScreen("loginScreen");
     return;
   }  
-	// Na początku funkcji:
+
   viewingFriendProfile = !!friendId;
   viewingFriendId = friendId;  
 
-const isOwnProfile = !viewingFriendProfile;
-const users = await getUsers();
-await renderFriendsList(); // 🔥 automatyczny refresh znajomych po wejściu w profil
+  const isOwnProfile = !viewingFriendProfile;
+  const users = await getUsers();
+  await renderFriendsList();
 
-
-document.getElementById("resetProgressBtn").style.display = isOwnProfile ? "inline-block" : "none";
-document.querySelector('.profile-controls button[onclick="closeProfileScreen()"]').style.display = isOwnProfile ? "inline-block" : "none";
-const backBtnEl = document.getElementById("backToOwnProfileBtn");
-
-
+  document.getElementById("resetProgressBtn").style.display = isOwnProfile ? "inline-block" : "none";
+  document.querySelector('.profile-controls button[onclick="closeProfileScreen()"]').style.display = isOwnProfile ? "inline-block" : "none";
+  const backBtnEl = document.getElementById("backToOwnProfileBtn");
 
   const currentNick = localStorage.getItem("currentUser");
   const dataKey = viewingFriendProfile
     ? Object.keys(users).find(k => users[k].id === friendId)
     : currentNick;
 
-const userData = users[dataKey];
-if (!userData) return;
-currentlyViewedUser = viewingFriendProfile ? userData : null;
+  let userData = users[dataKey];
 
+  // 🔥 Jeśli userData nie znalezione w users, próbuj z localStorage!
+  if (!userData && isOwnProfile) {
+    const userDataJSON = localStorage.getItem("currentUserData");
+    if (userDataJSON) {
+      userData = JSON.parse(userDataJSON);
+    }
+  }
+
+  if (!userData) {
+    console.error("Nie znaleziono danych użytkownika dla profilu.");
+    return;
+  }
+
+  currentlyViewedUser = viewingFriendProfile ? userData : null;
 
   // Wyświetlanie ekranu profilu
   const screen = document.getElementById("profileScreen");
@@ -2689,48 +2698,44 @@ currentlyViewedUser = viewingFriendProfile ? userData : null;
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("gameScreen").style.display = "none";
   document.getElementById("endScreen").style.display = "none";
-  // Ukryj przyciski tylko w widoku znajomego
-["logoutBtn", "resetProgressBtn", "deleteAccountBtn", "backToOwnProfileBtn"].forEach(id => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  if (id === "backToOwnProfileBtn") {
-    el.style.display = viewingFriendProfile ? "block" : "none";
-  } else {
-    el.style.display = viewingFriendProfile ? "none" : "block";
-  }
-});
 
-
+  ["logoutBtn", "resetProgressBtn", "deleteAccountBtn", "backToOwnProfileBtn"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id === "backToOwnProfileBtn") {
+      el.style.display = viewingFriendProfile ? "block" : "none";
+    } else {
+      el.style.display = viewingFriendProfile ? "none" : "block";
+    }
+  });
 
   // Wczytywanie danych UI
   const avatar = userData.ui?.avatar || "avatar1.png";
   const background = userData.ui?.background || "bg0.png";
   const frame = userData.ui?.frame || "default_frame";
 
-const avatarEl = document.getElementById("profileAvatar");
-if (avatarEl) avatarEl.src = `img/avatars/${avatar}`;
+  const avatarEl = document.getElementById("profileAvatar");
+  if (avatarEl) avatarEl.src = `img/avatars/${avatar}`;
 
-const bgEl = document.getElementById("profileBackgroundImage");
-if (bgEl) bgEl.src = `img/backgrounds/${background}`;
+  const bgEl = document.getElementById("profileBackgroundImage");
+  if (bgEl) bgEl.src = `img/backgrounds/${background}`;
 
-const frameEl = document.getElementById("profileAvatarFrame");
-if (frameEl) frameEl.src = `img/frames/${frame}.png`;
+  const frameEl = document.getElementById("profileAvatarFrame");
+  if (frameEl) frameEl.src = `img/frames/${frame}.png`;
 
-  const frameElem = document.getElementById("profileAvatarFrame");
-  if (frameElem) frameElem.style.display = frame === "none" ? "none" : "block";
+  if (frameEl) frameEl.style.display = frame === "none" ? "none" : "block";
 
-  document.querySelector(".player-nickname").textContent = dataKey;
+  document.querySelector(".player-nickname").textContent = userData.nick || "Brak";
   document.getElementById("playerLevel").textContent = `Poziom ${userData.level || 0}`;
 
-  updateAchievementsUI(); // pokaże osiągnięcia
-
-  // Pokaż/ukryj zakładki i przyciski w zależności od widoku
+  updateAchievementsUI();
   showProfileTabs();
   updateProfileUI();
   requestAnimationFrame(() =>
     requestAnimationFrame(() => openProfileTab("achievements"))
   );
 }
+
 
 function showProfileTabs() {
 	const isOwnProfile = !viewingFriendProfile;
@@ -3964,6 +3969,7 @@ async function startGameWithUser(nick) {
 
     activeUserNick = nick;
     localStorage.setItem("currentUser", nick);
+    localStorage.setItem("currentUserData", JSON.stringify(user));
 
     document.getElementById("playerNickname").textContent = nick;
 
