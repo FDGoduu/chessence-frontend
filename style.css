@@ -2852,6 +2852,40 @@ body {
   text-align: center;
   color: #ccc;
 }
+.add-friend-wrapper {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.friends-layout {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.friends-column, .invites-column {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 14px;
+  width: 400px;
+  min-height: 500px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.friends-list, .invite-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 10px;
+}
 
 
 
