@@ -195,20 +195,31 @@ async function sendFriendRequest(targetNick) {
     return;
   }
 
+  if (!targetNick) {
+    showFloatingStatus("Podaj nick znajomego.", "alert");
+    return;
+  }
+
   try {
-    await sendFriendRequestAPI(myNick, targetNick);
+    socket.emit('sendFriendRequest', {
+      from: myNick,
+      to: targetNick
+    });
+
     showFloatingStatus(`Zaproszenie do ${targetNick} wysłane`, "info");
 
-    socket.emit('friendListUpdated', { friend: targetNick });
-
-    await refreshUsers();
-    await renderFriendsList();
-    await renderInvites();
+    // 🔥 Opcjonalnie: możesz odświeżyć znajomych po jakimś czasie
+    setTimeout(async () => {
+      await refreshUsers();
+      await renderFriendsList();
+      await renderInvites();
+    }, 500); // małe opóźnienie, żeby serwer zdążył przetworzyć zaproszenie
   } catch (error) {
     console.error(error);
-    showFloatingStatus(error.message, "alert");
+    showFloatingStatus(error.message || "Błąd wysyłania zaproszenia", "alert");
   }
 }
+
 
 // Akceptuj zaproszenie od znajomego
 async function acceptFriendRequestAPI(senderNick, receiverNick) {
