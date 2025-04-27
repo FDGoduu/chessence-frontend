@@ -3170,33 +3170,36 @@ async function updateAchievementsUI() {
 
 
 function openProfileTab(tabName) {
-const content = document.getElementById("profileContent");
+  const content = document.getElementById("profileContent");
+  if (!content) return;
 
-// 🔥 UWAGA: jeśli wchodzimy na "friends" to NIE rób fade-out na całym profileContent
-if (tabName !== "friends") {
   content.classList.add("fade-out");
-}
 
-setTimeout(() => {
-  // zmiana treści
-  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
-    tab.style.display = 'none';
-    tab.classList.remove('fade-in');
-  });
+  setTimeout(() => {
+    // ⛔ Usuń klasę "active" z wszystkich przycisków
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
 
-  const targetButton = document.getElementById(`tab-${tabName}`);
-  const targetContent = document.getElementById(`tabContent-${tabName}`);
-  if (targetButton) targetButton.classList.add('active');
-  if (targetContent) {
-    targetContent.style.display = 'block';
-    targetContent.classList.add('fade-in');
-  }
+    // ⛔ Ukryj wszystkie treści zakładek
+    document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
+      tab.style.display = 'none';
+      tab.classList.remove('fade-in');
+    });
 
-  content.classList.remove("fade-out");
-  content.classList.add("fade-in");
-  setTimeout(() => content.classList.remove("fade-in"), 250);
-}, 200);
+    // ✅ Aktywuj odpowiedni przycisk i zakładkę
+    const targetButton = document.getElementById(`tab-${tabName}`);
+    const targetContent = document.getElementById(`tabContent-${tabName}`);
+    if (targetButton) targetButton.classList.add('active');
+    if (targetContent) {
+      targetContent.style.display = 'block';
+      targetContent.classList.add('fade-in');
+    }
+	if (tabName === "invites") {
+		renderInvites();
+	}
+    content.classList.remove("fade-out");
+    content.classList.add("fade-in");
+    setTimeout(() => content.classList.remove("fade-in"), 250);
+  }, 200);
 }
 
 async function showFriendsTab() {
@@ -3208,7 +3211,6 @@ async function showFriendsTab() {
 }
 
 async function renderFriendsList() {
-  document.getElementById("friendsList").innerHTML = "";
   await refreshUsers(); // 🔥 pobieramy najnowsze users.json
   const users = await getUsers();
   const currentUser = localStorage.getItem("currentUser");
@@ -3217,6 +3219,7 @@ async function renderFriendsList() {
   const myUser = users[currentUser];
   const container = document.getElementById("friendsList");
   if (!container) return;
+  container.innerHTML = "";
 
   const uniqueFriends = [...new Set(myUser.friends || [])]; // 🔥 upewniamy się, że istnieje lista
 
@@ -3259,7 +3262,6 @@ async function renderFriendsList() {
 }
 
 async function renderInvites() {
-  document.getElementById("inviteList").innerHTML = "";
   const inviteList = document.getElementById("inviteList");
   const users = await getUsers();
   const nick = localStorage.getItem("currentUser");
@@ -3277,6 +3279,8 @@ async function renderInvites() {
     inviteList.innerHTML = "<div class='friend-status-text'>Brak zaproszeń</div>";
     return;
   }
+
+  inviteList.innerHTML = "";
 
   // 🔵 Odebrane zaproszenia — pełna karta
   incoming.forEach(senderNick => {
