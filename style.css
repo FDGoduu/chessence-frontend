@@ -1620,11 +1620,24 @@ body {
 }
 .profile-controls {
   position: relative;
-  margin-top: 40px;
+  margin-top: auto;
   display: flex;
   justify-content: center;
   gap: 16px;
   z-index: 100;
+}
+
+#profileScreen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#profileContent {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 /* Przycisk profilu */
