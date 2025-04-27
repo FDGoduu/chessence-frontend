@@ -2860,11 +2860,13 @@ body {
 .friends-layout {
   display: flex;
   flex-direction: row;
-  justify-content: center; /* 🔥 */
-  width: auto; /* NIE 100%! */
-  max-width: 1600px;
-  margin-top: 30px;
+  justify-content: center;
+  align-items: flex-start;
   gap: 40px;
+  width: 100%;
+  max-width: 1600px;
+  margin: 30px auto 0 auto;
+  flex-wrap: nowrap;
 }
 
 /* Kolumny znajomych i zaproszeń */
@@ -2954,7 +2956,7 @@ body {
   flex: 1;
 }
 
-#tabContent-friends .friends-layout {
+#tabContent-friends{
   display: flex;
   flex-direction: row;
   gap: 30px;
