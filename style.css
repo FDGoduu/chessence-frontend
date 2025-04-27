@@ -1088,12 +1088,6 @@ body {
   color: #ccc;
 }
 
-.friends-list, .invite-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .friends-section {
   display: flex;
   flex-direction: column;
@@ -1157,14 +1151,7 @@ body {
   font-style: italic;
 }
 
-.friends-list {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
+
 
 /* ✅ Pojedyncza karta znajomego – większy padding i schludność */
 .friend-entry {
@@ -2833,14 +2820,6 @@ body {
   overflow: hidden;
 }
 
-.friends-list, .invite-list {
-  flex-grow: 1;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.2);
-  border-radius: 12px;
-  padding: 12px;
-}
-
 .add-friend-box {
   display: flex;
   gap: 8px;
@@ -2852,6 +2831,15 @@ body {
   text-align: center;
   color: #ccc;
 }
+
+/* Styl przycisków u góry */
+.profile-btn.small {
+  padding: 6px 14px;
+  font-size: 14px;
+}
+
+/* --- SEKJA ZNAJOMYCH I ZAPROSZEŃ --- */
+
 .add-friend-wrapper {
   margin-bottom: 20px;
   display: flex;
@@ -2860,90 +2848,6 @@ body {
   gap: 10px;
 }
 
-.friends-layout {
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.friends-column, .invites-column {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  border-radius: 14px;
-  width: 400px;
-  min-height: 500px;
-  max-height: 600px;
-  display: flex;
-  flex-direction: column;
-}
-
-.friends-list, .invite-list {
-  flex-grow: 1;
-  overflow-y: auto;
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 12px;
-  padding: 10px;
-  margin-top: 10px;
-}
-.friends-layout {
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.friends-column {
-  flex: 0 0 70%;
-  background: rgba(0,0,0,0.2);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  min-height: 400px;
-}
-
-.invites-column {
-  flex: 0 0 28%;
-  background: rgba(0,0,0,0.2);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  min-height: 400px;
-}
-
-.friends-controls-top {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.friends-list, .invite-list {
-  flex-grow: 1;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.15);
-  border-radius: 8px;
-  padding: 12px;
-}
-
-/* Styl scrolla */
-.friends-list::-webkit-scrollbar,
-.invite-list::-webkit-scrollbar {
-  width: 8px;
-}
-.friends-list::-webkit-scrollbar-thumb,
-.invite-list::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 4px;
-}
-.friends-list::-webkit-scrollbar-track,
-.invite-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Styl inputa i guzika */
 .add-friend-wrapper input[type="text"] {
   background: #222;
   color: #ddd;
@@ -2969,12 +2873,95 @@ body {
   background: #4b4b4b;
 }
 
-/* Styl przycisków u góry */
+.friend-status-text {
+  margin-top: 8px;
+  font-style: italic;
+  color: #bbb;
+  font-size: 14px;
+}
+
+/* Layout znajomych */
+.friends-layout {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Kolumny znajomych i zaproszeń */
+.friends-column {
+  flex: 0 0 70%;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 14px;
+  min-height: 400px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.invites-column {
+  flex: 0 0 28%;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 14px;
+  min-height: 400px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scroll listy znajomych i zaproszeń */
+.friends-list, .invite-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+/* Styl scrolla */
+.friends-list::-webkit-scrollbar,
+.invite-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.friends-list::-webkit-scrollbar-thumb,
+.invite-list::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.friends-list::-webkit-scrollbar-track,
+.invite-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Przyciski kontrolne u góry */
+.friends-controls-top {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
 .profile-btn.small {
   padding: 6px 14px;
   font-size: 14px;
 }
 
+/* Responsywność - poniżej 1200px zmiana układu */
+@media (max-width: 1200px) {
+  .friends-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .friends-column, .invites-column {
+    width: 90%;
+  }
+}
 
 
 
