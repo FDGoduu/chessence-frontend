@@ -161,7 +161,7 @@ async function loginUser(nick, password) {
     body: JSON.stringify({ nick, password })
   });
 
-  console.log(`📨 Odpowiedź z loginu:`, response.status);
+  console.log(`📨 Odpowiedź z loginu, status HTTP:`, response.status);
 
   if (!response.ok) {
     throw new Error('Błąd logowania');
@@ -174,12 +174,16 @@ async function loginUser(nick, password) {
 }
 
 async function getProfile(nick) {
+  console.log(`🌍 Pobieram profil użytkownika: ${nick}`);
   const response = await fetch(`${API_BASE}/api/profile/${nick}`);
+  console.log(`📥 Status odpowiedzi profilu: ${response.status}`);
+
   if (!response.ok) {
     throw new Error('Nie znaleziono profilu.');
   }
 
   const data = await response.json();
+  console.log(`📋 Dane profilu z serwera:`, data);
   return data.user;
 }
 
@@ -3952,7 +3956,7 @@ function showScreen(screenId) {
 
 async function startGameWithUser(nick) {
   try {
-    const user = await getProfile(nick); // 🔥 Najpierw pobierz profil!
+    const user = await getProfile(nick); // 🔥 najpierw pobierz profil
 
     if (!user) {
       throw new Error('Nie znaleziono użytkownika.');
@@ -3982,8 +3986,7 @@ async function startGameWithUser(nick) {
     await validateFriendsList();
     await renderFriendsList();
 
-    // 🔥 Dopiero TERAZ odśwież listę użytkowników
-    await refreshUsers();
+    await refreshUsers(); // 🔥 dopiero teraz odświeżamy listę users
 
     const users = await getUsers();
     const currentUser = users[nick];
@@ -3999,7 +4002,7 @@ async function startGameWithUser(nick) {
     });
 
   } catch (error) {
-    console.error('Błąd logowania:', error);
+    console.error('❌ Błąd logowania:', error);
   }
 }
 
@@ -4040,6 +4043,7 @@ document.getElementById("registerSubmit").addEventListener("click", async () => 
     alert("Rejestracja nie powiodła się. Być może nick już istnieje.");
   }
 });
+
 loginButton.addEventListener('click', async () => {
   const nick = document.getElementById('loginNickname').value.trim();
   const pass = document.getElementById('loginPassword').value.trim();
@@ -4051,11 +4055,11 @@ loginButton.addEventListener('click', async () => {
 
   let loggedUser = null;
   try {
-    loggedUser = await loginUser(nick, pass); // <-- próbuj się zalogować
+    loggedUser = await loginUser(nick, pass); // próbujemy się zalogować
   } catch (error) {
-    console.error(error);
+    console.error('❌ Błąd logowania:', error);
     alert("Logowanie nie powiodło się. Sprawdź dane.");
-    return; // ⛔ KONIEC — nie idź dalej
+    return; // jeśli błąd, zatrzymujemy się
   }
 
   if (!loggedUser) {
@@ -4063,9 +4067,9 @@ loginButton.addEventListener('click', async () => {
     return;
   }
 
-  await refreshUsers();
-  await startGameWithUser(loggedUser.nick); // <-- tylko jeśli login się udał
+  await startGameWithUser(loggedUser.nick); // przekazujemy nick z serwera
 });
+
 
 document.getElementById("openProfileBtn").addEventListener("click", () => {
   viewingFriendProfile = false;
