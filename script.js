@@ -275,24 +275,6 @@ async function tryRegister() {
   }
 }
 
-async function tryLogin() {
-  const nick = document.getElementById("nicknameInput").value.trim();
-  const password = document.getElementById("passwordInput").value.trim();
-
-  if (!nick || !password) {
-    alert("Podaj nick i hasło.");
-    return;
-  }
-
-  try {
-    await loginUser(nick, password); // użyj loginUser() który wywołuje API serwera
-    await startGameWithUser(nick);
-  } catch (error) {
-    console.error(error);
-    alert("Logowanie nie powiodło się. Sprawdź dane.");
-  }
-}
-
 function promotePawn(isWhite, isBot) {
   newPieceElem.dataset.promotion = "true";
   if (isBot) {
@@ -4056,16 +4038,15 @@ loginButton.addEventListener('click', async () => {
   const nick = document.getElementById('loginNickname').value.trim();
   const pass = document.getElementById('loginPassword').value.trim();
 
-  if (!nick) {
-    showFloatingStatus("Podaj nazwę użytkownika", "alert");
+  if (!nick || !pass) {
+    showFloatingStatus("Podaj nazwę użytkownika i hasło", "alert");
     return;
   }
 
   try {
-    await loginUser(nick, pass); // 🔥 logowanie na konto (w przyszłości możemy dodać hasło)
-    await refreshUsers();  // 🔥 pobranie users.json z serwera
-    await startGameWithUser(nick); // 🔥 teraz startGameWithUser zadba o socket.emit
-
+    const loggedUser = await loginUser(nick, pass); // <-- zapisz użytkownika
+    await refreshUsers();
+    await startGameWithUser(loggedUser.nick); // <-- użyj nicka z serwera
   } catch (error) {
     console.error(error);
     alert("Logowanie nie powiodło się. Sprawdź dane.");
