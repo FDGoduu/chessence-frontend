@@ -202,6 +202,7 @@ async function sendFriendRequest(targetNick) {
 
   const users = await getUsers();
   const currentUserData = users[myNick];
+  const targetUserData = users[targetNick];
 
   if (!currentUserData) {
     showFloatingStatus("Brak danych użytkownika.", "alert");
