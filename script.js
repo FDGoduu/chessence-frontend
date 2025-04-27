@@ -3354,6 +3354,19 @@ async function rejectInvite(fromNick) {
   }
 }
 
+async function removeFriendAPI(myNick, friendNick) {
+  const response = await fetch(`${API_BASE}/api/friends/remove`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ myNick, friendNick })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Błąd usuwania znajomego.");
+  }
+}
+
 function inviteToGame(friendId) {
   alert("Funkcja zaproszenia do gry zostanie dodana później.");
 }
