@@ -30,7 +30,7 @@ socket.on('refreshFriends', async () => {
 });
 
 
-
+let currentGameInvite = null; // zapamiętaj dane zaproszenia
 let currentRoomCode = null;
 let lastSentMove = null;
 let socketId = null;
@@ -3825,6 +3825,38 @@ function updateTurnStatus() {
 
 function setOnlineStatus(msg) {
   document.getElementById("onlineStatus").innerText = msg;
+}
+let currentGameInvite = null; // zapamiętaj dane zaproszenia
+
+// 🔵 Odbiór zaproszenia do gry
+socket.on('incomingGameInvite', ({ fromNick, roomCode }) => {
+  currentGameInvite = { fromNick, roomCode };
+  document.getElementById('inviteMessage').innerText = `${fromNick} zaprasza Cię do gry!`;
+  document.getElementById('gameInvitePopup').style.display = "flex"; // pokaż popup
+});
+
+// ✅ Kliknięcie "Akceptuj"
+document.getElementById('acceptInviteBtn').addEventListener('click', () => {
+  if (currentGameInvite) {
+    socket.emit('acceptGameInvite', { roomCode: currentGameInvite.roomCode, nickname: localStorage.getItem('currentUser') });
+    document.getElementById('gameInvitePopup').style.display = "none"; // schowaj popup
+    currentGameInvite = null;
+  }
+});
+
+// ❌ Kliknięcie "Odrzuć"
+document.getElementById('declineInviteBtn').addEventListener('click', () => {
+  document.getElementById('gameInvitePopup').style.display = "none"; // schowaj popup
+  currentGameInvite = null;
+});
+
+// 🔵 Funkcja do wysłania zaproszenia do znajomego
+function inviteFriendToGame(friendId) {
+  const myNick = localStorage.getItem("currentUser");
+  if (!myNick || !friendId) return;
+
+  // Tworzysz pokój i wysyłasz zaproszenie
+  socket.emit('createGameInvite', { fromNick: myNick, toFriendId: friendId });
 }
 
 socket.on('renderFriendsList', async () => {
