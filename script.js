@@ -283,16 +283,27 @@ async function declineFriendRequestAPI(senderNick, receiverNick) {
 }
 
 // Usuń znajomego
-async function removeFriendAPI(userNick, friendNick) {
-  const response = await fetch(`${API_BASE}/api/friends/remove`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user: userNick, friend: friendNick })
-  });
+async function removeFriend(friendNick) {
+  const myNick = localStorage.getItem("currentUser");
+  if (!myNick) {
+    showFloatingStatus("Musisz być zalogowany", "alert");
+    return;
+  }
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Nie udało się usunąć znajomego: ${errText}`);
+  try {
+    await removeFriendAPI(myNick, friendNick);
+
+    // 🔥 Emisja socketowa po usunięciu znajomego
+    socket.emit('friendListUpdated', { friend: friendNick });
+
+    await refreshUsers();
+    await renderFriendsList();
+    await renderInvites();
+
+    showFloatingStatus("Usunięto znajomego", "info");
+  } catch (error) {
+    console.error(error);
+    showFloatingStatus(error.message, "alert");
   }
 }
 
