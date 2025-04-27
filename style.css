@@ -2817,6 +2817,41 @@ body {
     transform: scale(0.85) translateY(-1vh);
   }
 }
+.friends-section {
+  display: flex;
+  gap: 24px;
+  padding: 20px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.friends-left, .friends-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.friends-list, .invite-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.add-friend-box {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.friend-status-text {
+  margin-bottom: 12px;
+  text-align: center;
+  color: #ccc;
+}
 
 
 
