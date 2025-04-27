@@ -188,6 +188,9 @@ async function sendFriendRequest(targetNickOrId) {
     console.error(error);
     showFloatingStatus(error.message, "alert");
   }
+  // ➔ odśwież użytkowników i zaproszenia
+  await refreshUsers();
+  await renderInvites();
 }
 
 // Akceptuj zaproszenie od znajomego
