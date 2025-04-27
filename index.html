@@ -319,6 +319,16 @@
   <button id="deleteAccountBtn" class="profile-btn red small fixed-corner">USUŃ KONTO</button>
   <button id="logoutBtn" class="profile-button logout-button fixed-corner">Wyloguj</button>
 </div>
+<!-- 🔥 Popup zaproszenia do gry -->
+<div id="gameInvitePopup" class="popup-overlay" style="display: none;">
+  <div class="popup-content">
+    <p id="inviteMessage">Gracz XYZ zaprasza Cię do gry!</p>
+    <div class="popup-buttons">
+      <button id="acceptInviteBtn">✅ Akceptuj</button>
+      <button id="declineInviteBtn">❌ Odrzuć</button>
+    </div>
+  </div>
+</div>
 <div class="fixed-corner version-label" id="gameVersion">v 0.6 (multi testv2)</div>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="./script.js" defer></script>
