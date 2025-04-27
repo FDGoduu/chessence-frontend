@@ -2981,5 +2981,8 @@ body {
   margin-top: 10px;
   min-height: 150px; /* 🔥 to dodajemy! */
 }
-
+.friend-entry, .friend-card {
+  width: 100%;
+  max-width: 100%;
+}
 
