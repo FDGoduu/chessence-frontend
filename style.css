@@ -1157,6 +1157,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  box-sizing: border-box; /* ✨ dodajemy to! */
 }
 
 /* ✅ Warstwa przyciemnienia tła */
@@ -2860,7 +2861,7 @@ body {
 .friends-layout {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: center; /* ✨ centrujemy */
   align-items: flex-start;
   gap: 40px;
   width: 100%;
@@ -2871,7 +2872,7 @@ body {
 
 /* Kolumny znajomych i zaproszeń */
 .friends-column {
-  width: 1200px;
+  width: 70%;
   background: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: 14px;
@@ -2882,7 +2883,7 @@ body {
 }
 
 .invites-column {
-  width: 400px;
+  width: 30%;
   background: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: 14px;
@@ -2943,9 +2944,17 @@ body {
     align-items: center;
   }
   
-  .friends-column, .invites-column {
-    width: 90%;
-  }
+.friends-column, .invites-column {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* ✨ dodajemy! */
+  max-height: 600px; /* ✨ trzymamy */
+  min-height: 400px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 14px;
+}
+
 }
 #tabContent-friends {
   display: flex;
