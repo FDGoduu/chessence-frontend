@@ -159,40 +159,51 @@
 		<div class="profile-tab-content" id="tabContent-other" style="display: none;">
 		  <p style="color: #ccc;">Tu pojawią się ustawienia i informacje dodatkowe.</p>
 		</div>
-		<div id="tabContent-friends" class="profile-tab-content" style="display: none;">
-		  
-		  <div class="friends-controls-top">
-		<button id="resetProgressBtn" class="profile-btn red">
-		  <img src="./img/reset.png" class="icon-inline" alt="Reset">
-		  Resetuj postęp
-		</button>
-		    <button onclick="closeProfileScreen()" class="profile-btn small">Wróć</button>
-		  </div>
 		
-		  <div class="add-friend-wrapper">
-		    <input type="text" id="addFriendInput" placeholder="Nick lub ID znajomego" />
-		    <button onclick="sendFriendRequest(document.getElementById('addFriendInput').value)">➕ Dodaj znajomego</button>
-		    <div id="friendStatus" class="friend-status-text"></div>
-		  </div>
+		<div class="profile-tab-content" id="tabContent-friends" style="display: none;">
 		
-		  <div class="friends-layout" style="display: flex; flex-direction: row; gap: 30px; justify-content: center; width: 100%; max-width: 1200px;">
+		  <div class="friends-layout">
+		
+		    <!-- Panel znajomych -->
 		    <div class="friends-column">
 		      <h3>Twoi znajomi</h3>
 		      <div id="friendsList" class="friends-list">
-			  <div class="empty-placeholder">Tu pojawią się znajomi</div>
+		        <div class="empty-placeholder">Tu pojawią się znajomi</div>
 		      </div>
-
 		    </div>
 		
+		    <!-- Panel zaproszeń -->
 		    <div class="invites-column">
 		      <h3>Otrzymane zaproszenia</h3>
 		      <div id="inviteList" class="invite-list">
-			  <div class="empty-placeholder">Tu pojawią się zaproszenia</div>
-			</div>
+		        <div class="empty-placeholder">Tu pojawią się zaproszenia</div>
+		      </div>
 		    </div>
+		
+		    <!-- Panel przycisków -->
+		    <div class="buttons-column">
+		      <button id="resetProgressBtn" class="profile-btn red">
+		        <img src="./img/reset.png" class="icon-inline" alt="Reset">
+		        Resetuj postęp
+		      </button>
+		
+		      <button onclick="closeProfileScreen()" class="profile-btn">
+		        ⬅️ Wróć
+		      </button>
+		
+		      <input id="addFriendInput" type="text" placeholder="Nick lub ID znajomego">
+		
+		      <button onclick="sendFriendRequest(document.getElementById('addFriendInput').value)" class="profile-btn">
+		        ➕ Dodaj znajomego
+		      </button>
+		
+		      <div id="friendStatus" class="friend-status-text"></div>
+		    </div>
+		
 		  </div>
 		
 		</div>
+
 
 	</div>
 
