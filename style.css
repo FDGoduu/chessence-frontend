@@ -2956,8 +2956,9 @@ body {
   flex-direction: row;
   gap: 30px;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* ✅ poprawne */
 }
+
 .empty-placeholder {
   text-align: center;
   color: #aaa;
