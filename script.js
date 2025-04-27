@@ -297,9 +297,8 @@ async function removeFriend(friendNick) {
     // 🔥 Emisja socketowa po usunięciu znajomego
     socket.emit('friendListUpdated', { friend: friendNick });
 
-    await refreshUsers();
-    await renderFriendsList();
-    await renderInvites();
+    // ❌ NIE rób tu ręcznego refreshUsers
+    // Poczekaj na socket.on('refreshFriends')
 
     showFloatingStatus("Usunięto znajomego", "info");
   } catch (error) {
