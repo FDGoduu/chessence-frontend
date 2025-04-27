@@ -16,15 +16,16 @@ try {
 }
 
 socket.on('refreshFriends', async () => {
-  window.cachedUsers = null; // ❗ Invalidate lokalny cache
+  window.cachedUsers = null;
+  await refreshUsers();
 
-  await refreshUsers(); // ❗ Pobierz świeżych użytkowników z serwera
+  const activeTabBtn = document.querySelector('.tab-button.active');
 
-  if (document.getElementById("friendsTab")?.style.display === "block") {
+  if (activeTabBtn?.id === 'tab-friends') {
     await renderFriendsList();
   }
 
-  if (document.getElementById("invitesTab")?.style.display === "block") {
+  if (activeTabBtn?.id === 'tab-invites') {
     await renderInvites();
   }
 });
