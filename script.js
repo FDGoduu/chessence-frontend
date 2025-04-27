@@ -3208,6 +3208,7 @@ async function showFriendsTab() {
 }
 
 async function renderFriendsList() {
+  document.getElementById("friendsList").innerHTML = "";
   await refreshUsers(); // 🔥 pobieramy najnowsze users.json
   const users = await getUsers();
   const currentUser = localStorage.getItem("currentUser");
@@ -3216,8 +3217,6 @@ async function renderFriendsList() {
   const myUser = users[currentUser];
   const container = document.getElementById("friendsList");
   if (!container) return;
-  const friendsInnerList = container.querySelector(".friends-list");
-  if (friendsInnerList) friendsInnerList.innerHTML = "";
 
   const uniqueFriends = [...new Set(myUser.friends || [])]; // 🔥 upewniamy się, że istnieje lista
 
@@ -3260,6 +3259,7 @@ async function renderFriendsList() {
 }
 
 async function renderInvites() {
+  document.getElementById("inviteList").innerHTML = "";
   const inviteList = document.getElementById("inviteList");
   const users = await getUsers();
   const nick = localStorage.getItem("currentUser");
@@ -3277,9 +3277,6 @@ async function renderInvites() {
     inviteList.innerHTML = "<div class='friend-status-text'>Brak zaproszeń</div>";
     return;
   }
-
-  const invitesInnerList = inviteList.querySelector(".invite-list");
-  if (invitesInnerList) invitesInnerList.innerHTML = "";
 
   // 🔵 Odebrane zaproszenia — pełna karta
   incoming.forEach(senderNick => {
