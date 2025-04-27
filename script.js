@@ -4062,7 +4062,7 @@ loginButton.addEventListener('click', async () => {
   }
 
   try {
-    await loginUser(nick); // 🔥 logowanie na konto (w przyszłości możemy dodać hasło)
+    await loginUser(nick, pass); // 🔥 logowanie na konto (w przyszłości możemy dodać hasło)
     await refreshUsers();  // 🔥 pobranie users.json z serwera
     await startGameWithUser(nick); // 🔥 teraz startGameWithUser zadba o socket.emit
 
