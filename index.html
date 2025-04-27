@@ -181,24 +181,23 @@
 		    </div>
 		
 		    <!-- Panel przycisków -->
-		    <div class="buttons-column">
-		      <button id="resetProgressBtn" class="profile-btn red">
-		        <img src="./img/reset.png" class="icon-inline" alt="Reset">
-		        Resetuj postęp
-		      </button>
-		
-		      <button onclick="closeProfileScreen()" class="profile-btn">
-		        ⬅️ Wróć
-		      </button>
-		
-		      <input id="addFriendInput" type="text" placeholder="Nick lub ID znajomego">
-		
-		      <button onclick="sendFriendRequest(document.getElementById('addFriendInput').value)" class="profile-btn">
-		        ➕ Dodaj znajomego
-		      </button>
-		
-		      <div id="friendStatus" class="friend-status-text"></div>
-		    </div>
+			<div class="buttons-column">
+			  <button id="resetProgressBtn" class="profile-btn reset-btn">
+			    <img src="./img/reset.png" class="icon-inline" alt="Reset"> Resetuj postęp
+			  </button>
+			
+			  <button onclick="closeProfileScreen()" class="profile-btn back-btn">
+			    ⬅️ Wróć
+			  </button>
+			
+			  <input id="addFriendInput" type="text" class="friend-input" placeholder="Nick lub ID znajomego">
+			
+			  <button onclick="sendFriendRequest(document.getElementById('addFriendInput').value)" class="profile-btn add-friend-btn">
+			    ➕ Dodaj znajomego
+			  </button>
+			
+			  <div id="friendStatus" class="friend-status-text"></div>
+			</div>
 		
 		  </div>
 		
