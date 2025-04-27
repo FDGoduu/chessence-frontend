@@ -2939,6 +2939,13 @@ body {
     width: 90%;
   }
 }
+#tabContent-friends .friends-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
 
 
 
