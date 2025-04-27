@@ -3011,7 +3011,15 @@ async function unlockAchievement(id, usersOverride = null) {
   users[currentUser].achievements = users[currentUser].achievements || {};
   users[currentUser].achievements[id] = true;
 
-  achievements = users[currentUser].achievements;
+  achievements = { ...users[currentUser].achievements };
+
+  window.cachedUsers[currentUser].achievements = { ...users[currentUser].achievements };
+
+  try {
+    localStorage.setItem("users", JSON.stringify(window.cachedUsers));
+  } catch (e) {
+    console.error("Błąd zapisu users do localStorage:", e);
+  }
 
   await saveUsers(users);
 
@@ -3024,6 +3032,45 @@ async function unlockAchievement(id, usersOverride = null) {
   await saveProfile();
 }
 
+async function updateStatsOnWin() {
+  const currentUser = activeUserNick || localStorage.getItem("currentUser");
+  if (!currentUser) return;
+
+  const users = await getUsers();
+  if (!users[currentUser]) return;
+
+  // Aktualizacja liczników
+  users[currentUser].stats = users[currentUser].stats || {};
+  users[currentUser].stats.wins = (users[currentUser].stats.wins || 0) + 1;
+  users[currentUser].stats.winStreak = (users[currentUser].stats.winStreak || 0) + 1;
+
+  // Aktualizuj cachedUsers i localStorage
+  window.cachedUsers[currentUser].stats = { ...users[currentUser].stats };
+  try {
+    localStorage.setItem("users", JSON.stringify(window.cachedUsers));
+  } catch (e) {
+    console.error("Błąd zapisu users do localStorage:", e);
+  }
+
+  await saveUsers(users);
+
+  // 🔥 PRZYZNAWANIE OSIĄGNIĘĆ progresywnych
+  if (users[currentUser].stats.wins >= 5) {
+    await unlockAchievement('win_5');
+  }
+  if (users[currentUser].stats.wins >= 50) {
+    await unlockAchievement('win_50');
+  }
+  if (users[currentUser].stats.wins >= 200) {
+    await unlockAchievement('win_200');
+  }
+  if (users[currentUser].stats.winStreak >= 3) {
+    await unlockAchievement('win_streak_3');
+  }
+  if (users[currentUser].stats.winStreak >= 5) {
+    await unlockAchievement('win_streak_5');
+  }
+}
 
 function processAchievementQueue() {
   if (isAchievementVisible || achievementQueue.length === 0) return;
