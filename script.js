@@ -361,6 +361,27 @@ document.getElementById("difficultyBlack").addEventListener("input", (e) => {
   document.getElementById("difficultyBlackValue").innerText = val;
 });
 
+function showNotification(message) {
+  const notification = document.createElement("div");
+  notification.innerText = message;
+  notification.style.position = "fixed";
+  notification.style.top = "20px";
+  notification.style.left = "50%";
+  notification.style.transform = "translateX(-50%)";
+  notification.style.padding = "10px 20px";
+  notification.style.backgroundColor = "#4CAF50";
+  notification.style.color = "white";
+  notification.style.fontSize = "16px";
+  notification.style.borderRadius = "8px";
+  notification.style.zIndex = "9999";
+  notification.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000); // znika po 3 sekundach
+}
+
 function renderBoard() {
   board.innerHTML = '';
   for (let y = 0; y < 8; y++) {
@@ -3404,14 +3425,14 @@ function openAvatarSelector() {
     img.dataset.id = id;
     if (!isUnlocked) img.classList.add("locked");
 
-    img.onclick = () => {
-      if (!img.classList.contains("locked")) {
-        localStorage.setItem("selectedAvatar", id);
-        applySavedAvatar();
-        closeAvatarSelector();
-		saveProfile();
-      }
-    };
+	img.onclick = async () => {
+	  if (!img.classList.contains("locked")) {
+	    localStorage.setItem("selectedAvatar", id);
+	    applySavedAvatar();
+	    closeAvatarSelector();
+	    await saveProfile();
+	  }
+	};
 
     wrapper.appendChild(img);
 
@@ -3438,12 +3459,12 @@ function openAvatarSelector() {
     img.dataset.id = id;
     if (!isUnlocked) img.classList.add("locked");
 
-    img.onclick = () => {
+    img.onclick = async () => {
       if (!img.classList.contains("locked")) {
         localStorage.setItem("selectedFrame", id);
         applySavedFrame();
         closeAvatarSelector();
-		saveProfile();
+	await saveProfile();
       }
     };
 
@@ -3484,12 +3505,12 @@ function openBackgroundSelector() {
     img.dataset.id = id;
     if (!isUnlocked) img.classList.add("locked");
 
-    img.onclick = () => {
+    img.onclick = async () => {
       if (!img.classList.contains("locked")) {
         localStorage.setItem("selectedBackground", id);
         applySavedBackground();
         closeBackgroundSelector();
-		saveProfile();
+	await saveProfile();
       }
     };
 
