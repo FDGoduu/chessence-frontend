@@ -886,6 +886,10 @@ function updateGameStatus() {
 
       // 🔥 Przyznaj XP natychmiast po zakończeniu
       awardXP(window.xpPendingResult);
+	if (window.xpPendingResult === "win") {
+  	await updateStatsOnWin();
+        }
+
       delete window.xpPendingResult;
     }
 
@@ -2916,21 +2920,9 @@ async function awardXP(resultType) {
     user.stats.wins++;
 
     unlockAchievement("first_win", users);
-    if (user.stats.wins === 5) unlockAchievement("win_5", users);
-    if (user.stats.wins === 50) unlockAchievement("win_50", users);
-    if (user.stats.wins === 200) unlockAchievement("win_200", users);
 
     unlockAchievement(`bot_${botLevel}`, users);
 
-    let streak = parseInt(localStorage.getItem("winStreak") || "0");
-    if (botLevel > 3) {
-      streak++;
-      if (streak === 3) unlockAchievement("win_streak_3", users);
-      if (streak === 5) unlockAchievement("win_streak_5", users);
-    } else {
-      streak = 0;
-    }
-    localStorage.setItem("winStreak", streak);
 
     const lostTo = JSON.parse(localStorage.getItem("lostToBots") || "[]");
     if (lostTo.includes(botLevel)) {
