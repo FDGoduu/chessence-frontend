@@ -3325,6 +3325,8 @@ async function rejectInvite(fromNick) {
     console.error(error);
     showFloatingStatus(error.message, "alert");
   }
+  await refreshUsers();
+  await renderInvites();
 }
 
 function inviteToGame(friendId) {
