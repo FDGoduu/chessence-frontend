@@ -19,16 +19,16 @@ socket.on('refreshFriends', async () => {
   window.cachedUsers = null;
   await refreshUsers();
 
+  // 🔥 ZAWSZE odśwież zaproszenia
+  await renderInvites();
+
   const activeTabBtn = document.querySelector('.tab-button.active');
 
   if (activeTabBtn?.id === 'tab-friends') {
     await renderFriendsList();
   }
-
-  if (activeTabBtn?.id === 'tab-invites') {
-    await renderInvites();
-  }
 });
+
 
 
 let currentRoomCode = null;
