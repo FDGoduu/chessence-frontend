@@ -184,10 +184,15 @@ async function sendFriendRequest(targetNickOrId) {
   try {
     await sendFriendRequestAPI(myNick, targetNickOrId);
     showFloatingStatus(`Zaproszenie do ${targetNickOrId} wysłane`, "info");
+
+    // 🔥 Tutaj poprawione:
+    socket.emit('friendListUpdated', { friend: targetNickOrId });
+
   } catch (error) {
     console.error(error);
     showFloatingStatus(error.message, "alert");
   }
+
   // ➔ odśwież użytkowników i zaproszenia
   await refreshUsers();
   await renderInvites();
@@ -3284,7 +3289,6 @@ async function refreshUsers() {
 
 // ✅ Akceptuj zaproszenie
 async function acceptInvite(fromNick) {
-  console.log('Akceptacja zaproszenia: od', fromNick, 'dla', localStorage.getItem("currentUser"));
   const myNick = localStorage.getItem("currentUser");
   if (!myNick) {
     showFloatingStatus("Musisz być zalogowany", "alert");
@@ -3293,15 +3297,16 @@ async function acceptInvite(fromNick) {
 
   try {
     await acceptFriendRequestAPI(fromNick, myNick);
+
+    // 🔥 Wyemituj event dla osoby, która Cię zaprosiła
     socket.emit('friendListUpdated', { friend: fromNick });
 
-	// 🔥 Wyemituj event, żeby wysyłający zaproszenie się odświeżył
-	socket.emit('friendListUpdated', { friend: fromNick });
-	
-	await refreshUsers();
-	renderFriendsList();
-	renderInvites();
-	showFloatingStatus("Dodano do znajomych!", "info");
+    // 🔥 Odśwież swoje dane
+    await refreshUsers();
+    await renderFriendsList();
+    await renderInvites();
+
+    showFloatingStatus("Dodano do znajomych!", "info");
 
   } catch (error) {
     console.error(error);
@@ -3319,14 +3324,21 @@ async function rejectInvite(fromNick) {
 
   try {
     await declineFriendRequestAPI(fromNick, myNick);
-    renderInvites();
+
+    // 🔥 Wyemituj event dla osoby, która Cię zaprosiła
+    socket.emit('friendListUpdated', { friend: fromNick });
+
+    // 🔥 Odśwież swoje dane
+    await refreshUsers();
+    await renderFriendsList();
+    await renderInvites();
+
     showFloatingStatus("Zaproszenie odrzucone", "info");
+
   } catch (error) {
     console.error(error);
     showFloatingStatus(error.message, "alert");
   }
-  await refreshUsers();
-  await renderInvites();
 }
 
 function inviteToGame(friendId) {
