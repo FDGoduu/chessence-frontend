@@ -236,9 +236,12 @@ async function removeFriendAPI(userNick, friendNick) {
 
 async function saveProfileToServer(nick, profileData) {
   await fetch(`${API_BASE}/api/profile/save`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nick, data: profileData })
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nick,
+      ui: profileData.ui
+    })
   });
 }
 
@@ -2514,20 +2517,21 @@ function triggerLevelUpAnimation() {
 }
 
 async function saveProfile() {
-  const currentUser = activeUserNick || localStorage.getItem("currentUser");
-  if (!currentUser) return;
+  const selectedAvatar = localStorage.getItem("selectedAvatar") || "avatar1.png";
+  const selectedBackground = localStorage.getItem("selectedBackground") || "bg0.png";
+  const selectedFrame = localStorage.getItem("selectedFrame") || "default_frame";
 
   const profileData = {
-    achievements,
     ui: {
-      avatar: localStorage.getItem("selectedAvatar") || "avatar1.png",
-      background: localStorage.getItem("selectedBackground") || "bg0.png",
-      frame: localStorage.getItem("selectedFrame") || "default_frame"
-    },
-    friends: (await getUsers())[localStorage.getItem("currentUser")]?.friends || []
-  };  
+      avatar: selectedAvatar,
+      background: selectedBackground,
+      frame: selectedFrame
+    }
+  };
 
   await saveProfileToServer(currentUser, profileData);
+
+  showNotification("Zapisano zmiany profilu!");
 }
 
 
