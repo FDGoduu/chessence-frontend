@@ -180,7 +180,7 @@ async function getProfile(nick) {
 }
 
 // Wyślij zaproszenie do znajomego
-async function sendFriendRequest(targetNickOrId) {
+async function sendFriendRequest(targetNick) {
   const myNick = localStorage.getItem("currentUser");
   if (!myNick) {
     showFloatingStatus("Musisz być zalogowany", "alert");
@@ -188,20 +188,18 @@ async function sendFriendRequest(targetNickOrId) {
   }
 
   try {
-    await sendFriendRequestAPI(myNick, targetNickOrId);
-    showFloatingStatus(`Zaproszenie do ${targetNickOrId} wysłane`, "info");
+    await sendFriendRequestAPI(myNick, targetNick);
+    showFloatingStatus(`Zaproszenie do ${targetNick} wysłane`, "info");
 
-    // 🔥 Tutaj poprawione:
-    socket.emit('friendListUpdated', { friend: targetNickOrId });
+    socket.emit('friendListUpdated', { friend: targetNick });
 
+    await refreshUsers();
+    await renderFriendsList();
+    await renderInvites();
   } catch (error) {
     console.error(error);
     showFloatingStatus(error.message, "alert");
   }
-
-  // ➔ odśwież użytkowników i zaproszenia
-  await refreshUsers();
-  await renderInvites();
 }
 
 // Akceptuj zaproszenie od znajomego
@@ -3280,16 +3278,14 @@ async function renderInvites() {
 }
 
 async function refreshUsers() {
-  const response = await fetch(`${API_BASE}/api/users`);
-  const { users } = await response.json();
-  
-  // 🔥 Poprawne ustawienie usersCache po nickach
-  const usersByNick = {};
-  Object.entries(users).forEach(([nick, userData]) => {
-    usersByNick[nick] = userData;
-  });
-
-  localStorage.setItem("usersCache", JSON.stringify(usersByNick));
+  try {
+    const res = await fetch(`${API_BASE}/api/users`);
+    const data = await res.json();
+    localStorage.setItem("users", JSON.stringify(data));
+    window.cachedUsers = data; // 🔥 Dodajemy cache użytkowników w RAM
+  } catch (error) {
+    console.error("Błąd pobierania użytkowników:", error);
+  }
 }
 
 
@@ -3303,17 +3299,13 @@ async function acceptInvite(fromNick) {
 
   try {
     await acceptFriendRequestAPI(fromNick, myNick);
-
-    // 🔥 Wyemituj event dla osoby, która Cię zaprosiła
     socket.emit('friendListUpdated', { friend: fromNick });
 
-    // 🔥 Odśwież swoje dane
     await refreshUsers();
     await renderFriendsList();
     await renderInvites();
 
     showFloatingStatus("Dodano do znajomych!", "info");
-
   } catch (error) {
     console.error(error);
     showFloatingStatus(error.message, "alert");
@@ -3330,17 +3322,13 @@ async function rejectInvite(fromNick) {
 
   try {
     await declineFriendRequestAPI(fromNick, myNick);
-
-    // 🔥 Wyemituj event dla osoby, która Cię zaprosiła
     socket.emit('friendListUpdated', { friend: fromNick });
 
-    // 🔥 Odśwież swoje dane
     await refreshUsers();
     await renderFriendsList();
     await renderInvites();
 
     showFloatingStatus("Zaproszenie odrzucone", "info");
-
   } catch (error) {
     console.error(error);
     showFloatingStatus(error.message, "alert");
@@ -3931,10 +3919,22 @@ document.getElementById("joinRoomBtn").addEventListener("click", () => {
 renderBoard();
 
 async function getUsers() {
-  const response = await fetch(`${API_BASE}/api/users`);
-  if (!response.ok) throw new Error("Nie można pobrać użytkowników.");
-  const data = await response.json();
-  return data.users;
+  if (window.cachedUsers) {
+    return window.cachedUsers;
+  }
+
+  const stored = localStorage.getItem("users");
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      window.cachedUsers = parsed; // 🔥 Jak ładujemy z localStorage też ustawiamy RAM
+      return parsed;
+    } catch (e) {
+      console.error("Błąd parsowania użytkowników:", e);
+    }
+  }
+
+  return {}; // Brak danych
 }
 
 async function saveUsers(users) {
