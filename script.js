@@ -226,12 +226,6 @@ async function sendFriendRequest(targetNick) {
     return;
   }
 
-  // 🔥 BLOKADA 4: Zaproszenie już czeka od tamtej osoby (pendingFriends)
-  if (currentUserData.pendingFriends?.includes(targetNick)) {
-    showFloatingStatus(`Użytkownik ${targetNick} już wysłał Ci zaproszenie!`, "alert");
-    return;
-  }
-
   try {
     socket.emit('sendFriendRequest', {
       from: myNick,
