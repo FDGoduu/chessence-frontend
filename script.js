@@ -883,7 +883,7 @@ function updateGameStatus() {
       if (typeof window.xpBotLevelAtEnd === "undefined") {
         window.xpBotLevelAtEnd = getCurrentBotLevel();
       }
-
+    window.hasLostPieceFinal = hasLostPiece;
       // 🔥 Przyznaj XP natychmiast po zakończeniu
       awardXP(window.xpPendingResult);
 	if (window.xpPendingResult === "win") {
@@ -893,7 +893,7 @@ function updateGameStatus() {
       delete window.xpPendingResult;
     }
 
-    window.hasLostPieceFinal = hasLostPiece;
+
     gameEnded = true;
 
   } else if (!inCheck && !hasLegalMove) {
