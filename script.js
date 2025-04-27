@@ -2057,6 +2057,11 @@ document.querySelector(".captured-bottom .capture-label").textContent =
 });
 
 function showStartMenu() {
+	if (gameMode === "online" && currentRoomCode && socket) {
+	  socket.emit("leaveRoom", { roomCode: currentRoomCode });
+	  currentRoomCode = null; // wyczyść kod pokoju
+	}
+
 	// 🎯 Przyznaj zaległy XP tylko przy wejściu do menu
 	if (!hasAwardedXP && typeof window.xpPendingResult !== "undefined") {
 	  awardXP(window.xpPendingResult);
