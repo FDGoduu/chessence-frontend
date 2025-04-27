@@ -2950,5 +2950,21 @@ body {
   max-width: 1600px;
   margin: 0 auto;
 }
+#tabContent-friends {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+#tabContent-friends .friends-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
 
 
