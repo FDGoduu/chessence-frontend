@@ -3299,6 +3299,7 @@ async function acceptInvite(fromNick) {
 
   try {
     await acceptFriendRequestAPI(fromNick, myNick);
+
     socket.emit('friendListUpdated', { friend: fromNick });
 
     await refreshUsers();
@@ -3322,6 +3323,7 @@ async function rejectInvite(fromNick) {
 
   try {
     await declineFriendRequestAPI(fromNick, myNick);
+
     socket.emit('friendListUpdated', { friend: fromNick });
 
     await refreshUsers();
