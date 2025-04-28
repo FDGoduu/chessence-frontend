@@ -2622,6 +2622,41 @@ function showPopup(message) {
   };
 }
 
+function showPopupAdvanced({ message, input = false, confirm = false, onConfirm, onCancel }) {
+  const popupContainer = document.getElementById("popupContainer");
+  const popupMessage = document.getElementById("popupMessage");
+  const popupInput = document.getElementById("popupInput");
+  const popupConfirmBtn = document.getElementById("popupConfirmBtn");
+  const popupCancelBtn = document.getElementById("popupCancelBtn");
+
+  popupMessage.textContent = message;
+  popupInput.value = "";
+  
+  // Reset widoczności
+  popupInput.classList.toggle('popup-hidden', !input);
+  popupCancelBtn.classList.toggle('popup-hidden', !confirm);
+
+  popupContainer.classList.remove("popup-hidden");
+
+  const cleanUp = () => {
+    popupContainer.classList.add("popup-hidden");
+    popupConfirmBtn.onclick = null;
+    popupCancelBtn.onclick = null;
+  };
+
+  popupConfirmBtn.onclick = () => {
+    const value = input ? popupInput.value : true;
+    cleanUp();
+    onConfirm && onConfirm(value);
+  };
+
+  popupCancelBtn.onclick = () => {
+    cleanUp();
+    onCancel && onCancel();
+  };
+}
+
+
 function showLevelRewardsPopup(level) {
   const unlocked = levelRewards.filter(r => r.level === level);
   if (unlocked.length === 0) return;
@@ -2743,14 +2778,17 @@ const initialVal = parseInt(document.getElementById("difficultyPVB").value);
 document.getElementById("difficultyPVBName").innerText = difficultyNames[initialVal];
 
 async function resetProfile() {
-  if (confirm("Na pewno zresetować cały postęp?")) {
+showPopupAdvanced({
+  message: "Na pewno zresetować cały postęp?",
+  confirm: true,
+  onConfirm: async () => {
     const currentUser = activeUserNick || localStorage.getItem("currentUser");
     const users = await getUsers();
 
     if (!users[currentUser]) return;
 
-    users[currentUser].xp = 1000;
-    users[currentUser].level = 69;
+    users[currentUser].xp = 0;
+    users[currentUser].level = 0;
     users[currentUser].achievements = {};
     users[currentUser].stats = { wins: 0 };
     users[currentUser].ui = {
@@ -2769,9 +2807,8 @@ async function resetProfile() {
     updateAchievementsUI();
     updateProfileUI();
   }
+});
 }
-
-
 
 function resetLevelRewards() {
   for (const r of levelRewards) {
@@ -4274,36 +4311,45 @@ document.getElementById("openProfileBtn").addEventListener("click", () => {
   openProfileScreen();
 });
 document.getElementById("logoutBtn").addEventListener("click", () => {
-  if (confirm("Na pewno chcesz się wylogować?")) {
+showPopupAdvanced({
+  message: "Na pewno chcesz się wylogować?",
+  confirm: true,
+  onConfirm: () => {
     logout();
   }
 });
+});
 
-document.getElementById("deleteAccountBtn").addEventListener("click", async () => {
-  const pass = prompt("Aby usunąć konto, wpisz swoje hasło:");
-  if (!pass) return;
+document.getElementById("deleteAccountBtn").addEventListener("click", () => {
+  showPopupAdvanced({
+    message: "Aby usunąć konto, wpisz swoje hasło:",
+    input: true,
+    onConfirm: async (pass) => {
+      if (!pass) return;
 
-  const currentUser = activeUserNick || localStorage.getItem("currentUser");
+      const currentUser = activeUserNick || localStorage.getItem("currentUser");
 
-  try {
-    const response = await fetch(`${API_BASE}/api/users/delete`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nick: currentUser, password: pass })
-    });
+      try {
+        const response = await fetch(`${API_BASE}/api/users/delete`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nick: currentUser, password: pass })
+        });
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(text || "Błąd serwera");
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || "Błąd serwera");
+        }
+
+        showPopup("Twoje konto zostało usunięte.");
+        localStorage.clear();
+        showScreen("registerScreen");
+      } catch (error) {
+        console.error(error);
+        showPopup("Nie udało się usunąć konta: " + error.message);
+      }
     }
-
-    showPopup("Twoje konto zostało usunięte.");
-    localStorage.clear();
-    showScreen("registerScreen");
-  } catch (error) {
-    console.error(error);
-    showPopup("Nie udało się usunąć konta: " + error.message);
-  }
+  });
 });
 
 document.getElementById("resetProgressBtn").addEventListener("click", resetProfile);
