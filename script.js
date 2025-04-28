@@ -1763,6 +1763,7 @@ document.getElementById("modePVB").addEventListener("click", () => {
   toggleModeButtons(document.getElementById("modePVB"));
 
   startShiftTo("pvb");
+  updateStartGameButton();
   document.getElementById("modePVB").classList.add("selected");
   document.getElementById("modePVP").classList.remove("selected");
   document.getElementById("modeBVB").classList.remove("selected");
@@ -1811,7 +1812,7 @@ document.getElementById("modeBVB").addEventListener("click", () => {
   toggleModeButtons(document.getElementById("modeBVB"));
 
   startShiftTo("bvb");
-
+  updateStartGameButton();
   document.getElementById("modeBVB").classList.add("selected");
   document.getElementById("modePVB").classList.remove("selected");
   document.getElementById("modePVP").classList.remove("selected");
