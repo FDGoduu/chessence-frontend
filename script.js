@@ -2073,25 +2073,34 @@ document.getElementById('startGame').addEventListener('click', function () {
 	  botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
 	  botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
 	}
-  resetGame(false);
-  isInputLocked = false;
+resetGame(false);
+isInputLocked = false;
 
-  if (gameMode === "bvb") {
-    runBotVsBot();
-    return;
+if (gameMode === "bvb") {
+  runBotVsBot();
+  return;
+}
+
+if (gameMode === "pvp-hotseat") {
+  document.getElementById("board").classList.remove("rotated");
+  return;
+}
+
+if (playerColor === 'b') {
+  document.getElementById("board").classList.add("rotated");
+
+  if (gameMode === "pvb") {
+    stockfishPVBWorker.postMessage("uci");
+    stockfishPVBWorker.onmessage = function (e) {
+      const line = String(e.data);
+      if (line.includes("uciok")) {
+        runAIMove();
+      }
+    };
   }
-
-	if (gameMode === "pvp-hotseat") {
-	  document.getElementById("board").classList.remove("rotated");
-	  return;
-	}
-
-  if (playerColor === 'b') {
-    document.getElementById("board").classList.add("rotated");
-    setTimeout(runAIMove, 600);
-  } else {
-    document.getElementById("board").classList.remove("rotated");
-  }
+} else {
+  document.getElementById("board").classList.remove("rotated");
+}
   // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
 const topLabel = document.querySelector(".captured-top .capture-label");
 const bottomLabel = document.querySelector(".captured-bottom .capture-label");
