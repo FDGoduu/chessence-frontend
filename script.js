@@ -2832,13 +2832,16 @@ async function openProfileScreen(friendId = null) {
   const users = await getUsers();
   await renderFriendsList();
 
-if (viewingFriendProfile) {
-  document.getElementById("backGeneralBtn").style.display = "none";
-  document.getElementById("backFriendBtn").style.display = "inline-block";
-} else {
+document.getElementById("resetProgressBtn").style.display = isOwnProfile ? "inline-block" : "none";
+
+if (isOwnProfile) {
   document.getElementById("backGeneralBtn").style.display = "inline-block";
   document.getElementById("backFriendBtn").style.display = "none";
+} else {
+  document.getElementById("backGeneralBtn").style.display = "none";
+  document.getElementById("backFriendBtn").style.display = "inline-block";
 }
+
 
   const backBtnEl = document.getElementById("backToOwnProfileBtn");
 
