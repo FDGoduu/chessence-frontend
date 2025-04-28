@@ -2673,10 +2673,10 @@ const cleanUp = () => {
 
 
   // Przycisk OK
-	popupConfirmBtn.onclick = () => {
-	    const value = input ? popupInput.value : true;
-	    cleanUp();
-	    if (onConfirm) onConfirm(value);
+	popupConfirmBtn.onclick = async () => {
+	  const value = input ? popupInput.value : true;
+	  if (onConfirm) await onConfirm(value); // 🔥 najpierw czekaj na zakończenie akcji
+	  cleanUp(); // 🔥 dopiero potem zamknij popup
 	};
 
   // Przycisk Anuluj
