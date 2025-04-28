@@ -29,7 +29,7 @@ socket.on('refreshFriends', async () => {
   }
 });
 
-
+let currentPopupID = 0;
 let currentGameInvite = null; // zapamiętaj dane zaproszenia
 let currentRoomCode = null;
 let lastSentMove = null;
@@ -2640,6 +2640,7 @@ console.log("Odblokowywanie nagród dla poziomu:", newLevel, unlocked);
 }
 
 function showPopupAdvanced({ message, input = false, confirm = false, onConfirm = null, onCancel = null }) {
+  const thisPopupID = ++currentPopupID; // 🔥 nadaj ID temu popupowi
   const popupContainer = document.getElementById("popupContainer");
   const popupMessage = document.getElementById("popupMessage");
   const popupInput = document.getElementById("popupInput");
@@ -2664,11 +2665,13 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
   popupContainer.classList.remove("popup-hidden");
 
 const cleanUp = () => {
+  const thisCleanupID = currentPopupID; // zapisz ID popupu, który ma się wyczyścić
+
   popupContainer.classList.add("popup-hidden");
 
-  // NIE rób natychmiastowego resetu — zrób po 400ms i tylko jeśli popupContainer nadal hidden
   setTimeout(() => {
-    if (popupContainer.classList.contains("popup-hidden")) {
+    if (thisCleanupID === currentPopupID) {
+      // ✅ Czyścimy tylko jeśli popup nie został nadpisany nowym
       popupMessage.textContent = "";
       popupInput.value = "";
       popupInput.classList.add("popup-hidden");
@@ -2678,7 +2681,7 @@ const cleanUp = () => {
       popupConfirmBtn.classList.remove("popup-hidden");
       popupCancelBtn.classList.add("popup-hidden");
     }
-  }, 400);
+  }, 400); // 400ms opóźnienia na animację
 };
 
 popupConfirmBtn.onclick = async () => {
