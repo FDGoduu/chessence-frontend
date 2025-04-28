@@ -1633,15 +1633,15 @@ function toggleModeButtons(activeButton) {
   const difficultyPVB = document.getElementById("difficultyPVBContainer");
   const difficultyBVB = document.getElementById("difficultyBVBContainer");
 
-  smoothToggle(colorButtons, false);
-  smoothToggle(difficultyPVB, false);
-  smoothToggle(difficultyBVB, false);
+  colorButtons.style.display = "none";
+  difficultyPVB.style.display = "none";
+  difficultyBVB.style.display = "none";
 
   if (gameMode === "pvb") {
-    smoothToggle(colorButtons, true);
-    smoothToggle(difficultyPVB, true);
+    colorButtons.style.display = "flex";
+    difficultyPVB.style.display = "block";
   } else if (gameMode === "bvb") {
-    smoothToggle(difficultyBVB, true);
+    difficultyBVB.style.display = "block";
   }
 
   document.getElementById("startGame").disabled = (gameMode === "pvb" && !playerColor);
@@ -1695,15 +1695,15 @@ document.getElementById("modePVP").addEventListener("click", () => {
 
   // 📌 Pokaż subopcji PvP natychmiast
   document.getElementById("pvpSubmodeButtons").style.display = "flex";
-  smoothToggle(document.getElementById("colorButtons"), false);
-  smoothToggle(document.getElementById("difficultyPVBContainer"), false);
-  smoothToggle(document.getElementById("difficultyBVBContainer"), false);
+  document.getElementById("colorButtons").style.display = "none";
+  document.getElementById("difficultyPVBContainer").style.display = "none";
+  document.getElementById("difficultyBVBContainer").style.display = "none";
 
   // 📌 Uruchom przesunięcie UI bez opóźnienia
   startShiftReset();
   startShiftTo("pvp");
-  updateStartGameButton();
   document.getElementById("startGame").disabled = true;
+  updateStartGameButton();
 });
 
 
@@ -1768,9 +1768,9 @@ document.getElementById("modePVB").addEventListener("click", () => {
   document.getElementById("modePVP").classList.remove("selected");
   document.getElementById("modeBVB").classList.remove("selected");
 
-  smoothToggle(document.getElementById("colorButtons"), true);
-  smoothToggle(document.getElementById("difficultyPVBContainer"), true);
-  smoothToggle(document.getElementById("difficultyBVBContainer"), false);
+  document.getElementById("colorButtons").style.display = "flex";
+  document.getElementById("difficultyPVBContainer").style.display = "block";
+  document.getElementById("difficultyBVBContainer").style.display = "none";
   document.getElementById("startGame").disabled = true;
   // Ustaw kolor i nazwę trudności od razu po wejściu do PvB
 	const val = parseInt(document.getElementById("difficultyPVB").value, 10);
@@ -1817,9 +1817,9 @@ document.getElementById("modeBVB").addEventListener("click", () => {
   document.getElementById("modePVB").classList.remove("selected");
   document.getElementById("modePVP").classList.remove("selected");
 
-  smoothToggle(document.getElementById("colorButtons"), false);
-  smoothToggle(document.getElementById("difficultyPVBContainer"), false);
-smoothToggle(document.getElementById("difficultyBVBContainer"), true);
+  document.getElementById("colorButtons").style.display = "none";
+  document.getElementById("difficultyPVBContainer").style.display = "none";
+document.getElementById("difficultyBVBContainer").style.display = "block";
 document.getElementById("difficultyWhite").style.display = "inline-block";
 document.getElementById("difficultyBlack").style.display = "inline-block";
 document.getElementById("difficultyWhiteValue").style.display = "inline";
@@ -1893,34 +1893,6 @@ function startShiftTo(mode) {
 lastGameMode = mode;
 }
 
-function smoothToggle(element, show) {
-  if (!element) return;
-
-  element.classList.remove('fade-slide-in', 'fade-slide-out');
-
-  requestAnimationFrame(() => {
-    if (show) {
-      element.style.display = "flex"; // lub block
-      element.classList.add('fade-slide-in');
-
-      const removeInClass = () => {
-        element.classList.remove('fade-slide-in');
-        element.removeEventListener('animationend', removeInClass);
-      };
-      element.addEventListener('animationend', removeInClass, { once: true });
-
-    } else {
-      element.classList.add('fade-slide-out');
-
-      const hideAfter = () => {
-        element.style.display = "none";
-        element.classList.remove('fade-slide-out');
-        element.removeEventListener('animationend', hideAfter);
-      };
-      element.addEventListener('animationend', hideAfter, { once: true });
-    }
-  });
-}
 
 function runBotVsBot() {
   if (gameEnded || isBotRunning || gameMode !== "bvb") return;
@@ -2028,9 +2000,9 @@ function runBotVsBot() {
 
 
   // Domyślnie ukryj wszystko
-  smoothToggle(colorButtons, false);
-smoothToggle(difficultyPVB, false);
-smoothToggle(difficultyBVB, false);
+  colorButtons.style.display = "none";
+difficultyPVB.style.display = "none";
+difficultyBVB.style.display = "none";
 
 
   // Ukryj suwaki i etykiety
@@ -4356,6 +4328,5 @@ function showDisconnectedPopup(message) {
     showStartMenu();
   });
 }
-
 
 
