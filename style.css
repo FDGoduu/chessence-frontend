@@ -1646,11 +1646,11 @@ body {
   font-size: 0.85em;
 }
 .profile-controls {
-  position: relative;
-  margin-top: 40px;
+  margin-top: auto; /* 🔥 automatycznie przyklej do dołu */
   display: flex;
   justify-content: center;
   gap: 16px;
+  padding: 20px 0;
   z-index: 100;
 }
 
@@ -1874,17 +1874,17 @@ body {
 }
 
 #profileScreen {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  background: #1b1b1b;
-  color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  min-height: 100vh;
+  width: 100%;
+  background: #1b1b1b;
+  color: white;
   overflow-y: auto;
-  padding: 20px; /* zamiast 180px i 140px */
+  padding: 20px 0;
+  box-sizing: border-box;
 }
 
 .profile-cover {
