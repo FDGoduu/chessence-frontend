@@ -335,29 +335,36 @@ async function tryRegister() {
 
   if (!nick || !password) {
     showPopupAdvanced({
-	  message: "Podaj nick i hasło.",
-	  confirm: false
-	});
+      message: "Podaj nick i hasło.",
+      confirm: false
+    });
     return;
   }
 
-  try {
-    await registerUser(nick, password);
-    showPopupAdvanced({
-  message: "Rejestracja zakończona sukcesem. Teraz możesz się zalogować!",
-  confirm: false,
-  onConfirm: () => {
-    showScreen("loginScreen"); // 🔥 przełączenie na ekran logowania
-  }
-});
-
-  } catch (error) {
-    console.error(error);
-    showPopupAdvanced({
-	  message: "Rejestracja nie powiodła się. Być może nick już istnieje.",
-	  confirm: false
-	});
-  }
+  showPopupAdvanced({
+    message: "Rejestruję konto...",
+    confirm: false,
+    onConfirm: async () => {
+      try {
+        await registerUser(nick, password);
+        showPopupAdvanced({
+          message: "Rejestracja zakończona sukcesem!",
+          confirm: false,
+          onConfirm: () => {
+            showScreen("loginScreen");
+          }
+        });
+        return true;
+      } catch (error) {
+        console.error(error);
+        showPopupAdvanced({
+          message: "Rejestracja nie powiodła się. Być może nick już istnieje.",
+          confirm: false
+        });
+        return false;
+      }
+    }
+  });
 }
 
 function promotePawn(isWhite, isBot) {
@@ -2636,56 +2643,48 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
   popupInput.value = "";
   popupInput.classList.toggle('popup-hidden', !input);
 
-  // Pokazuj lub ukrywaj przycisk Anuluj w zależności od 'confirm'
   if (confirm) {
     popupCancelBtn.classList.remove('popup-hidden');
   } else {
     popupCancelBtn.classList.add('popup-hidden');
   }
 
-  // Ustaw odpowiednią klasę układu przycisków
   popupButtons.classList.remove("single-button", "double-button");
   popupButtons.classList.add(confirm ? "double-button" : "single-button");
 
   popupContainer.classList.remove("popup-hidden");
 
-  // Usuń stare akcje na przyciskach (żeby nie nakładały się eventy)
-  popupConfirmBtn.onclick = null;
-  popupCancelBtn.onclick = null;
+  const cleanUp = () => {
+    popupContainer.classList.add("popup-hidden");
+    setTimeout(() => {
+      popupMessage.textContent = "";
+      popupInput.value = "";
+      popupInput.classList.add("popup-hidden");
+      popupButtons.classList.remove("single-button", "double-button");
+      popupConfirmBtn.onclick = null;
+      popupCancelBtn.onclick = null;
+      popupConfirmBtn.classList.remove("popup-hidden");
+      popupCancelBtn.classList.add("popup-hidden");
+    }, 100);
+  };
 
-  // Funkcja zamykająca popup
-const cleanUp = () => {
-  // Najpierw ukryj cały kontener
-  popupContainer.classList.add("popup-hidden");
+  popupConfirmBtn.onclick = async () => {
+    const value = input ? popupInput.value : true;
+    if (onConfirm) {
+      const shouldClose = await onConfirm(value);
+      if (shouldClose !== false) {
+        cleanUp();
+      }
+    } else {
+      cleanUp();
+    }
+  };
 
-  // Następnie wyczyść treści i ustawienia
-  setTimeout(() => {
-    popupMessage.textContent = "";
-    popupInput.value = "";
-    popupInput.classList.add("popup-hidden");
-    popupButtons.classList.remove("single-button", "double-button");
-    popupConfirmBtn.onclick = null;
-    popupCancelBtn.onclick = null;
-    popupConfirmBtn.classList.remove("popup-hidden");
-    popupCancelBtn.classList.add("popup-hidden");
-  }, 100); // <- maleńkie opóźnienie, żeby browser zdążył ukryć popup przed czyszczeniem
-};
-
-
-  // Przycisk OK
-	popupConfirmBtn.onclick = async () => {
-	  const value = input ? popupInput.value : true;
-	  if (onConfirm) await onConfirm(value); // 🔥 najpierw czekaj na zakończenie akcji
-	  cleanUp(); // 🔥 dopiero potem zamknij popup
-	};
-
-  // Przycisk Anuluj
   popupCancelBtn.onclick = () => {
     cleanUp();
     if (onCancel) onCancel();
   };
 }
-
 
 
 function showLevelRewardsPopup(level) {
@@ -4419,8 +4418,9 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
   showPopupAdvanced({
     message: "Aby usunąć konto, wpisz swoje hasło:",
     input: true,
+    confirm: true,
     onConfirm: async (pass) => {
-      if (!pass) return;
+      if (!pass) return false;
 
       const currentUser = activeUserNick || localStorage.getItem("currentUser");
 
@@ -4436,12 +4436,23 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
           throw new Error(text || "Błąd serwera");
         }
 
-        showPopup("Twoje konto zostało usunięte.");
-        localStorage.clear();
-        showScreen("registerScreen");
+        showPopupAdvanced({
+          message: "Twoje konto zostało usunięte.",
+          confirm: false,
+          onConfirm: () => {
+            localStorage.clear();
+            showScreen("registerScreen");
+          }
+        });
+
+        return true;
       } catch (error) {
         console.error(error);
-        showPopupAdvanced({ message: "Nie udało się usunąć konta: " + error.message, confirm: false });
+        showPopupAdvanced({
+          message: "Nie udało się usunąć konta: " + error.message,
+          confirm: false
+        });
+        return false;
       }
     }
   });
