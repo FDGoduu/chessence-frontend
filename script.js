@@ -3304,31 +3304,37 @@ function openProfileTab(tabName) {
       targetContent.style.display = 'block';
       targetContent.classList.add('fade-in');
     }
-    
-// 📋 ZARZĄDZANIE PRZYCISKAMI WRÓĆ
-const backGeneralBtn = document.getElementById("backGeneralBtn");
-const backFriendBtn = document.getElementById("backFriendBtn");
 
-if (tabName === "friends") {
-  if (backGeneralBtn) backGeneralBtn.style.display = "none";
-  if (backFriendBtn) backFriendBtn.style.display = "inline-block";
-} else {
-  if (backGeneralBtn) backGeneralBtn.style.display = "inline-block";
-  if (backFriendBtn) backFriendBtn.style.display = "none";
-}
+    // 📋 Obsługa przycisków
+    const backGeneralBtn = document.getElementById("backGeneralBtn");
+    const backFriendBtn = document.getElementById("backFriendBtn");
+    const backToOwnProfileBtn = document.getElementById("backToOwnProfileBtn");
+    const resetProgressBtn = document.getElementById("resetProgressBtn");
+    const resetFriendBtn = document.getElementById("resetFriendBtn");
 
-// 📋 ZARZĄDZANIE PRZYCISKAMI RESETUJ POSTĘP
-const resetProgressBtn = document.getElementById("resetProgressBtn");
-const resetFriendBtn = document.getElementById("resetFriendBtn");
+    if (viewingFriendProfile) {
+      // 👤 Oglądamy profil znajomego
+      if (backGeneralBtn) backGeneralBtn.style.display = "none";
+      if (backFriendBtn) backFriendBtn.style.display = "none";
+      if (backToOwnProfileBtn) backToOwnProfileBtn.style.display = "inline-block";
+      if (resetProgressBtn) resetProgressBtn.style.display = "none";
+      if (resetFriendBtn) resetFriendBtn.style.display = "none";
+    } else {
+      // 🧍‍♂️ Mój własny profil
+      if (backToOwnProfileBtn) backToOwnProfileBtn.style.display = "none";
 
-if (tabName === "friends") {
-  if (resetProgressBtn) resetProgressBtn.style.display = "none";
-  if (resetFriendBtn) resetFriendBtn.style.display = "inline-block";
-} else {
-  if (resetProgressBtn) resetProgressBtn.style.display = "inline-block";
-  if (resetFriendBtn) resetFriendBtn.style.display = "none";
-}
-
+      if (tabName === "friends") {
+        if (backGeneralBtn) backGeneralBtn.style.display = "none";
+        if (backFriendBtn) backFriendBtn.style.display = "inline-block";
+        if (resetProgressBtn) resetProgressBtn.style.display = "none";
+        if (resetFriendBtn) resetFriendBtn.style.display = "inline-block";
+      } else {
+        if (backGeneralBtn) backGeneralBtn.style.display = "inline-block";
+        if (backFriendBtn) backFriendBtn.style.display = "none";
+        if (resetProgressBtn) resetProgressBtn.style.display = "inline-block";
+        if (resetFriendBtn) resetFriendBtn.style.display = "none";
+      }
+    }
 
     content.classList.remove("fade-out");
     content.classList.add("fade-in");
