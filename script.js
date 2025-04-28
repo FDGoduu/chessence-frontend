@@ -2088,22 +2088,23 @@ if (gameMode === "pvp-hotseat") {
   document.getElementById("board").classList.remove("rotated");
   return;
 }
-
+	
 if (playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
-
-  if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci");
-    stockfishPVBWorker.onmessage = function (e) {
-      const line = String(e.data);
-      if (line.includes("uciok")) {
-        runAIMove();
-      }
-    };
-  }
 } else {
   document.getElementById("board").classList.remove("rotated");
 }
+
+if (gameMode === "pvb") {
+  stockfishPVBWorker.postMessage("uci");
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    if (line.includes("uciok")) {
+      runAIMove();
+    }
+  };
+}
+
   // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
 const topLabel = document.querySelector(".captured-top .capture-label");
 const bottomLabel = document.querySelector(".captured-bottom .capture-label");
