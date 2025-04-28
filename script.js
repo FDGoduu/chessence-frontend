@@ -2631,25 +2631,25 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
   const popupCancelBtn = document.getElementById("popupCancelBtn");
   const popupButtons = document.getElementById("popupButtons");
 
-  // Reset treści popupu
+  // Reset popup
   popupMessage.textContent = message || "";
   popupInput.value = "";
   popupInput.classList.toggle('popup-hidden', !input);
 
-  // Pokaż / ukryj przycisk Anuluj
+  // Pokazuj lub ukrywaj przycisk Anuluj w zależności od 'confirm'
   if (confirm) {
     popupCancelBtn.classList.remove('popup-hidden');
   } else {
     popupCancelBtn.classList.add('popup-hidden');
   }
 
-  // Ustaw układ przycisków
+  // Ustaw odpowiednią klasę układu przycisków
   popupButtons.classList.remove("single-button", "double-button");
   popupButtons.classList.add(confirm ? "double-button" : "single-button");
 
   popupContainer.classList.remove("popup-hidden");
 
-  // Najpierw odpinamy stare akcje
+  // Usuń stare akcje na przyciskach (żeby nie nakładały się eventy)
   popupConfirmBtn.onclick = null;
   popupCancelBtn.onclick = null;
 
@@ -2663,18 +2663,19 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
     popupCancelBtn.classList.add("popup-hidden");
   };
 
-  // Przypisujemy funkcje
+  // Przycisk OK
   popupConfirmBtn.onclick = () => {
-    const value = input ? popupInput.value : true;
     cleanUp();
-    if (onConfirm) onConfirm(value); // wykonujemy tylko jeśli jest przypisane
+    if (onConfirm) onConfirm(input ? popupInput.value : true);
   };
 
+  // Przycisk Anuluj
   popupCancelBtn.onclick = () => {
     cleanUp();
     if (onCancel) onCancel();
   };
 }
+
 
 
 function showLevelRewardsPopup(level) {
