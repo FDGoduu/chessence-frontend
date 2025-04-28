@@ -4204,6 +4204,20 @@ window.addEventListener("load", () => {
     startWrapper.classList.add("scale-small-ui");
   }
 });
+function checkUpdatePopup() {
+  const currentVersion = "0.6.0"; // <- podaj tutaj aktualną wersję gry
+  const seenVersion = localStorage.getItem("seenUpdateVersion");
+
+  if (seenVersion !== currentVersion) {
+    showPopupAdvanced({
+      message: "🚀 Nowa wersja Chessence! Odśwież stronę, aby wczytać aktualizację.",
+      confirm: false,
+      onConfirm: () => {
+        localStorage.setItem("seenUpdateVersion", currentVersion);
+      }
+    });
+  }
+}
 document.getElementById("prevAchievementsPage").addEventListener("click", () => {
   if (currentAchievementsPage > 0) {
     const list = document.getElementById("achievementsList");
@@ -4370,6 +4384,7 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("profileScreen").style.display = "none";
   activeUserNick = null;
+  checkUpdatePopup();
 });
 
 
