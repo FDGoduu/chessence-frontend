@@ -330,7 +330,7 @@ async function saveProfileToServer(nick, profileData) {
 }
 
 async function tryRegister() {
-  const nick = document.getElementById("registerNick").value.trim();
+  const nick = document.getElementById("registerNickname").value.trim();
   const password = document.getElementById("registerPassword").value.trim();
   const confirmPassword = document.getElementById("registerConfirmPassword").value.trim();
 
@@ -2677,17 +2677,19 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
     }, 100);
   };
 
-  popupConfirmBtn.onclick = async () => {
-    const value = input ? popupInput.value : true;
-    if (onConfirm) {
-      try {
-        await onConfirm(value); // 🔥 poczekaj na zakończenie działania onConfirm
-      } catch (e) {
-        console.error("Błąd w onConfirm:", e);
-      }
+popupConfirmBtn.onclick = async () => {
+  const value = input ? popupInput.value : true;
+  if (onConfirm) {
+    const result = await onConfirm(value);
+
+    if (result !== false) {
+      cleanUp(); // ✅ CleanUp tylko jeśli onConfirm zwróci true lub undefined
     }
-    cleanUp(); // 🔥 Dopiero po onConfirm
-  };
+    // jeśli onConfirm zwróci false ➔ popup nie zamyka się automatycznie
+  } else {
+    cleanUp();
+  }
+};
 
   popupCancelBtn.onclick = () => {
     cleanUp();
