@@ -202,12 +202,12 @@ async function getProfile(nick) {
 async function sendFriendRequest(targetNick) {
   const myNick = localStorage.getItem("currentUser");
   if (!myNick) {
-    showFloatingStatus("Musisz być zalogowany", "alert");
+    showFloatingStatus("Musisz być zalogowany", "showPopup");
     return;
   }
 
   if (!targetNick) {
-    showFloatingStatus("Podaj nick znajomego.", "alert");
+    showFloatingStatus("Podaj nick znajomego.", "showPopup");
     return;
   }
 
@@ -216,31 +216,31 @@ async function sendFriendRequest(targetNick) {
   const targetUserData = users[targetNick];
 
   if (!currentUserData) {
-    showFloatingStatus("Brak danych użytkownika.", "alert");
+    showFloatingStatus("Brak danych użytkownika.", "showPopup");
     return;
   }
 
   // 🔥 NOWA BLOKADA: czy istnieje gracz do którego wysyłasz zaproszenie
   if (!targetUserData) {
-    showFloatingStatus(`Użytkownik ${targetNick} nie istnieje.`, "alert");
+    showFloatingStatus(`Użytkownik ${targetNick} nie istnieje.`, "showPopup");
     return;
   }
 	
   // 🔥 BLOKADA 1: Próba dodania siebie
   if (myNick === targetNick) {
-    showFloatingStatus("Nie możesz dodać siebie do znajomych.", "alert");
+    showFloatingStatus("Nie możesz dodać siebie do znajomych.", "showPopup");
     return;
   }
 
   // 🔥 BLOKADA 2: Target już jest na liście znajomych
   if (currentUserData.friends?.includes(targetNick)) {
-    showFloatingStatus(`Użytkownik ${targetNick} jest już na Twojej liście znajomych.`, "alert");
+    showFloatingStatus(`Użytkownik ${targetNick} jest już na Twojej liście znajomych.`, "showPopup");
     return;
   }
 
   // 🔥 BLOKADA 3: Zaproszenie już wysłane (pendingInvites)
   if (currentUserData.pendingInvites?.includes(targetNick)) {
-    showFloatingStatus(`Wysłałeś już zaproszenie do ${targetNick}.`, "alert");
+    showFloatingStatus(`Wysłałeś już zaproszenie do ${targetNick}.`, "showPopup");
     return;
   }
 
@@ -259,7 +259,7 @@ async function sendFriendRequest(targetNick) {
     }, 500);
   } catch (error) {
     console.error(error);
-    showFloatingStatus(error.message || "Błąd wysyłania zaproszenia", "alert");
+    showFloatingStatus(error.message || "Błąd wysyłania zaproszenia", "showPopup");
   }
 }
 
@@ -298,7 +298,7 @@ async function declineFriendRequestAPI(senderNick, receiverNick) {
 async function removeFriend(friendNick) {
   const myNick = localStorage.getItem("currentUser");
   if (!myNick) {
-    showFloatingStatus("Musisz być zalogowany", "alert");
+    showFloatingStatus("Musisz być zalogowany", "showPopup");
     return;
   }
 
@@ -314,7 +314,7 @@ async function removeFriend(friendNick) {
     showFloatingStatus("Usunięto znajomego", "info");
   } catch (error) {
     console.error(error);
-    showFloatingStatus(error.message, "alert");
+    showFloatingStatus(error.message, "showPopup");
   }
 }
 
@@ -334,16 +334,16 @@ async function tryRegister() {
   const password = document.getElementById("passwordInput").value.trim();
 
   if (!nick || !password) {
-    alert("Podaj nick i hasło.");
+    showPopup("Podaj nick i hasło.");
     return;
   }
 
   try {
     await registerUser(nick, password);
-    alert("Rejestracja zakończona sukcesem. Teraz możesz się zalogować!");
+    showPopup("Rejestracja zakończona sukcesem. Teraz możesz się zalogować!");
   } catch (error) {
     console.error(error);
-    alert("Rejestracja nie powiodła się. Być może nick już istnieje.");
+    showPopup("Rejestracja nie powiodła się. Być może nick już istnieje.");
   }
 }
 
@@ -813,7 +813,7 @@ function getCurrentBotLevel() {
 function updateGameStatus() {
   const msg = document.getElementById("status");
   if (!msg) return;
-  msg.classList.remove("alert");
+  msg.classList.remove("showPopup");
   
   const endScreen = document.getElementById("endScreen");
   const endMessage = document.getElementById("endMessage");
@@ -869,7 +869,7 @@ function updateGameStatus() {
   // 🔥 Logika zakończenia gry
   if (inCheck && !hasLegalMove) {
     updateStatus("🔥 SZACH-MAT!");
-    msg.classList.add("alert");
+    msg.classList.add("showPopup");
 
     const mateOverlay = document.getElementById("mateOverlay");
     mateOverlay.classList.remove("show-mate");
@@ -909,7 +909,7 @@ function updateGameStatus() {
 
   } else if (!inCheck && !hasLegalMove) {
     updateStatus("🤝 PAT – REMIS");
-    msg.classList.add("alert");
+    msg.classList.add("showPopup");
 
     endScreen.style.display = "block";
     endMessage.textContent = "Partia zakończona remisem.";
@@ -927,7 +927,7 @@ function updateGameStatus() {
 
   } else if (inCheck && hasLegalMove) {
     updateStatus("🚨 SZACH dla " + (currentTurn === 'w' ? "białych" : "czarnych") + "!");
-    msg.classList.add("alert");
+    msg.classList.add("showPopup");
     boardWrapper.classList.add("shake", "board-warning");
     setTimeout(() => {
       boardWrapper.classList.remove("shake", "board-warning");
@@ -2609,6 +2609,19 @@ console.log("Odblokowywanie nagród dla poziomu:", newLevel, unlocked);
   }
 }
 
+function showPopup(message) {
+  const popupContainer = document.getElementById("popupContainer");
+  const popupMessage = document.getElementById("popupMessage");
+  const popupCloseBtn = document.getElementById("popupCloseBtn");
+
+  popupMessage.textContent = message;
+  popupContainer.classList.remove("popup-hidden");
+
+  popupCloseBtn.onclick = () => {
+    popupContainer.classList.add("popup-hidden");
+  };
+}
+
 function showLevelRewardsPopup(level) {
   const unlocked = levelRewards.filter(r => r.level === level);
   if (unlocked.length === 0) return;
@@ -2794,7 +2807,7 @@ async function openProfileScreen(friendId = null) {
   const userData = users[dataKey];
   if (!userData) {
     console.error("Nie znaleziono danych użytkownika dla profilu.");
-    alert("Nie można załadować danych profilu.");
+    showPopup("Nie można załadować danych profilu.");
     return;
   }
 
@@ -3411,7 +3424,7 @@ async function refreshUsers() {
 async function acceptInvite(fromNick) {
   const myNick = localStorage.getItem("currentUser");
   if (!myNick) {
-    showFloatingStatus("Musisz być zalogowany", "alert");
+    showFloatingStatus("Musisz być zalogowany", "showPopup");
     return;
   }
 
@@ -3427,7 +3440,7 @@ async function acceptInvite(fromNick) {
     showFloatingStatus("Dodano do znajomych!", "info");
   } catch (error) {
     console.error(error);
-    showFloatingStatus(error.message, "alert");
+    showFloatingStatus(error.message, "showPopup");
   }
 }
 
@@ -3435,7 +3448,7 @@ async function acceptInvite(fromNick) {
 async function rejectInvite(fromNick) {
   const myNick = localStorage.getItem("currentUser");
   if (!myNick) {
-    showFloatingStatus("Musisz być zalogowany", "alert");
+    showFloatingStatus("Musisz być zalogowany", "showPopup");
     return;
   }
 
@@ -3451,7 +3464,7 @@ async function rejectInvite(fromNick) {
     showFloatingStatus("Zaproszenie odrzucone", "info");
   } catch (error) {
     console.error(error);
-    showFloatingStatus(error.message, "alert");
+    showFloatingStatus(error.message, "showPopup");
   }
 }
 
@@ -3480,7 +3493,7 @@ function inviteToGame(friendId) {
 async function removeFriend(friendNick) {
   const myNick = localStorage.getItem("currentUser");
   if (!myNick) {
-    showFloatingStatus("Musisz być zalogowany", "alert");
+    showFloatingStatus("Musisz być zalogowany", "showPopup");
     return;
   }
 
@@ -3496,7 +3509,7 @@ async function removeFriend(friendNick) {
     showFloatingStatus("Usunięto znajomego", "info");
   } catch (error) {
     console.error(error);
-    showFloatingStatus(error.message, "alert");
+    showFloatingStatus(error.message, "showPopup");
   }
 }
 
@@ -3507,7 +3520,7 @@ function showFloatingStatus(text, type = "info") {
   div.style.bottom = "40px";
   div.style.left = "50%";
   div.style.transform = "translateX(-50%)";
-  div.style.background = type === "alert" ? "#aa2222" : "#222";
+  div.style.background = type === "showPopup" ? "#aa2222" : "#222";
   div.style.color = "#fff";
   div.style.padding = "10px 16px";
   div.style.borderRadius = "8px";
@@ -4150,7 +4163,7 @@ async function startGameWithUser(nick) {
 
     if (!user) {
       console.error('Nie znaleziono użytkownika w users po zalogowaniu.');
-      alert("Błąd ładowania danych użytkownika. Spróbuj zalogować się ponownie.");
+      showPopup("Błąd ładowania danych użytkownika. Spróbuj zalogować się ponownie.");
       showScreen("loginScreen");
       return;
     }
@@ -4186,7 +4199,7 @@ async function startGameWithUser(nick) {
 
   } catch (error) {
     console.error('❌ Błąd startu gry:', error);
-    alert("Wystąpił błąd podczas uruchamiania gry.");
+    showPopup("Wystąpił błąd podczas uruchamiania gry.");
     showScreen("loginScreen");
   }
 }
@@ -4215,17 +4228,17 @@ document.getElementById("registerSubmit").addEventListener("click", async () => 
   const pass = document.getElementById("registerPassword").value;
   const confirm = document.getElementById("registerConfirmPassword").value;
 
-  if (nick.length < 3) return alert("Nick musi mieć co najmniej 3 znaki.");
-  if (pass.length < 4) return alert("Hasło musi mieć co najmniej 4 znaki.");
-  if (pass !== confirm) return alert("Hasła nie są takie same.");
+  if (nick.length < 3) return showPopup("Nick musi mieć co najmniej 3 znaki.");
+  if (pass.length < 4) return showPopup("Hasło musi mieć co najmniej 4 znaki.");
+  if (pass !== confirm) return showPopup("Hasła nie są takie same.");
 
   try {
     await registerUser(nick, pass);
-    alert("Rejestracja zakończona! Możesz się teraz zalogować.");
+    showPopup("Rejestracja zakończona! Możesz się teraz zalogować.");
     showScreen("loginScreen");
   } catch (error) {
     console.error(error);
-    alert("Rejestracja nie powiodła się. Być może nick już istnieje.");
+    showPopup("Rejestracja nie powiodła się. Być może nick już istnieje.");
   }
 });
 
@@ -4234,7 +4247,7 @@ loginButton.addEventListener('click', async () => {
   const pass = document.getElementById('loginPassword').value.trim();
 
   if (!nick || !pass) {
-    showFloatingStatus("Podaj nazwę użytkownika i hasło", "alert");
+    showFloatingStatus("Podaj nazwę użytkownika i hasło", "showPopup");
     return;
   }
 
@@ -4243,12 +4256,12 @@ loginButton.addEventListener('click', async () => {
     loggedUser = await loginUser(nick, pass); // próbujemy się zalogować
   } catch (error) {
     console.error('❌ Błąd logowania:', error);
-    alert("Logowanie nie powiodło się. Sprawdź dane.");
+    showPopup("Logowanie nie powiodło się. Sprawdź dane.");
     return; // jeśli błąd, zatrzymujemy się
   }
 
   if (!loggedUser) {
-    alert("Nie udało się zalogować. Spróbuj ponownie.");
+    showPopup("Nie udało się zalogować. Spróbuj ponownie.");
     return;
   }
 
@@ -4284,12 +4297,12 @@ document.getElementById("deleteAccountBtn").addEventListener("click", async () =
       throw new Error(text || "Błąd serwera");
     }
 
-    alert("Twoje konto zostało usunięte.");
+    showPopup("Twoje konto zostało usunięte.");
     localStorage.clear();
     showScreen("registerScreen");
   } catch (error) {
     console.error(error);
-    alert("Nie udało się usunąć konta: " + error.message);
+    showPopup("Nie udało się usunąć konta: " + error.message);
   }
 });
 
