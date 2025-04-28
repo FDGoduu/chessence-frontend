@@ -1702,8 +1702,8 @@ document.getElementById("modePVP").addEventListener("click", () => {
   // 📌 Uruchom przesunięcie UI bez opóźnienia
   startShiftReset();
   startShiftTo("pvp");
-  document.getElementById("startGame").disabled = true;
   updateStartGameButton();
+  document.getElementById("startGame").disabled = true;
 });
 
 
