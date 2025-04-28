@@ -4350,24 +4350,11 @@ document.getElementById("switchToLogin").addEventListener("click", () => {
 document.getElementById("switchToRegister").addEventListener("click", () => {
   showScreen("registerScreen");
 });
+
 document.getElementById("registerSubmit").addEventListener("click", async () => {
-  const nick = document.getElementById("registerNickname").value.trim();
-  const pass = document.getElementById("registerPassword").value;
-  const confirm = document.getElementById("registerConfirmPassword").value;
-
-  if (nick.length < 3) return showPopupAdvanced({ message: "Nick musi mieć co najmniej 3 znaki.", confirm: false });
-  if (pass.length < 4) return showPopupAdvanced({ message: "Hasło musi mieć co najmniej 4 znaki.", confirm: false })
-  if (pass !== confirm) return showPopupAdvanced({ message: "Hasła nie są takie same.", confirm: false, onConfirm: () => { document.getElementById("registerPassword").value = ""; document.getElementById("registerConfirmPassword").value = ""; } });
-
-  try {
-    await registerUser(nick, pass);
-    showPopup("Rejestracja zakończona! Możesz się teraz zalogować.");
-    showScreen("loginScreen");
-  } catch (error) {
-    console.error(error);
-    showPopupAdvanced({ message: "Rejestracja nie powiodła się. Być może nick już istnieje.", confirm: false });
-  }
+  await tryRegister();
 });
+
 
 loginButton.addEventListener('click', async () => {
   const nick = document.getElementById('loginNickname').value.trim();
@@ -4440,7 +4427,7 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
         });
 
         if (response.ok) {
-          // PO FETCHU pokazujemy OSOBNY popup sukcesu
+          // 🔥 Jeśli usunięcie konta się powiodło
           showPopupAdvanced({
             message: "✅ Twoje konto zostało usunięte. Kliknij OK aby przejść na ekran logowania.",
             confirm: false,
@@ -4451,16 +4438,23 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
             }
           });
         } else {
-          const data = await response.json();
+          // 🔥 Jeśli serwer zwraca błąd (np. 401 Unauthorized)
+          let errorText = "";
+          try {
+            errorText = await response.text(); // 🔥 Parsujemy bezpiecznie jako tekst
+          } catch (e) {
+            errorText = "Nieznany błąd serwera.";
+          }
+
           showPopupAdvanced({
-            message: data.error || "Nie udało się usunąć konta. Spróbuj ponownie.",
+            message: errorText || "Nie udało się usunąć konta. Spróbuj ponownie.",
             confirm: false
           });
         }
       } catch (error) {
         console.error(error);
         showPopupAdvanced({
-          message: "Błąd połączenia z serwerem.",
+          message: "Błąd połączenia z serwerem podczas usuwania konta.",
           confirm: false
         });
       }
