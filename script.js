@@ -2078,6 +2078,15 @@ document.getElementById('startGame').addEventListener('click', function () {
 	}
 resetGame(false);
 isInputLocked = false;
+if (gameMode === "pvb") {
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    if (line.includes("uciok")) {
+      runAIMove();
+    }
+  };
+  stockfishPVBWorker.postMessage("uci");
+}
 
 if (gameMode === "bvb") {
   runBotVsBot();
