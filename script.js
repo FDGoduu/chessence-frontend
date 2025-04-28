@@ -2668,13 +2668,9 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
   popupConfirmBtn.onclick = async () => {
     const value = input ? popupInput.value : true;
     if (onConfirm) {
-      const shouldClose = await onConfirm(value);
-      if (shouldClose !== false) {
-        cleanUp();
-      }
-    } else {
-      cleanUp();
+      await onConfirm(value);
     }
+    cleanUp(); // 🔥 cleanUp ZAWSZE po kliknięciu, a NIE automatycznie
   };
 
   popupCancelBtn.onclick = () => {
