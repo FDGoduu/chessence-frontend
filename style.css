@@ -3067,4 +3067,16 @@ body {
   width: 100%;
   max-width: 100%;
 }
+/* 📏 Dynamiczne skalowanie całej gry w dół dla laptopów */
+#mainContainer {
+  transform: scale(1);
+  transform-origin: top center;
+}
+
+/* Skalowanie na laptopach 1366x768 lub podobnych */
+@media (max-width: 1400px), (max-height: 800px) {
+  #mainContainer {
+    transform: scale(0.88);
+  }
+}
 
