@@ -4272,6 +4272,19 @@ document.getElementById("joinRoomBtn").addEventListener("click", () => {
   socket.emit("joinRoom", { roomCode, nickname });
   setOnlineStatus("🔄 Dołączanie do pokoju...");
 });
+const findMatchBtn = document.getElementById('findMatchBtn');
+const matchmakingOverlay = document.getElementById('matchmakingOverlay');
+const cancelMatchBtn = document.getElementById('cancelMatchBtn');
+
+findMatchBtn.addEventListener('click', () => {
+  socket.emit('matchmake', { nickname: currentNick });
+  matchmakingOverlay.classList.remove('popup-hidden');
+});
+
+cancelMatchBtn.addEventListener('click', () => {
+  matchmakingOverlay.classList.add('popup-hidden');
+  // Możesz ewentualnie rozważyć anulowanie wyszukiwania po stronie serwera (opcja zaawansowana na przyszłość)
+});
 
 renderBoard();
 
