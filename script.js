@@ -127,6 +127,7 @@ const levelRewards = [
   { level: 8, type: "avatar", id: "avatar10.png" },
   { level: 9, type: "avatar", id: "avatar11.png" },
   { level: 10, type: "avatar", id: "avatar12.png" },
+  { level: 10, type: "background", id: "bg4.png" },
   { level: 10, type: "frame", id: "silver_frame" },
   { level: 20, type: "frame", id: "gold_frame" },
   { level: 30, type: "frame", id: "platinum_frame" },
@@ -3808,7 +3809,7 @@ function openBackgroundSelector() {
   const container = document.getElementById("backgroundGridContainer");
   container.innerHTML = "";
 
-  const backgrounds = ["bg0.png", "bg1.png", "bg2.png", "bg3.png"];
+  const backgrounds = ["bg0.png", "bg1.png", "bg2.png", "bg3.png", "bg4.png"];
 
   backgrounds.forEach(id => {
     const isUnlocked = isRewardUnlocked("background", id);
@@ -4205,7 +4206,7 @@ window.addEventListener("load", () => {
   }
 });
 function checkUpdatePopup() {
-  const currentVersion = "0.6.0"; // <- podaj tutaj aktualną wersję gry
+  const currentVersion = "0.6.0"; // 🔥 TU wpisujesz aktualną wersję gry
   const seenVersion = localStorage.getItem("seenUpdateVersion");
 
   if (seenVersion !== currentVersion) {
