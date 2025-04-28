@@ -2680,9 +2680,13 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
   popupConfirmBtn.onclick = async () => {
     const value = input ? popupInput.value : true;
     if (onConfirm) {
-      await onConfirm(value);
+      try {
+        await onConfirm(value); // 🔥 poczekaj na zakończenie działania onConfirm
+      } catch (e) {
+        console.error("Błąd w onConfirm:", e);
+      }
     }
-    cleanUp(); // 🔥 cleanUp ZAWSZE po kliknięciu, a NIE automatycznie
+    cleanUp(); // 🔥 Dopiero po onConfirm
   };
 
   popupCancelBtn.onclick = () => {
@@ -2690,7 +2694,6 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
     if (onCancel) onCancel();
   };
 }
-
 
 function showLevelRewardsPopup(level) {
   const unlocked = levelRewards.filter(r => r.level === level);
