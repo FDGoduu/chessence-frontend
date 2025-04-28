@@ -340,31 +340,28 @@ async function tryRegister() {
     });
     return;
   }
-
-  showPopupAdvanced({
-    message: "Rejestruję konto...",
-    confirm: false,
-    onConfirm: async () => {
-      try {
-        await registerUser(nick, password);
-        showPopupAdvanced({
-          message: "Rejestracja zakończona sukcesem!",
-          confirm: false,
-          onConfirm: () => {
-            showScreen("loginScreen");
-          }
-        });
-        return true;
-      } catch (error) {
-        console.error(error);
-        showPopupAdvanced({
-          message: "Rejestracja nie powiodła się. Być może nick już istnieje.",
-          confirm: false
-        });
-        return false;
-      }
+showPopupAdvanced({
+  message: "Rejestruję konto...",
+  confirm: false,
+  onConfirm: async () => {
+    try {
+      await registerUser(nick, password);
+      return showPopupAdvanced({
+        message: "Rejestracja zakończona sukcesem! Możesz się teraz zalogować.",
+        confirm: false,
+        onConfirm: () => {
+          showScreen("loginScreen");
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      return showPopupAdvanced({
+        message: "Rejestracja nie powiodła się. Być może nick już istnieje.",
+        confirm: false
+      });
     }
-  });
+  }
+});
 }
 
 function promotePawn(isWhite, isBot) {
@@ -4436,14 +4433,18 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
           throw new Error(text || "Błąd serwera");
         }
 
-        showPopupAdvanced({
-          message: "Twoje konto zostało usunięte.",
-          confirm: false,
-          onConfirm: () => {
-            localStorage.clear();
-            showScreen("registerScreen");
-          }
-        });
+	showPopupAdvanced({
+	  message: "Twoje konto zostało usunięte.",
+	  confirm: false,
+	  onConfirm: () => {
+	    setTimeout(() => {
+	      localStorage.clear();
+	      activeUserNick = null;
+	      showScreen("registerScreen");
+	    }, 50);
+	  }
+	});
+
 
         return true;
       } catch (error) {
