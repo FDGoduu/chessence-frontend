@@ -2068,6 +2068,7 @@ document.getElementById('startGame').addEventListener('click', function () {
 	  } else {
 		botDifficultyW = val;
 	  }
+	window.xpBotLevelAtEnd = getCurrentBotLevel();
 	} else if (gameMode === "bvb") {
 	  botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
 	  botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
@@ -3075,7 +3076,7 @@ async function awardXP(resultType) {
   user.stats = user.stats || { wins: 0 };
 
   let xpGained = 0;
-  const botLevel = window.xpBotLevelAtEnd ?? getCurrentBotLevel();
+  const botLevel = typeof window.xpBotLevelAtEnd !== "undefined" ? window.xpBotLevelAtEnd : getCurrentBotLevel();
   const multipliers = [0.1, 0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 3, 4, 8];
   const multiplier = multipliers[botLevel] || 1;
 
