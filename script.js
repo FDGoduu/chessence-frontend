@@ -2631,22 +2631,32 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm,
   const popupCancelBtn = document.getElementById("popupCancelBtn");
   const popupButtons = document.getElementById("popupButtons");
 
-  popupMessage.textContent = message;
+  // Ustaw treść wiadomości i reset inputa
+  popupMessage.textContent = message || "";
   popupInput.value = "";
 
+  // Pokaż lub ukryj pole input
   popupInput.classList.toggle('popup-hidden', !input);
+
+  // Pokaż lub ukryj przycisk Anuluj
   if (confirm) {
-  popupCancelBtn.classList.remove('popup-hidden');
-} else {
-  popupCancelBtn.classList.add('popup-hidden');
-}
+    popupCancelBtn.classList.remove('popup-hidden');
+  } else {
+    popupCancelBtn.classList.add('popup-hidden');
+  }
 
-
+  // Ustaw style przycisków
   popupButtons.classList.remove("single-button", "double-button");
   popupButtons.classList.add(confirm ? "double-button" : "single-button");
 
+  // Przygotuj popup do pokazania
   popupContainer.classList.remove("popup-hidden");
 
+  // ✅ Najpierw odpinamy stare akcje
+  popupConfirmBtn.onclick = null;
+  popupCancelBtn.onclick = null;
+
+  // Funkcja zamykająca popup
   const cleanUp = () => {
     popupContainer.classList.add("popup-hidden");
     popupConfirmBtn.onclick = null;
@@ -2656,17 +2666,19 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm,
     popupCancelBtn.classList.add("popup-hidden");
   };
 
+  // ✅ Przypinamy nowe funkcje
   popupConfirmBtn.onclick = () => {
     const value = input ? popupInput.value : true;
     cleanUp();
-    onConfirm && onConfirm(value);
+    if (onConfirm) onConfirm(value);
   };
 
   popupCancelBtn.onclick = () => {
     cleanUp();
-    onCancel && onCancel();
+    if (onCancel) onCancel();
   };
 }
+
 
 function showLevelRewardsPopup(level) {
   const unlocked = levelRewards.filter(r => r.level === level);
