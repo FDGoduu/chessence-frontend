@@ -4431,7 +4431,7 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
         showScreen("registerScreen");
       } catch (error) {
         console.error(error);
-        showPopup("Nie udało się usunąć konta: " + error.message);
+        showPopupAdvanced({ message: "Nie udało się usunąć konta: " + error.message, confirm: false });
       }
     }
   });
