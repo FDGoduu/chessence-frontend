@@ -4424,7 +4424,7 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
     input: true,
     confirm: true,
     onConfirm: async (pass) => {
-      if (!pass) return false;
+      if (!pass) return;
 
       const currentUser = activeUserNick || localStorage.getItem("currentUser");
 
@@ -4436,40 +4436,40 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
         });
 
         if (response.ok) {
-          // 🔥 Jeśli usunięcie konta się powiodło
-          showPopupAdvanced({
-            message: "✅ Twoje konto zostało usunięte. Kliknij OK aby przejść na ekran logowania.",
-            confirm: false,
-            onConfirm: () => {
-              localStorage.clear();
-              activeUserNick = null;
-              showScreen("registerScreen");
-            }
-          });
+          // 🔥 UWAGA! Teraz nie robimy nowego popupu OD RAZU
+          setTimeout(() => { 
+            showPopupAdvanced({
+              message: "✅ Twoje konto zostało usunięte. Kliknij OK aby przejść na ekran rejestracji.",
+              confirm: false,
+              onConfirm: () => {
+                localStorage.clear();
+                activeUserNick = null;
+                showScreen("registerScreen");
+              }
+            });
+          }, 300); // 🔥 Po krótkim czasie, po cleanUp starego popupu
         } else {
-          // 🔥 Jeśli serwer zwraca błąd (np. 401 Unauthorized)
-          let errorText = "";
-          try {
-            errorText = await response.text(); // 🔥 Parsujemy bezpiecznie jako tekst
-          } catch (e) {
-            errorText = "Nieznany błąd serwera.";
-          }
-
-          showPopupAdvanced({
-            message: errorText || "Nie udało się usunąć konta. Spróbuj ponownie.",
-            confirm: false
-          });
+          const errorText = await response.text();
+          setTimeout(() => {
+            showPopupAdvanced({
+              message: errorText || "Nie udało się usunąć konta. Spróbuj ponownie.",
+              confirm: false
+            });
+          }, 300);
         }
       } catch (error) {
         console.error(error);
-        showPopupAdvanced({
-          message: "Błąd połączenia z serwerem podczas usuwania konta.",
-          confirm: false
-        });
+        setTimeout(() => {
+          showPopupAdvanced({
+            message: "Błąd połączenia z serwerem.",
+            confirm: false
+          });
+        }, 300);
       }
     }
   });
 });
+
 
 const resetProgressBtn = document.getElementById("resetProgressBtn");
 if (resetProgressBtn) {
