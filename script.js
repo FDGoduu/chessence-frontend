@@ -4430,5 +4430,27 @@ function showDisconnectedPopup(message) {
     showStartMenu();
   });
 }
+let currentVersion = "0.6.0"; // 🚀 Ustawiona wersja gry
+
+socket.on('serverVersionUpdate', (data) => {
+  if (!data || !data.version) return;
+
+  if (data.version !== currentVersion) {
+    const updatePopup = document.getElementById("updatePopup");
+    const reloadBtn = document.getElementById("reloadGameBtn");
+
+    if (updatePopup && reloadBtn) {
+      updatePopup.classList.remove("popup-hidden");
+
+      // Odblokuj guzik
+      reloadBtn.disabled = false;
+      reloadBtn.classList.add("active");
+
+      reloadBtn.onclick = () => {
+        location.reload(true); // Pełny reload strony
+      };
+    }
+  }
+});
 
 
