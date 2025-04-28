@@ -1681,7 +1681,6 @@ document.getElementById("modePVP").addEventListener("click", () => {
 	  document.getElementById("onlineUI").style.display = "none";
 	  document.getElementById("chooseOnline").classList.remove("selected");
 	  document.getElementById("chooseHotseat").classList.remove("selected");
-	  document.getElementById("startGame").style.display = "block";
 	  document.getElementById("startGame").disabled = true;
 	  return;
 	}
@@ -1700,7 +1699,7 @@ document.getElementById("modePVP").addEventListener("click", () => {
   // 📌 Uruchom przesunięcie UI bez opóźnienia
   startShiftReset();
   startShiftTo("pvp");
-
+  document.getElementById("startGame").style.display = "block";
   document.getElementById("startGame").disabled = true;
   updateStartGameButton();
 });
