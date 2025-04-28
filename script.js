@@ -1633,15 +1633,15 @@ function toggleModeButtons(activeButton) {
   const difficultyPVB = document.getElementById("difficultyPVBContainer");
   const difficultyBVB = document.getElementById("difficultyBVBContainer");
 
-  colorButtons.style.display = "none";
-  difficultyPVB.style.display = "none";
-  difficultyBVB.style.display = "none";
+  smoothToggle(colorButtons, false);
+  smoothToggle(difficultyPVB, false);
+  smoothToggle(difficultyBVB, false);
 
   if (gameMode === "pvb") {
-    colorButtons.style.display = "flex";
-    difficultyPVB.style.display = "block";
+    smoothToggle(colorButtons, true);
+    smoothToggle(difficultyPVB, true);
   } else if (gameMode === "bvb") {
-    difficultyBVB.style.display = "block";
+    smoothToggle(difficultyBVB, true);
   }
 
   document.getElementById("startGame").disabled = (gameMode === "pvb" && !playerColor);
@@ -1893,6 +1893,21 @@ function startShiftTo(mode) {
 lastGameMode = mode;
 }
 
+function smoothToggle(element, show) {
+  if (!element) return;
+  element.classList.remove('fade-slide-in', 'fade-slide-out');
+  void element.offsetWidth; // Reset animacji
+
+  if (show) {
+    element.style.display = "flex"; // lub "block" zależnie od typu elementu
+    element.classList.add('fade-slide-in');
+  } else {
+    element.classList.add('fade-slide-out');
+    setTimeout(() => {
+      element.style.display = "none";
+    }, 400); // musi być równe czasowi animacji (0.4s)
+  }
+}
 
 function runBotVsBot() {
   if (gameEnded || isBotRunning || gameMode !== "bvb") return;
@@ -2000,9 +2015,9 @@ function runBotVsBot() {
 
 
   // Domyślnie ukryj wszystko
-  colorButtons.style.display = "none";
-difficultyPVB.style.display = "none";
-difficultyBVB.style.display = "none";
+  smoothToggle(colorButtons, false);
+smoothToggle(difficultyPVB, false);
+smoothToggle(difficultyBVB, false);
 
 
   // Ukryj suwaki i etykiety
