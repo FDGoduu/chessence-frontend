@@ -1897,23 +1897,29 @@ function smoothToggle(element, show) {
   if (!element) return;
 
   element.classList.remove('fade-slide-in', 'fade-slide-out');
-  void element.offsetWidth; // Reset animacji
 
-  if (show) {
-    element.style.display = "flex"; // lub block – jak chcesz
-    element.classList.add('fade-slide-in');
-    element.addEventListener('animationend', function handler() {
-      element.classList.remove('fade-slide-in'); // 🔥 USUWAMY fade-slide-in po zakończeniu
-      element.removeEventListener('animationend', handler);
-    }, { once: true });
-  } else {
-    element.classList.add('fade-slide-out');
-    element.addEventListener('animationend', function handler() {
-      element.style.display = "none";
-      element.classList.remove('fade-slide-out');
-      element.removeEventListener('animationend', handler);
-    }, { once: true });
-  }
+  requestAnimationFrame(() => {
+    if (show) {
+      element.style.display = "flex"; // lub block
+      element.classList.add('fade-slide-in');
+
+      const removeInClass = () => {
+        element.classList.remove('fade-slide-in');
+        element.removeEventListener('animationend', removeInClass);
+      };
+      element.addEventListener('animationend', removeInClass, { once: true });
+
+    } else {
+      element.classList.add('fade-slide-out');
+
+      const hideAfter = () => {
+        element.style.display = "none";
+        element.classList.remove('fade-slide-out');
+        element.removeEventListener('animationend', hideAfter);
+      };
+      element.addEventListener('animationend', hideAfter, { once: true });
+    }
+  });
 }
 
 function runBotVsBot() {
