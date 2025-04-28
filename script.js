@@ -7,6 +7,10 @@ let activeUserNick = null; // 🧠 aktualnie zalogowany użytkownik w tej karcie
 try {
   socket = io(API_BASE);
   socket.on("connect", () => {
+	const connectionOverlay = document.getElementById("connectionOverlay");
+	if (connectionOverlay) {
+ 	connectionOverlay.classList.add("hidden");
+	}
     socketId = socket.id;
     console.log("🆔 Moje socket.id:", socketId);
   });  
