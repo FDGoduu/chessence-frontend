@@ -182,11 +182,11 @@
 		
 		    <!-- Panel przycisków -->
 			<div class="buttons-column">
-			  <button id="resetProgressBtn" class="panel-button profile-btn red reset-btn">
+			  <button id="resetFriendBtn" class="panel-button profile-btn red reset-btn">
 			    <img src="./img/reset.png" class="icon-inline" alt="Reset"> Resetuj postęp
 			  </button>
 			
-			  <button onclick="closeProfileScreen()" class="panel-button profile-btn back-btn"> Wróć </button>
+			  <button onclick="closeProfileScreen()" class="panel-button profile-btn back-btn" id="backGeneralBtn"> Wróć </button>
 			
 			  <input id="addFriendInput" type="text" class="friend-input" placeholder="Nick znajomego">
 			
@@ -209,7 +209,7 @@
 		  <img src="./img/reset.png" class="icon-inline" alt="Reset">
 		  Resetuj postęp
 		</button>
-	  <button onclick="closeProfileScreen()" class="profile-btn">Wróć</button>
+	  <button onclick="closeProfileScreen()" class="profile-btn" id="backFriendBtn">Wróć</button>
 	  <button id="backToOwnProfileBtn" onclick="openProfileScreen()" class="profile-btn">POWRÓT DO PROFILU</button>
 	</div>
 
