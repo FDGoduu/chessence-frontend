@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+  <div id="mainContainer">
 	<!-- 🧾 Rejestracja -->
 	<div id="registerScreen" class="auth-screen" style="display: none;">
 	  <div class="auth-box">
@@ -186,9 +187,7 @@
 			    <img src="./img/reset.png" class="icon-inline" alt="Reset"> Resetuj postęp
 			  </button>
 			
-			  <button onclick="closeProfileScreen()" class="panel-button profile-btn back-btn">
-			    ⬅️ Wróć
-			  </button>
+			  <button onclick="closeProfileScreen()" class="panel-button profile-btn back-btn"> Wróć </button>
 			
 			  <input id="addFriendInput" type="text" class="friend-input" placeholder="Nick znajomego">
 			
@@ -338,5 +337,6 @@
 <div class="fixed-corner version-label" id="gameVersion">v 0.6 (multi testv2)</div>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="./script.js" defer></script>
+  </div>
 </body>
 </html>
