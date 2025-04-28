@@ -1660,9 +1660,12 @@ function updateStartGameButton() {
       startGameBtn.style.display = "block";
       startGameBtn.disabled = true;
     }
+  } else if (gameMode === "pvb" || gameMode === "bvb") {
+    startGameBtn.style.display = "block";
+    startGameBtn.disabled = !playerColor; // tylko blokuj, jeśli nie wybrano koloru
   } else {
     startGameBtn.style.display = "block";
-    startGameBtn.disabled = !playerColor; // domyślne zachowanie dla PvB, BvB
+    startGameBtn.disabled = true; // domyślnie zablokowany
   }
 }
   
