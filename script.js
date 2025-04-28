@@ -2628,13 +2628,16 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm,
   const popupInput = document.getElementById("popupInput");
   const popupConfirmBtn = document.getElementById("popupConfirmBtn");
   const popupCancelBtn = document.getElementById("popupCancelBtn");
+  const popupButtons = document.getElementById("popupButtons");
 
   popupMessage.textContent = message;
   popupInput.value = "";
-  
-  // Reset widoczności
+
   popupInput.classList.toggle('popup-hidden', !input);
   popupCancelBtn.classList.toggle('popup-hidden', !confirm);
+
+  popupButtons.classList.remove("single-button", "double-button");
+  popupButtons.classList.add(confirm ? "double-button" : "single-button");
 
   popupContainer.classList.remove("popup-hidden");
 
@@ -2655,7 +2658,6 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm,
     onCancel && onCancel();
   };
 }
-
 
 function showLevelRewardsPopup(level) {
   const unlocked = levelRewards.filter(r => r.level === level);
