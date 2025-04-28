@@ -3079,4 +3079,10 @@ body {
     transform: scale(0.88);
   }
 }
+/* 📱 Skalowanie dla telefonów i małych ekranów */
+@media (max-width: 768px) {
+  #mainContainer {
+    transform: scale(0.65);
+  }
+}
 
