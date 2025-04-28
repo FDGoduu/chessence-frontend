@@ -3296,23 +3296,30 @@ function openProfileTab(tabName) {
       targetContent.classList.add('fade-in');
     }
     
-    // 📋 Zarządzanie przyciskami Wróć
-    if (tabName === "friends") {
-      document.getElementById("backGeneralBtn").style.display = "none";
-      document.getElementById("backFriendBtn").style.display = "inline-block";
-    } else {
-      document.getElementById("backGeneralBtn").style.display = "inline-block";
-      document.getElementById("backFriendBtn").style.display = "none";
-    }
+// 📋 ZARZĄDZANIE PRZYCISKAMI WRÓĆ
+const backGeneralBtn = document.getElementById("backGeneralBtn");
+const backFriendBtn = document.getElementById("backFriendBtn");
 
-    // 📋 Zarządzanie przyciskami Resetuj Postęp
-    if (tabName === "friends") {
-      document.getElementById("resetProgressBtn").style.display = "none";
-      document.getElementById("resetFriendBtn").style.display = "inline-block";
-    } else {
-      document.getElementById("resetProgressBtn").style.display = "inline-block";
-      document.getElementById("resetFriendBtn").style.display = "none";
-    }
+if (tabName === "friends") {
+  if (backGeneralBtn) backGeneralBtn.style.display = "none";
+  if (backFriendBtn) backFriendBtn.style.display = "inline-block";
+} else {
+  if (backGeneralBtn) backGeneralBtn.style.display = "inline-block";
+  if (backFriendBtn) backFriendBtn.style.display = "none";
+}
+
+// 📋 ZARZĄDZANIE PRZYCISKAMI RESETUJ POSTĘP
+const resetProgressBtn = document.getElementById("resetProgressBtn");
+const resetFriendBtn = document.getElementById("resetFriendBtn");
+
+if (tabName === "friends") {
+  if (resetProgressBtn) resetProgressBtn.style.display = "none";
+  if (resetFriendBtn) resetFriendBtn.style.display = "inline-block";
+} else {
+  if (resetProgressBtn) resetProgressBtn.style.display = "inline-block";
+  if (resetFriendBtn) resetFriendBtn.style.display = "none";
+}
+
 
     content.classList.remove("fade-out");
     content.classList.add("fade-in");
