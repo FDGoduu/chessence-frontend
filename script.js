@@ -1528,20 +1528,23 @@ function evaluatePiece(piece) {
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
   if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
+
   const fen = getFEN();
 
   // Bezpieczne ograniczenie poziomu (0–10)
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
 
   const depthMap = [1, 1, 1, 2, 2, 3, 4, 6, 8, 10, 12];
-  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1]; // ilu najlepszych ruchów rozważać
-  const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0]; // jak często zrobi coś głupiego
+  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1]; 
+  const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0];
 
   const depth = depthMap[level];
   const multiPV = multiPVMap[level];
   const errorChance = errorChanceMap[level];
 
-  const bestMoves = [];
+  window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
+
+  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
 
   stockfishPVBWorker.postMessage("uci");
 
@@ -1556,25 +1559,24 @@ function runAIMove() {
 
     if (line.startsWith("info") && line.includes(" pv ")) {
       const move = line.split(" pv ")[1].split(" ")[0];
-      if (move && !bestMoves.includes(move)) {
-        bestMoves.push(move);
-		isInputLocked = false;
+      if (move && !window.bestMoves.includes(move)) {
+        window.bestMoves.push(move);
       }
     }
 
     if (line.startsWith("bestmove")) {
-      let chosenMove;
       if (line.includes("bestmove (none)")) return; // brak ruchu – partia się skończyła
-      if (bestMoves.length === 0) {
+
+      let chosenMove;
+      if (window.bestMoves.length === 0) {
         chosenMove = line.split(" ")[1]; // awaryjnie użyj bestmove, jeśli nie złapaliśmy info
       } else {
         const shouldMakeMistake = Math.random() < errorChance;
         if (shouldMakeMistake) {
-          // Wybierz losowy słabszy ruch
-          const worseMoves = bestMoves.slice(1);
-          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || bestMoves[0];
+          const worseMoves = window.bestMoves.slice(1);
+          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || window.bestMoves[0];
         } else {
-          chosenMove = bestMoves[0]; // najlepszy
+          chosenMove = window.bestMoves[0];
         }
       }
 
@@ -1593,15 +1595,17 @@ function runAIMove() {
       tryMove(sx, sy, dx, dy, false);
 
       const movedPiece = boardState[dy][dx];
-      const attackerPiece = boardState[sy][sx]; // po ruchu już będzie puste – użyj kopii z tempBoard!
+      const attackerPiece = boardState[sy][sx]; 
       const victimPiece = tempBoard[dy][dx];
+
       if (victimPiece && pieceColor(victimPiece) === playerColor && victimPiece.toLowerCase() !== 'p') {
-      hasLostPiece = true; // 🔥 bot zbił Twoją figurę (ale nie pionka)
+        hasLostPiece = true;
       }
+
       const captured = victimPiece && pieceColor(victimPiece) !== pieceColor(attackerPiece) ? victimPiece : '';
-      
+
       if (victimPiece && victimPiece.toLowerCase() !== 'k') {
-        const color = pieceColor(attackerPiece); // kto zbił
+        const color = pieceColor(attackerPiece);
         const type = victimPiece.toUpperCase();
         if (color === 'w') {
           capturedByWhite[type]++;
@@ -1610,28 +1614,27 @@ function runAIMove() {
         }
         updateCapturedDisplay();
       }
-          
-    
 
       logMove(sx, sy, dx, dy, movedPiece, captured);
       currentTurn = currentTurn === 'w' ? 'b' : 'w';
 
-const onFinish = () => {
-  renderBoard();
-  updateGameStatus();
-  updateEvaluationBar();
-};
+      const onFinish = () => {
+        renderBoard();
+        updateGameStatus();
+        updateEvaluationBar();
+      };
 
-if (pieceElem) {
-  animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
-    setTimeout(onFinish, 0);
-  });
-} else {
-  onFinish();
-}
+      if (pieceElem) {
+        animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
+          setTimeout(onFinish, 0);
+        });
+      } else {
+        onFinish();
+      }
     }
   };
 }
+
 
   // Obsługa wyboru koloru
 document.getElementById('chooseWhite').addEventListener('click', function() {
