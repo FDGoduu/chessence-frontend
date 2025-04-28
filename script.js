@@ -334,16 +334,29 @@ async function tryRegister() {
   const password = document.getElementById("passwordInput").value.trim();
 
   if (!nick || !password) {
-    showPopup("Podaj nick i hasło.");
+    showPopupAdvanced({
+	  message: "Podaj nick i hasło.",
+	  confirm: false
+	});
     return;
   }
 
   try {
     await registerUser(nick, password);
-    showPopup("Rejestracja zakończona sukcesem. Teraz możesz się zalogować!");
+    showPopupAdvanced({
+  message: "Rejestracja zakończona sukcesem. Teraz możesz się zalogować!",
+  confirm: false,
+  onConfirm: () => {
+    showScreen("loginScreen"); // 🔥 przełączenie na ekran logowania
+  }
+});
+
   } catch (error) {
     console.error(error);
-    showPopup("Rejestracja nie powiodła się. Być może nick już istnieje.");
+    showPopupAdvanced({
+	  message: "Rejestracja nie powiodła się. Być może nick już istnieje.",
+	  confirm: false
+	});
   }
 }
 
@@ -2610,19 +2623,6 @@ console.log("Odblokowywanie nagród dla poziomu:", newLevel, unlocked);
   }
 }
 
-function showPopup(message) {
-  const popupContainer = document.getElementById("popupContainer");
-  const popupMessage = document.getElementById("popupMessage");
-  const popupCloseBtn = document.getElementById("popupCloseBtn");
-
-  popupMessage.textContent = message;
-  popupContainer.classList.remove("popup-hidden");
-
-  popupCloseBtn.onclick = () => {
-    popupContainer.classList.add("popup-hidden");
-  };
-}
-
 function showPopupAdvanced({ message, input = false, confirm = false, onConfirm = null, onCancel = null }) {
   const popupContainer = document.getElementById("popupContainer");
   const popupMessage = document.getElementById("popupMessage");
@@ -4267,7 +4267,10 @@ async function startGameWithUser(nick) {
 
     if (!user) {
       console.error('Nie znaleziono użytkownika w users po zalogowaniu.');
-      showPopup("Błąd ładowania danych użytkownika. Spróbuj zalogować się ponownie.");
+      showPopupAdvanced({
+	  message: "Błąd ładowania danych użytkownika. Spróbuj zalogować się ponownie.",
+	  confirm: false
+	});
       showScreen("loginScreen");
       return;
     }
@@ -4303,7 +4306,10 @@ async function startGameWithUser(nick) {
 
   } catch (error) {
     console.error('❌ Błąd startu gry:', error);
-    showPopup("Wystąpił błąd podczas uruchamiania gry.");
+    showPopupAdvanced({
+	  message: "Wystąpił błąd podczas uruchamiania gry.",
+	  confirm: false
+	});
     showScreen("loginScreen");
   }
 }
@@ -4360,12 +4366,24 @@ loginButton.addEventListener('click', async () => {
     loggedUser = await loginUser(nick, pass); // próbujemy się zalogować
   } catch (error) {
     console.error('❌ Błąd logowania:', error);
-    showPopup("Logowanie nie powiodło się. Sprawdź dane.");
+    showPopupAdvanced({
+  message: "Logowanie nie powiodło się. Sprawdź dane.",
+  confirm: false,
+  onConfirm: () => {
+    document.getElementById("loginPassword").value = ""; // 🔥 czyścimy hasło
+  }
+});
     return; // jeśli błąd, zatrzymujemy się
   }
 
   if (!loggedUser) {
-    showPopup("Nie udało się zalogować. Spróbuj ponownie.");
+    showPopupAdvanced({
+  message: "Nie udało się zalogować. Spróbuj ponownie.",
+  confirm: false,
+  onConfirm: () => {
+    document.getElementById("loginPassword").value = ""; // 🔥 czyścimy hasło
+  }
+});
     return;
   }
 
