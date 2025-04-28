@@ -330,38 +330,50 @@ async function saveProfileToServer(nick, profileData) {
 }
 
 async function tryRegister() {
-  const nick = document.getElementById("nicknameInput").value.trim();
-  const password = document.getElementById("passwordInput").value.trim();
+  const nick = document.getElementById("registerNick").value.trim();
+  const password = document.getElementById("registerPassword").value.trim();
+  const confirmPassword = document.getElementById("registerConfirmPassword").value.trim();
 
-  if (!nick || !password) {
-    showPopupAdvanced({
-      message: "Podaj nick i hasło.",
-      confirm: false
-    });
-    return;
+  if (nick.length < 3) {
+    return showPopupAdvanced({ message: "Nick musi mieć co najmniej 3 znaki.", confirm: false });
   }
-showPopupAdvanced({
-  message: "Rejestruję konto...",
-  confirm: false,
-  onConfirm: async () => {
-    try {
-      await registerUser(nick, password);
-      return showPopupAdvanced({
+  if (password.length < 4) {
+    return showPopupAdvanced({ message: "Hasło musi mieć co najmniej 4 znaki.", confirm: false });
+  }
+  if (password !== confirmPassword) {
+    return showPopupAdvanced({ message: "Hasła nie są takie same.", confirm: false });
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/api/users/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nick, password })
+    });
+
+    if (response.ok) {
+      // UWAGA: tutaj tylko pokazujesz popup
+      showPopupAdvanced({
         message: "Rejestracja zakończona sukcesem! Możesz się teraz zalogować.",
         confirm: false,
         onConfirm: () => {
-          showScreen("loginScreen");
+          showScreen("loginScreen"); // przejście dopiero po kliknięciu OK
         }
       });
-    } catch (error) {
-      console.error(error);
-      return showPopupAdvanced({
-        message: "Rejestracja nie powiodła się. Być może nick już istnieje.",
+    } else {
+      const data = await response.json();
+      showPopupAdvanced({
+        message: data.error || "Rejestracja nie powiodła się. Być może nick już istnieje.",
         confirm: false
       });
     }
+  } catch (error) {
+    console.error(error);
+    showPopupAdvanced({
+      message: "Błąd połączenia z serwerem.",
+      confirm: false
+    });
   }
-});
 }
 
 function promotePawn(isWhite, isBot) {
@@ -4424,32 +4436,29 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
           body: JSON.stringify({ nick: currentUser, password: pass })
         });
 
-        if (!response.ok) {
-          const text = await response.text();
-          throw new Error(text || "Błąd serwera");
+        if (response.ok) {
+          showPopupAdvanced({
+            message: "Twoje konto zostało usunięte.",
+            confirm: false,
+            onConfirm: () => {
+              localStorage.clear();
+              activeUserNick = null;
+              showScreen("registerScreen"); // dopiero po kliknięciu OK!
+            }
+          });
+        } else {
+          const data = await response.json();
+          showPopupAdvanced({
+            message: data.error || "Nie udało się usunąć konta.",
+            confirm: false
+          });
         }
-
-	showPopupAdvanced({
-	  message: "Twoje konto zostało usunięte.",
-	  confirm: false,
-	  onConfirm: () => {
-	    setTimeout(() => {
-	      localStorage.clear();
-	      activeUserNick = null;
-	      showScreen("registerScreen");
-	    }, 50);
-	  }
-	});
-
-
-        return true;
       } catch (error) {
         console.error(error);
         showPopupAdvanced({
-          message: "Nie udało się usunąć konta: " + error.message,
+          message: "Błąd połączenia z serwerem.",
           confirm: false
         });
-        return false;
       }
     }
   });
