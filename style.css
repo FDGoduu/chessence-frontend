@@ -2379,8 +2379,10 @@ body {
   background-color: #e53935;
 }
 
-#popupButtons.single-button {
-  justify-content: center;
+#popupButtons.single-button button {
+  min-width: 120px;
+  font-size: 18px;
+  padding: 12px 24px;
 }
 
 #popupButtons.double-button {
