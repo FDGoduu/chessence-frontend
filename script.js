@@ -3305,34 +3305,34 @@ function openProfileTab(tabName) {
       targetContent.classList.add('fade-in');
     }
 
-    // 📋 Obsługa przycisków
+    // 📋 Przyciski
+    const resetProgressBtn = document.getElementById("resetProgressBtn");
+    const resetFriendBtn = document.getElementById("resetFriendBtn");
     const backGeneralBtn = document.getElementById("backGeneralBtn");
     const backFriendBtn = document.getElementById("backFriendBtn");
     const backToOwnProfileBtn = document.getElementById("backToOwnProfileBtn");
-    const resetProgressBtn = document.getElementById("resetProgressBtn");
-    const resetFriendBtn = document.getElementById("resetFriendBtn");
 
     if (viewingFriendProfile) {
-      // 👤 Oglądamy profil znajomego
+      // 👤 Profil znajomego
+      if (resetProgressBtn) resetProgressBtn.style.display = "none";
+      if (resetFriendBtn) resetFriendBtn.style.display = "none";
       if (backGeneralBtn) backGeneralBtn.style.display = "none";
       if (backFriendBtn) backFriendBtn.style.display = "none";
       if (backToOwnProfileBtn) backToOwnProfileBtn.style.display = "inline-block";
-      if (resetProgressBtn) resetProgressBtn.style.display = "none";
-      if (resetFriendBtn) resetFriendBtn.style.display = "none";
     } else {
       // 🧍‍♂️ Mój własny profil
       if (backToOwnProfileBtn) backToOwnProfileBtn.style.display = "none";
 
       if (tabName === "friends") {
-        if (backGeneralBtn) backGeneralBtn.style.display = "none";
-        if (backFriendBtn) backFriendBtn.style.display = "inline-block";
         if (resetProgressBtn) resetProgressBtn.style.display = "none";
         if (resetFriendBtn) resetFriendBtn.style.display = "inline-block";
+        if (backGeneralBtn) backGeneralBtn.style.display = "none";
+        if (backFriendBtn) backFriendBtn.style.display = "inline-block";
       } else {
-        if (backGeneralBtn) backGeneralBtn.style.display = "inline-block";
-        if (backFriendBtn) backFriendBtn.style.display = "none";
         if (resetProgressBtn) resetProgressBtn.style.display = "inline-block";
         if (resetFriendBtn) resetFriendBtn.style.display = "none";
+        if (backGeneralBtn) backGeneralBtn.style.display = "inline-block";
+        if (backFriendBtn) backFriendBtn.style.display = "none";
       }
     }
 
@@ -3341,6 +3341,7 @@ function openProfileTab(tabName) {
     setTimeout(() => content.classList.remove("fade-in"), 250);
   }, 200);
 }
+
 
 async function showFriendsTab() {
   document.querySelectorAll(".profile-tab-content").forEach(el => el.style.display = "none");
