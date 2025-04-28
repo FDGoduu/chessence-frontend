@@ -4085,6 +4085,9 @@ if (socket) {
   });
 
 socket.on("startGame", ({ colorMap, roomCode }) => {
+// 🔥 Ukryj overlay szukania przeciwnika
+const matchmakingOverlay = document.getElementById('matchmakingOverlay');
+if (matchmakingOverlay) matchmakingOverlay.classList.add('popup-hidden');
   const myColor = colorMap[socket.id];
   startGameOnline(myColor);
 
