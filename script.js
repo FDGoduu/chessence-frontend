@@ -2058,8 +2058,15 @@ document.querySelector(".captured-bottom .capture-label").textContent =
 
 function showStartMenu() {
 	if (gameMode === "online" && currentRoomCode && socket) {
+	  // Jeśli był tryb online, wyślij leaveRoom
 	  socket.emit("leaveRoom", { roomCode: currentRoomCode });
-	  currentRoomCode = null; // wyczyść kod pokoju
+	  currentRoomCode = null;
+	  gameMode = null;
+	  pvpSubmode = null;
+	} else {
+	  // Jeśli był tryb offline, po prostu resetuj dane gry
+	  gameMode = null;
+	  pvpSubmode = null;
 	}
 
 	// 🎯 Przyznaj zaległy XP tylko przy wejściu do menu
