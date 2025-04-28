@@ -1695,9 +1695,9 @@ document.getElementById("modePVP").addEventListener("click", () => {
 
   // 📌 Pokaż subopcji PvP natychmiast
   document.getElementById("pvpSubmodeButtons").style.display = "flex";
-  document.getElementById("colorButtons").style.display = "none";
-  document.getElementById("difficultyPVBContainer").style.display = "none";
-  document.getElementById("difficultyBVBContainer").style.display = "none";
+  smoothToggle(document.getElementById("colorButtons"), false);
+  smoothToggle(document.getElementById("difficultyPVBContainer"), false);
+  smoothToggle(document.getElementById("difficultyBVBContainer"), false);
 
   // 📌 Uruchom przesunięcie UI bez opóźnienia
   startShiftReset();
@@ -1768,9 +1768,9 @@ document.getElementById("modePVB").addEventListener("click", () => {
   document.getElementById("modePVP").classList.remove("selected");
   document.getElementById("modeBVB").classList.remove("selected");
 
-  document.getElementById("colorButtons").style.display = "flex";
-  document.getElementById("difficultyPVBContainer").style.display = "block";
-  document.getElementById("difficultyBVBContainer").style.display = "none";
+  smoothToggle(document.getElementById("colorButtons"), true);
+  smoothToggle(document.getElementById("difficultyPVBContainer"), true);
+  smoothToggle(document.getElementById("difficultyBVBContainer"), false);
   document.getElementById("startGame").disabled = true;
   // Ustaw kolor i nazwę trudności od razu po wejściu do PvB
 	const val = parseInt(document.getElementById("difficultyPVB").value, 10);
@@ -1817,9 +1817,9 @@ document.getElementById("modeBVB").addEventListener("click", () => {
   document.getElementById("modePVB").classList.remove("selected");
   document.getElementById("modePVP").classList.remove("selected");
 
-  document.getElementById("colorButtons").style.display = "none";
-  document.getElementById("difficultyPVBContainer").style.display = "none";
-document.getElementById("difficultyBVBContainer").style.display = "block";
+  smoothToggle(document.getElementById("colorButtons"), false);
+  smoothToggle(document.getElementById("difficultyPVBContainer"), false);
+smoothToggle(document.getElementById("difficultyBVBContainer"), true);
 document.getElementById("difficultyWhite").style.display = "inline-block";
 document.getElementById("difficultyBlack").style.display = "inline-block";
 document.getElementById("difficultyWhiteValue").style.display = "inline";
