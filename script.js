@@ -2668,7 +2668,7 @@ const cleanUp = () => {
     popupCancelBtn.onclick = null;
     popupConfirmBtn.classList.remove("popup-hidden");
     popupCancelBtn.classList.add("popup-hidden");
-  }, 70); // <- maleńkie opóźnienie, żeby browser zdążył ukryć popup przed czyszczeniem
+  }, 100); // <- maleńkie opóźnienie, żeby browser zdążył ukryć popup przed czyszczeniem
 };
 
 
