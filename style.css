@@ -2332,8 +2332,9 @@ body {
 
 #popupButtons {
   display: flex;
-  justify-content: center;
   gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 #popupCancelBtn {
@@ -2378,6 +2379,13 @@ body {
   background-color: #e53935;
 }
 
+#popupButtons.single-button {
+  justify-content: center;
+}
+
+#popupButtons.double-button {
+  justify-content: space-between;
+}
 /* Wybór AWATARÓW: siatka okrągła */
 .avatar-grid {
   display: grid;
