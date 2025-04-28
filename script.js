@@ -1895,13 +1895,17 @@ lastGameMode = mode;
 
 function smoothToggle(element, show) {
   if (!element) return;
-  
+
   element.classList.remove('fade-slide-in', 'fade-slide-out');
   void element.offsetWidth; // Reset animacji
 
   if (show) {
     element.style.display = "flex"; // lub block – jak chcesz
     element.classList.add('fade-slide-in');
+    element.addEventListener('animationend', function handler() {
+      element.classList.remove('fade-slide-in'); // 🔥 USUWAMY fade-slide-in po zakończeniu
+      element.removeEventListener('animationend', handler);
+    }, { once: true });
   } else {
     element.classList.add('fade-slide-out');
     element.addEventListener('animationend', function handler() {
