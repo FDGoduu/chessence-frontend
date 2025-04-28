@@ -2028,6 +2028,7 @@ document.getElementById('startGame').addEventListener('click', function () {
 
   applySavedAvatar();
   applySavedBackground();
+  rebindPopupButtons();
   hasAwardedXP = false; // 🔄 Reset flagi przy nowej grze
   currentTurn = 'w';
   // 🔁 Uaktualnij poziomy trudności botów na starcie gry
@@ -2634,7 +2635,12 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm,
   popupInput.value = "";
 
   popupInput.classList.toggle('popup-hidden', !input);
-  popupCancelBtn.classList.toggle('popup-hidden', !confirm);
+  if (confirm) {
+  popupCancelBtn.classList.remove('popup-hidden');
+} else {
+  popupCancelBtn.classList.add('popup-hidden');
+}
+
 
   popupButtons.classList.remove("single-button", "double-button");
   popupButtons.classList.add(confirm ? "double-button" : "single-button");
@@ -2645,6 +2651,9 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm,
     popupContainer.classList.add("popup-hidden");
     popupConfirmBtn.onclick = null;
     popupCancelBtn.onclick = null;
+    popupButtons.classList.remove("single-button", "double-button");
+    popupInput.classList.add("popup-hidden");
+    popupCancelBtn.classList.add("popup-hidden");
   };
 
   popupConfirmBtn.onclick = () => {
@@ -4101,6 +4110,18 @@ socket.on("opponentLeft", () => {
   showDisconnectedPopup("Przeciwnik opuścił grę 😢");
 });
   
+}
+
+function rebindPopupButtons() {
+  const popupConfirmBtn = document.getElementById("popupConfirmBtn");
+  const popupCancelBtn = document.getElementById("popupCancelBtn");
+
+  if (popupConfirmBtn) {
+    popupConfirmBtn.onclick = null;
+  }
+  if (popupCancelBtn) {
+    popupCancelBtn.onclick = null;
+  }
 }
 
 function closeBackgroundSelector() {
