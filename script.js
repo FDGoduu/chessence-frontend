@@ -3275,7 +3275,6 @@ async function updateAchievementsUI() {
   }
 }
 
-
 function openProfileTab(tabName) {
   const content = document.getElementById("profileContent");
   if (!content) return;
@@ -3283,16 +3282,12 @@ function openProfileTab(tabName) {
   content.classList.add("fade-out");
 
   setTimeout(() => {
-    // ⛔ Usuń klasę "active" z wszystkich przycisków
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-
-    // ⛔ Ukryj wszystkie treści zakładek
     document.querySelectorAll('#profileScreen .profile-tab-content').forEach(tab => {
       tab.style.display = 'none';
       tab.classList.remove('fade-in');
     });
 
-    // ✅ Aktywuj odpowiedni przycisk i zakładkę
     const targetButton = document.getElementById(`tab-${tabName}`);
     const targetContent = document.getElementById(`tabContent-${tabName}`);
     if (targetButton) targetButton.classList.add('active');
@@ -3300,9 +3295,25 @@ function openProfileTab(tabName) {
       targetContent.style.display = 'block';
       targetContent.classList.add('fade-in');
     }
-	if (tabName === "invites") {
-		renderInvites();
-	}
+    
+    // 📋 Zarządzanie przyciskami Wróć
+    if (tabName === "friends") {
+      document.getElementById("backGeneralBtn").style.display = "none";
+      document.getElementById("backFriendBtn").style.display = "inline-block";
+    } else {
+      document.getElementById("backGeneralBtn").style.display = "inline-block";
+      document.getElementById("backFriendBtn").style.display = "none";
+    }
+
+    // 📋 Zarządzanie przyciskami Resetuj Postęp
+    if (tabName === "friends") {
+      document.getElementById("resetProgressBtn").style.display = "none";
+      document.getElementById("resetFriendBtn").style.display = "inline-block";
+    } else {
+      document.getElementById("resetProgressBtn").style.display = "inline-block";
+      document.getElementById("resetFriendBtn").style.display = "none";
+    }
+
     content.classList.remove("fade-out");
     content.classList.add("fade-in");
     setTimeout(() => content.classList.remove("fade-in"), 250);
