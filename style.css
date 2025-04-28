@@ -2379,10 +2379,16 @@ body {
   background-color: #e53935;
 }
 
+#popupButtons.single-button {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+
 #popupButtons.single-button button {
   min-width: 140px;
-  font-size: 18px;
   padding: 14px 30px;
+  font-size: 18px;
   justify-content: center;
 }
 
