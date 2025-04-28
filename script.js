@@ -4338,9 +4338,9 @@ document.getElementById("registerSubmit").addEventListener("click", async () => 
   const pass = document.getElementById("registerPassword").value;
   const confirm = document.getElementById("registerConfirmPassword").value;
 
-  if (nick.length < 3) return showPopup("Nick musi mieć co najmniej 3 znaki.");
-  if (pass.length < 4) return showPopup("Hasło musi mieć co najmniej 4 znaki.");
-  if (pass !== confirm) return showPopup("Hasła nie są takie same.");
+  if (nick.length < 3) return showPopupAdvanced({ message: "Nick musi mieć co najmniej 3 znaki.", confirm: false });
+  if (pass.length < 4) return showPopupAdvanced({ message: "Hasło musi mieć co najmniej 4 znaki.", confirm: false })
+  if (pass !== confirm) return showPopupAdvanced({ message: "Hasła nie są takie same.", confirm: false, onConfirm: () => { document.getElementById("registerPassword").value = ""; document.getElementById("registerConfirmPassword").value = ""; } });
 
   try {
     await registerUser(nick, pass);
@@ -4348,7 +4348,7 @@ document.getElementById("registerSubmit").addEventListener("click", async () => 
     showScreen("loginScreen");
   } catch (error) {
     console.error(error);
-    showPopup("Rejestracja nie powiodła się. Być może nick już istnieje.");
+    showPopupAdvanced({ message: "Rejestracja nie powiodła się. Być może nick już istnieje.", confirm: false });
   }
 });
 
