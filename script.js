@@ -3979,14 +3979,7 @@ socket.on("startGame", ({ colorMap, roomCode }) => {
   
 
 socket.on("opponentLeft", () => {
-  alert("Przeciwnik opuścił grę 😢");
-
-  // 🔥 Jeśli byłeś w grze online – wyczyść stan gry
-  currentRoomCode = null;
-  gameMode = null;
-  pvpSubmode = null;
-
-  showStartMenu(); // 👈 wróć elegancko do menu głównego!
+  showDisconnectedPopup("Przeciwnik opuścił grę 😢");
 });
   
 }
@@ -4283,6 +4276,25 @@ function initBackToOwnProfileBtn() {
 document.addEventListener("DOMContentLoaded", () => {
   initBackToOwnProfileBtn(); // będzie dostępne po załadowaniu DOM
 });
+function showDisconnectedPopup(message) {
+  const overlay = document.createElement("div");
+  overlay.className = "disconnect-overlay";
+  overlay.innerHTML = `
+    <div class="disconnect-box">
+      <div class="disconnect-message">${message}</div>
+      <button id="returnToMenuBtn">Wróć do menu</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  document.getElementById("returnToMenuBtn").addEventListener("click", () => {
+    overlay.remove();
+    currentRoomCode = null;
+    gameMode = null;
+    pvpSubmode = null;
+    showStartMenu();
+  });
+}
 
 
 
