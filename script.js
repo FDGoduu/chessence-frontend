@@ -4363,7 +4363,16 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
   });
 });
 
-document.getElementById("resetProgressBtn").addEventListener("click", resetProfile);
+const resetProgressBtn = document.getElementById("resetProgressBtn");
+if (resetProgressBtn) {
+  resetProgressBtn.addEventListener("click", resetProfile);
+}
+
+const resetFriendBtn = document.getElementById("resetFriendBtn");
+if (resetFriendBtn) {
+  resetFriendBtn.addEventListener("click", resetProfile);
+}
+
 document.getElementById("profileAvatar").addEventListener("click", () => {
   openAvatarSelector();
 });
