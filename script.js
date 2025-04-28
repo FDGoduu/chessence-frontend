@@ -2654,14 +2654,22 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
   popupCancelBtn.onclick = null;
 
   // Funkcja zamykająca popup
-  const cleanUp = () => {
-    popupContainer.classList.add("popup-hidden");
-    popupConfirmBtn.onclick = null;
-    popupCancelBtn.onclick = null;
-    popupButtons.classList.remove("single-button", "double-button");
-    popupInput.classList.add("popup-hidden");
-    popupCancelBtn.classList.add("popup-hidden");
-  };
+const cleanUp = () => {
+  popupContainer.classList.add("popup-hidden");
+
+  // Resetuj treść i układ
+  popupMessage.textContent = "";
+  popupInput.value = "";
+  popupInput.classList.add("popup-hidden");
+  
+  popupButtons.classList.remove("single-button", "double-button");
+  popupConfirmBtn.onclick = null;
+  popupCancelBtn.onclick = null;
+  
+  popupConfirmBtn.classList.remove("popup-hidden");
+  popupCancelBtn.classList.add("popup-hidden");
+};
+
 
   // Przycisk OK
   popupConfirmBtn.onclick = () => {
