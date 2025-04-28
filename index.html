@@ -72,6 +72,7 @@
 		  <input type="text" id="roomCodeInput" placeholder="Kod pokoju (np. AB3XK7)" maxlength="12">
 		  <button id="createRoomBtn">🆕 Stwórz pokój</button>
 		  <button id="joinRoomBtn">🔗 Dołącz do pokoju</button>
+		  <button id="findMatchBtn">🔎 Znajdź przeciwnika</button>
 		  <div id="onlineStatus" class="online-status"></div>
 		</div>
 
@@ -349,6 +350,12 @@
   <div id="updatePopupBox">
     <div id="updatePopupMessage">Nowa wersja gry dostępna!</div>
     <button id="reloadGameBtn" disabled>Odśwież grę</button>
+  </div>
+</div>
+<div id="matchmakingOverlay" class="popup-hidden">
+  <div id="matchmakingBox">
+    <p>⏳ Szukam przeciwnika...</p>
+    <button id="cancelMatchBtn">❌ Anuluj</button>
   </div>
 </div>
 
