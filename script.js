@@ -2623,7 +2623,7 @@ function showPopup(message) {
   };
 }
 
-function showPopupAdvanced({ message, input = false, confirm = false, onConfirm, onCancel }) {
+function showPopupAdvanced({ message, input = false, confirm = false, onConfirm = null, onCancel = null }) {
   const popupContainer = document.getElementById("popupContainer");
   const popupMessage = document.getElementById("popupMessage");
   const popupInput = document.getElementById("popupInput");
@@ -2631,28 +2631,25 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm,
   const popupCancelBtn = document.getElementById("popupCancelBtn");
   const popupButtons = document.getElementById("popupButtons");
 
-  // Ustaw treść wiadomości i reset inputa
+  // Reset treści popupu
   popupMessage.textContent = message || "";
   popupInput.value = "";
-
-  // Pokaż lub ukryj pole input
   popupInput.classList.toggle('popup-hidden', !input);
 
-  // Pokaż lub ukryj przycisk Anuluj
+  // Pokaż / ukryj przycisk Anuluj
   if (confirm) {
     popupCancelBtn.classList.remove('popup-hidden');
   } else {
     popupCancelBtn.classList.add('popup-hidden');
   }
 
-  // Ustaw style przycisków
+  // Ustaw układ przycisków
   popupButtons.classList.remove("single-button", "double-button");
   popupButtons.classList.add(confirm ? "double-button" : "single-button");
 
-  // Przygotuj popup do pokazania
   popupContainer.classList.remove("popup-hidden");
 
-  // ✅ Najpierw odpinamy stare akcje
+  // Najpierw odpinamy stare akcje
   popupConfirmBtn.onclick = null;
   popupCancelBtn.onclick = null;
 
@@ -2666,11 +2663,11 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm,
     popupCancelBtn.classList.add("popup-hidden");
   };
 
-  // ✅ Przypinamy nowe funkcje
+  // Przypisujemy funkcje
   popupConfirmBtn.onclick = () => {
     const value = input ? popupInput.value : true;
     cleanUp();
-    if (onConfirm) onConfirm(value);
+    if (onConfirm) onConfirm(value); // wykonujemy tylko jeśli jest przypisane
   };
 
   popupCancelBtn.onclick = () => {
