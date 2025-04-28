@@ -219,34 +219,6 @@ body {
   width: 500px;
 }
 
-/* Responsywność */
-@media (max-width: 600px) {
-  #board {
-    grid-template-columns: repeat(8, 40px);
-  }
-
-  .square {
-    width: 40px;
-    height: 40px;
-    font-size: 24px;
-	font-family: "Segoe UI Symbol", "DejaVu Sans", "Arial", sans-serif;
-  }
-
-  .status-bar {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  #restartBtn {
-    width: 100%;
-	margin: 30px;
-  }
-
-  #moveLog {
-    font-size: 13px;
-  }
-}
-
 /* Grupy guzików i suwaków */
 .button-group {
   display: flex;
@@ -2425,16 +2397,7 @@ body {
   font-size: 12px;
   color: #aaa;
 }
-@media (min-width: 1400px) {
-  #achievementsList {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-@media (min-width: 1800px) {
-  #achievementsList {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
+
 .profile-tabs {
   display: flex;
   justify-content: center;
@@ -2860,29 +2823,6 @@ body {
   cursor: pointer;
 }
 
-
-@media (min-height: 900px) {
-  .start-box {
-    padding-top: 20px;
-    gap: 24px;
-  }
-
-  .mode-buttons button {
-    font-size: 20px;
-    padding: 16px 30px;
-  }
-
-  #startGame {
-    margin-top: 30px;
-    padding: 20px 50px;
-    font-size: 22px;
-  }
-
-  .game-version {
-    bottom: 2vh;
-    font-size: 13px;
-  }
-}
 .profile-header {
   display: flex;
   justify-content: space-between;
@@ -2896,40 +2836,6 @@ body {
   gap: 16px;
 }
 
-
-/* ⚠️ Stylizacja dla małych ekranów – np. laptopowych */
-@media screen and (max-height: 768px) {
-  #startLogo {
-    transform: scale(0.9);
-  }
-
-  #startBox {
-    transform: scale(0.9);
-  }
-
-  #profileBox {
-    transform: scale(0.9);
-  }
-
-  #startOptions {
-    transform: scale(0.9);
-  }
-
-  .game-options-box {
-    transform: scale(0.9) translateY(1vh);
-  }
-
-  .difficulty-label,
-  .color-selection,
-  .start-button-wrapper {
-    transform: scale(0.9);
-    margin-top: 0.5em;
-  }
-
-  .start-button-wrapper {
-    transform: scale(0.85) translateY(-1vh);
-  }
-}
 
 .add-friend-box {
   display: flex;
@@ -3120,25 +3026,6 @@ body {
   font-size: 14px;
 }
 
-/* Responsywność - poniżej 1200px zmiana układu */
-@media (max-width: 1200px) {
-  .friends-layout {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-.friends-column, .invites-column {
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  border-radius: 14px;
-  height: 600px; /* 🔥 KONKRETNA wysokość */
-  max-height: 600px;
-  overflow: hidden; /* trzymamy */
-}
-
-}
 #tabContent-friends {
   display: flex;
   flex-direction: column;
