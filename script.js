@@ -352,12 +352,12 @@ async function tryRegister() {
     });
 
     if (response.ok) {
-      // UWAGA: tutaj tylko pokazujesz popup
+      // PO FETCHU pokazujemy OSOBNY popup sukcesu
       showPopupAdvanced({
-        message: "Rejestracja zakończona sukcesem! Możesz się teraz zalogować.",
+        message: "✅ Rejestracja zakończona sukcesem! Kliknij OK aby przejść do logowania.",
         confirm: false,
         onConfirm: () => {
-          showScreen("loginScreen"); // przejście dopiero po kliknięciu OK
+          showScreen("loginScreen");
         }
       });
     } else {
@@ -4440,19 +4440,20 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
         });
 
         if (response.ok) {
+          // PO FETCHU pokazujemy OSOBNY popup sukcesu
           showPopupAdvanced({
-            message: "Twoje konto zostało usunięte.",
+            message: "✅ Twoje konto zostało usunięte. Kliknij OK aby przejść na ekran logowania.",
             confirm: false,
             onConfirm: () => {
               localStorage.clear();
               activeUserNick = null;
-              showScreen("registerScreen"); // dopiero po kliknięciu OK!
+              showScreen("registerScreen");
             }
           });
         } else {
           const data = await response.json();
           showPopupAdvanced({
-            message: data.error || "Nie udało się usunąć konta.",
+            message: data.error || "Nie udało się usunąć konta. Spróbuj ponownie.",
             confirm: false
           });
         }
