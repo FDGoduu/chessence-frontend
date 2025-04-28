@@ -345,7 +345,7 @@ async function tryRegister() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/api/users/register`, {
+    const response = await fetch(`${API_BASE}/api/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nick, password })
@@ -2663,9 +2663,12 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
 
   popupContainer.classList.remove("popup-hidden");
 
-  const cleanUp = () => {
-    popupContainer.classList.add("popup-hidden");
-    setTimeout(() => {
+const cleanUp = () => {
+  popupContainer.classList.add("popup-hidden");
+
+  // NIE rób natychmiastowego resetu — zrób po 400ms i tylko jeśli popupContainer nadal hidden
+  setTimeout(() => {
+    if (popupContainer.classList.contains("popup-hidden")) {
       popupMessage.textContent = "";
       popupInput.value = "";
       popupInput.classList.add("popup-hidden");
@@ -2674,8 +2677,9 @@ function showPopupAdvanced({ message, input = false, confirm = false, onConfirm 
       popupCancelBtn.onclick = null;
       popupConfirmBtn.classList.remove("popup-hidden");
       popupCancelBtn.classList.add("popup-hidden");
-    }, 100);
-  };
+    }
+  }, 400);
+};
 
 popupConfirmBtn.onclick = async () => {
   const value = input ? popupInput.value : true;
