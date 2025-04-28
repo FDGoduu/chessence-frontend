@@ -2832,8 +2832,14 @@ async function openProfileScreen(friendId = null) {
   const users = await getUsers();
   await renderFriendsList();
 
-  document.getElementById("resetProgressBtn").style.display = isOwnProfile ? "inline-block" : "none";
-  document.querySelector('.profile-controls button[onclick="closeProfileScreen()"]').style.display = isOwnProfile ? "inline-block" : "none";
+if (viewingFriendProfile) {
+  document.getElementById("backGeneralBtn").style.display = "none";
+  document.getElementById("backFriendBtn").style.display = "inline-block";
+} else {
+  document.getElementById("backGeneralBtn").style.display = "inline-block";
+  document.getElementById("backFriendBtn").style.display = "none";
+}
+
   const backBtnEl = document.getElementById("backToOwnProfileBtn");
 
   const currentNick = localStorage.getItem("currentUser");
