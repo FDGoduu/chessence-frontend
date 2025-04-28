@@ -3412,10 +3412,14 @@ body {
   font-size: 24px;
   color: white;
   backdrop-filter: blur(4px);
+  opacity: 1; /* Nowe */
+  transition: opacity 0.5s ease; /* Nowe */
+  pointer-events: all; /* Blokuje klikanie pod spodem */
 }
 
 #connectionOverlay.hidden {
-  display: none;
+  opacity: 0;
+  pointer-events: none; /* Po ukryciu pozwala klikać */
 }
 
 .connectionBox {
