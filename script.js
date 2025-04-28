@@ -3978,10 +3978,16 @@ socket.on("startGame", ({ colorMap, roomCode }) => {
   });
   
 
-  socket.on("opponentLeft", () => {
-    alert("Przeciwnik opuścił grę 😢");
-    location.reload();
-  });
+socket.on("opponentLeft", () => {
+  alert("Przeciwnik opuścił grę 😢");
+
+  // 🔥 Jeśli byłeś w grze online – wyczyść stan gry
+  currentRoomCode = null;
+  gameMode = null;
+  pvpSubmode = null;
+
+  showStartMenu(); // 👈 wróć elegancko do menu głównego!
+});
   
 }
 
