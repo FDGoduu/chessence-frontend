@@ -243,8 +243,6 @@ body {
 /* Ekran startowy – pełnoekranowa scena z dominującymi elementami */
 #startScreen {
   position: relative;
-  top: 0;
-  left: 0;
   width: 100%;
   min-height: 100vh;
   background: radial-gradient(circle, #1b1b1b 0%, #121212 100%);
@@ -252,13 +250,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: 'Segoe UI', sans-serif;
+  justify-content: center;
   overflow-x: hidden;
   overflow-y: auto;
   z-index: 9999;
-  padding-top: 6vh;
-  padding-bottom: 6vh;
-  justify-content: flex-start;
+  padding: 0;
 }
 
 .start-logo {
@@ -1500,8 +1496,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 60px 20px 40px;
+  justify-content: center;
+  padding: 20px;
   background: radial-gradient(circle, #1a1a1a 0%, #111 100%);
   min-height: 100vh;
   color: #f0f0f0;
@@ -1883,9 +1879,12 @@ body {
   min-height: 100vh;
   background: #1b1b1b;
   color: white;
-  padding-top: 180px;
-  padding-bottom: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   overflow-y: auto;
+  padding: 20px; /* zamiast 180px i 140px */
 }
 
 .profile-cover {
