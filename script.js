@@ -1838,6 +1838,8 @@ function startShiftReset() {
   startLogo.style.transition = "transform 0.4s ease, scale 0.4s ease";
   startBox.style.transform = "translateY(0) scale(1)";
   startLogo.style.transform = "translateY(0) scale(1)";
+  document.getElementById("startGame").style.display = "block";
+  document.getElementById("startGame").disabled = true;
 }
 
 function startShiftTo(mode) {
@@ -1884,8 +1886,6 @@ function startShiftTo(mode) {
 	  startBox.style.transform = `translateY(${profile.pvb.box})${scale}`;
 	  startLogo.style.transform = `translateY(${profile.pvb.logo})${scale}`;
 }
-document.getElementById("startGame").style.display = "block";
-document.getElementById("startGame").disabled = true;
 
 // ⬇️ Zawsze zapamiętuj tryb, niezależnie od tego, czy to pierwszy raz
 lastGameMode = mode;
