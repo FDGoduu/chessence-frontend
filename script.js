@@ -1647,6 +1647,24 @@ function toggleModeButtons(activeButton) {
   document.getElementById("startGame").disabled = (gameMode === "pvb" && !playerColor);
 }
 
+function updateStartGameButton() {
+  const startGameBtn = document.getElementById("startGame");
+
+  if (gameMode === "pvp") {
+    if (pvpSubmode === "hotseat") {
+      startGameBtn.style.display = "block";
+      startGameBtn.disabled = false;
+    } else if (pvpSubmode === "online") {
+      startGameBtn.style.display = "none";
+    } else {
+      startGameBtn.style.display = "block";
+      startGameBtn.disabled = true;
+    }
+  } else {
+    startGameBtn.style.display = "block";
+    startGameBtn.disabled = !playerColor; // domyślne zachowanie dla PvB, BvB
+  }
+}
   
 // Tryb gry – Gracz vs Gracz
 document.getElementById("modePVP").addEventListener("click", () => {
@@ -1684,6 +1702,7 @@ document.getElementById("modePVP").addEventListener("click", () => {
   startShiftTo("pvp");
 
   document.getElementById("startGame").disabled = true;
+  updateStartGameButton();
 });
 
 
@@ -1701,6 +1720,7 @@ document.getElementById("chooseHotseat").addEventListener("click", () => {
   document.getElementById("chooseOnline").classList.remove("selected");
   document.getElementById("onlineUI").style.display = "none";
   document.getElementById("startGame").disabled = false;
+  updateStartGameButton();
 });
 
 
@@ -1719,6 +1739,7 @@ document.getElementById("chooseOnline").addEventListener("click", () => {
   document.getElementById("chooseHotseat").classList.remove("selected");
   document.getElementById("onlineUI").style.display = "flex";
   document.getElementById("startGame").disabled = false;
+  updateStartGameButton();
 });
 
 
