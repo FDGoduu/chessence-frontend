@@ -4277,7 +4277,7 @@ const matchmakingOverlay = document.getElementById('matchmakingOverlay');
 const cancelMatchBtn = document.getElementById('cancelMatchBtn');
 
 findMatchBtn.addEventListener('click', () => {
-  socket.emit('matchmake', { nickname: currentNick });
+  socket.emit('matchmake', { nickname: currentNickname });
   matchmakingOverlay.classList.remove('popup-hidden');
 });
 
