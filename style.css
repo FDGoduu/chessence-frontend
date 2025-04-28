@@ -2269,6 +2269,35 @@ body {
   opacity: 0;
   pointer-events: none;
 }
+#popupInput {
+  width: 80%;
+  padding: 10px;
+  margin: 20px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  text-align: center;
+}
+
+#popupButtons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+#popupCancelBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #d9534f;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#popupCancelBtn:hover {
+  background: #c9302c;
+}
 
 /* Wybór AWATARÓW: siatka okrągła */
 .avatar-grid {
