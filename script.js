@@ -9,7 +9,12 @@ try {
   socket.on("connect", () => {
 	const connectionOverlay = document.getElementById("connectionOverlay");
 	if (connectionOverlay) {
- 	connectionOverlay.classList.add("hidden");
+	  connectionOverlay.classList.add("hidden");
+	
+	  // Opcjonalnie całkowicie usuń z DOM po animacji:
+	  setTimeout(() => {
+	    connectionOverlay.style.display = "none";
+	  }, 600); // Daj czas na fade-out (500ms + trochę zapasu)
 	}
     socketId = socket.id;
     console.log("🆔 Moje socket.id:", socketId);
