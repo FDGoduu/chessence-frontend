@@ -4,11 +4,6 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  min-height: 100vh; /* NIE max-height! */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
 }
 
 .container {
@@ -3073,8 +3068,14 @@ body {
 }
 /* 📏 Dynamiczne skalowanie całej gry w dół dla laptopów */
 #mainContainer {
+  width: 100vw;
+  height: 100vh;
   transform: scale(1);
   transform-origin: top center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Skalowanie na laptopach 1366x768 lub podobnych */
