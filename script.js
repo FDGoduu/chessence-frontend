@@ -2090,9 +2090,14 @@ resetGame(false);
 isInputLocked = false;
 if (gameMode === "pvb") {
   stockfishPVBWorker.postMessage("uci");
-  if (currentTurn !== playerColor) {
-    setTimeout(runAIMove, 500); // bot zaczyna tylko jeśli to jego tura
-  }
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    if (line.includes("uciok")) {
+      if (currentTurn !== playerColor) {
+        setTimeout(runAIMove, 200); // małe opóźnienie żeby nie wyprzedzić Workera
+      }
+    }
+  };
 }
 
 if (gameMode === "bvb") {
