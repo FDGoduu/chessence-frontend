@@ -1537,24 +1537,112 @@ function evaluatePiece(piece) {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
+  if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
 
   const fen = getFEN();
+
+  // Bezpieczne ograniczenie poziomu (0–10)
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
 
-  const depthMap = [1, 1, 2, 3, 4, 5, 6, 7, 9, 11, 13];
-  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
+  const depthMap = [1, 1, 1, 2, 2, 3, 4, 6, 8, 10, 12];
+  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1]; 
   const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0];
 
   const depth = depthMap[level];
   const multiPV = multiPVMap[level];
-  errorChance = errorChanceMap[level];
+  const errorChance = errorChanceMap[level];
 
-  bestMoves = [];
+  window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
+
+  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
 
   stockfishPVBWorker.postMessage("uci");
-  stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
-  stockfishPVBWorker.postMessage(`position fen ${fen}`);
-  stockfishPVBWorker.postMessage(`go depth ${depth}`);
+
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+
+    if (line.includes("uciok")) {
+      stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
+      stockfishPVBWorker.postMessage(`position fen ${fen}`);
+      stockfishPVBWorker.postMessage(`go depth ${depth}`);
+    }
+
+    if (line.startsWith("info") && line.includes(" pv ")) {
+      const move = line.split(" pv ")[1].split(" ")[0];
+      if (move && !window.bestMoves.includes(move)) {
+        window.bestMoves.push(move);
+      }
+    }
+
+    if (line.startsWith("bestmove")) {
+      if (line.includes("bestmove (none)")) return; // brak ruchu – partia się skończyła
+
+      let chosenMove;
+      if (window.bestMoves.length === 0) {
+        chosenMove = line.split(" ")[1]; // awaryjnie użyj bestmove, jeśli nie złapaliśmy info
+      } else {
+        const shouldMakeMistake = Math.random() < errorChance;
+        if (shouldMakeMistake) {
+          const worseMoves = window.bestMoves.slice(1);
+          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || window.bestMoves[0];
+        } else {
+          chosenMove = window.bestMoves[0];
+        }
+      }
+
+      if (!chosenMove || chosenMove.length < 4) return;
+
+      const sx = chosenMove.charCodeAt(0) - 97;
+      const sy = 8 - parseInt(chosenMove[1]);
+      const dx = chosenMove.charCodeAt(2) - 97;
+      const dy = 8 - parseInt(chosenMove[3]);
+
+      const fromSquareElem = document.querySelector(`.square[data-x="${sx}"][data-y="${sy}"]`);
+      const toSquareElem = document.querySelector(`.square[data-x="${dx}"][data-y="${dy}"]`);
+      const pieceElem = fromSquareElem?.querySelector('.piece');
+
+      const tempBoard = JSON.parse(JSON.stringify(boardState));
+      tryMove(sx, sy, dx, dy, false);
+
+      const movedPiece = boardState[dy][dx];
+      const attackerPiece = boardState[sy][sx]; 
+      const victimPiece = tempBoard[dy][dx];
+
+      if (victimPiece && pieceColor(victimPiece) === playerColor && victimPiece.toLowerCase() !== 'p') {
+        hasLostPiece = true;
+      }
+
+      const captured = victimPiece && pieceColor(victimPiece) !== pieceColor(attackerPiece) ? victimPiece : '';
+
+      if (victimPiece && victimPiece.toLowerCase() !== 'k') {
+        const color = pieceColor(attackerPiece);
+        const type = victimPiece.toUpperCase();
+        if (color === 'w') {
+          capturedByWhite[type]++;
+        } else {
+          capturedByBlack[type]++;
+        }
+        updateCapturedDisplay();
+      }
+
+      logMove(sx, sy, dx, dy, movedPiece, captured);
+      currentTurn = currentTurn === 'w' ? 'b' : 'w';
+
+      const onFinish = () => {
+        renderBoard();
+        updateGameStatus();
+        updateEvaluationBar();
+      };
+
+      if (pieceElem) {
+        animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
+          setTimeout(onFinish, 0);
+        });
+      } else {
+        onFinish();
+      }
+    }
+  };
 }
 
 
@@ -2000,6 +2088,15 @@ document.getElementById('startGame').addEventListener('click', function () {
 	}
 resetGame(false);
 isInputLocked = false;
+if (gameMode === "pvb") {
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    if (line.includes("uciok")) {
+      runAIMove();
+    }
+  };
+  stockfishPVBWorker.postMessage("uci");
+}
 
 if (gameMode === "bvb") {
   runBotVsBot();
@@ -2010,14 +2107,19 @@ if (gameMode === "pvp-hotseat") {
   document.getElementById("board").classList.remove("rotated");
   return;
 }
-if (gameMode === "pvb") {
-  stockfishPVBWorker.postMessage("uci");
-  if (playerColor === 'b') {
-    setTimeout(runAIMove, 300);
-  }
-}
+
 if (playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
+
+  if (gameMode === "pvb") {
+    stockfishPVBWorker.postMessage("uci");
+    stockfishPVBWorker.onmessage = function (e) {
+      const line = String(e.data);
+      if (line.includes("uciok")) {
+        runAIMove();
+      }
+    };
+  }
 } else {
   document.getElementById("board").classList.remove("rotated");
 }
@@ -2097,63 +2199,17 @@ function showStartMenu() {
 }
 
 function resetGame(showMenuAfter) {
-  if (stockfishBVBWorker) {
-    stockfishBVBWorker.terminate();
-    stockfishBVBWorker = new Worker("stockfish.js");
-  }
+	if (stockfishBVBWorker) {
+	  stockfishBVBWorker.terminate();
+	  stockfishBVBWorker = new Worker("stockfish.js");
+	}
 
-  if (stockfishPVBWorker) {
-    stockfishPVBWorker.terminate();
-  }
-  stockfishPVBWorker = new Worker("stockfish.js");
+	if (stockfishPVBWorker) {
+	  stockfishPVBWorker.terminate();
+	  stockfishPVBWorker = new Worker("stockfish.js");
+	}
 
-  stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
-
-    if (line.includes("uciok")) return;
-
-    if (line.startsWith("info") && line.includes(" pv ")) {
-      const move = line.split(" pv ")[1].split(" ")[0];
-      if (move && !bestMoves.includes(move)) {
-        bestMoves.push(move);
-      }
-    }
-
-    if (line.startsWith("bestmove")) {
-      if (line.includes("bestmove (none)")) return;
-
-      let chosenMove;
-      if (bestMoves.length === 0) {
-        chosenMove = line.split(" ")[1];
-      } else {
-        const shouldMakeMistake = Math.random() < errorChance;
-        const worseMoves = bestMoves.slice(1);
-        chosenMove = shouldMakeMistake
-          ? (worseMoves[Math.floor(Math.random() * worseMoves.length)] || bestMoves[0])
-          : bestMoves[0];
-      }
-
-      if (!chosenMove || chosenMove.length < 4) return;
-
-      const sx = chosenMove.charCodeAt(0) - 97;
-      const sy = 8 - parseInt(chosenMove[1]);
-      const dx = chosenMove.charCodeAt(2) - 97;
-      const dy = 8 - parseInt(chosenMove[3]);
-
-      tryMove(sx, sy, dx, dy, false);
-
-      currentTurn = currentTurn === 'w' ? 'b' : 'w';
-      renderBoard();
-      updateGameStatus();
-      updateEvaluationBar();
-
-      if (!gameEnded && gameMode === "pvb" && currentTurn !== playerColor) {
-        setTimeout(runAIMove, 500);
-      }
-    }
-  };
-
-  isBotRunning = false;
+	isBotRunning = false;
   boardState = [
     ['r','n','b','q','k','b','n','r'],
     ['p','p','p','p','p','p','p','p'],
@@ -2171,15 +2227,17 @@ function resetGame(showMenuAfter) {
   blackKingMoved = false;
   whiteRookMoved = [false, false];
   blackRookMoved = [false, false];
+  document.getElementById("endScreen").style.display = "none";
+  document.getElementById("boardContainer").classList.remove("board-mate");
   capturedByWhite = { ...initialCapturedCounts };
   capturedByBlack = { ...initialCapturedCounts };
-  previousCapturedByWhite = {};
-  previousCapturedByBlack = {};
-  updateCapturedDisplay();
+  updateCapturedDisplay();  
   renderBoard();
+const botInfo = document.getElementById("botDifficultyDisplay");
   updateGameStatus();
-  updateEvaluationBar();
+  clearHighlights();
   updateBotLabels();
+  updateEvaluationBar();
   moveLog = [];
   gameEnded = false;
   isInputLocked = false;
@@ -2188,18 +2246,19 @@ function resetGame(showMenuAfter) {
   delete window.xpBotLevelAtEnd;
   document.getElementById('logList').innerHTML = '';
   promotionContext = null;
-  document.getElementById("endScreen").style.display = "none";
-  document.getElementById("boardContainer").classList.remove("board-mate");
   document.getElementById("promotionModal").style.display = "none";
 
+
+
+  // Jeżeli chcemy powrócić do menu, to je pokażemy
   if (showMenuAfter) {
-    if (typeof window.previousLevelBeforeAward !== "undefined" && playerLevel > window.previousLevelBeforeAward) {
-      triggerLevelUpAnimation();
-      delete window.previousLevelBeforeAward;
-    }
+  if (showMenuAfter && typeof window.previousLevelBeforeAward !== "undefined" && playerLevel > window.previousLevelBeforeAward) {
+  triggerLevelUpAnimation();
+  // tylko raz!
+  delete window.previousLevelBeforeAward;
+	}
     showStartMenu();
   }
-
   document.getElementById("gameScreen").style.display = "block";
 }
 
