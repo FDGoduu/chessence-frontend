@@ -2089,6 +2089,11 @@ document.getElementById('startGame').addEventListener('click', function () {
 resetGame(false);
 isInputLocked = false;
 if (gameMode === "pvb") {
+  if (stockfishPVBWorker) {
+    stockfishPVBWorker.terminate();
+  }
+  stockfishPVBWorker = new Worker("stockfish.js"); // 🔥 zawsze nowy Worker przy nowej grze
+
   stockfishPVBWorker.onmessage = function (e) {
     const line = String(e.data);
     if (line.includes("uciok")) {
@@ -2199,17 +2204,19 @@ function showStartMenu() {
 }
 
 function resetGame(showMenuAfter) {
-	if (stockfishBVBWorker) {
-	  stockfishBVBWorker.terminate();
-	  stockfishBVBWorker = new Worker("stockfish.js");
-	}
+  if (stockfishBVBWorker) {
+    stockfishBVBWorker.terminate();
+    stockfishBVBWorker = new Worker("stockfish.js");
+  }
 
-	if (stockfishPVBWorker) {
-	  stockfishPVBWorker.terminate();
-	  stockfishPVBWorker = new Worker("stockfish.js");
-	}
+  if (stockfishPVBWorker) {
+    stockfishPVBWorker.terminate();
+    stockfishPVBWorker = new Worker("stockfish.js");
+  }
 
-	isBotRunning = false;
+  stockfishPVBWorker.onmessage = null; // 🔥 WAŻNE: reset nasłuchu PvB
+
+  isBotRunning = false;
   boardState = [
     ['r','n','b','q','k','b','n','r'],
     ['p','p','p','p','p','p','p','p'],
