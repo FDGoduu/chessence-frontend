@@ -2091,18 +2091,6 @@ document.getElementById('startGame').addEventListener('click', function () {
   resetGame(false);
   isInputLocked = false;
 
-  // 🔥 Funkcja pomocnicza do przygotowania PvB Workera
-  function preparePvBBot() {
-    if (!stockfishPVBWorker) return;
-    stockfishPVBWorker.onmessage = function (e) {
-      const line = String(e.data);
-      if (line.includes("uciok")) {
-        runAIMove();
-      }
-    };
-    stockfishPVBWorker.postMessage("uci");
-  }
-
   if (gameMode === "pvb") {
     preparePvBBot();
   }
@@ -2147,6 +2135,62 @@ document.getElementById('startGame').addEventListener('click', function () {
   topLabel.textContent = `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
   bottomLabel.textContent = `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
 });
+
+function preparePvBBot() {
+  if (!stockfishPVBWorker) return;
+
+  const fen = getFEN();
+  const level = playerColor === 'w' ? botDifficultyB : botDifficultyW;
+
+  const depthMap = [1, 1, 2, 3, 4, 5, 6, 7, 9, 11, 13];
+  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
+
+  const depth = depthMap[level];
+  const multiPV = multiPVMap[level];
+
+  window.bestMoves = [];
+
+  stockfishPVBWorker.postMessage("uci");
+
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+
+    if (line.includes("uciok")) {
+      stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
+      stockfishPVBWorker.postMessage(`position fen ${fen}`);
+      stockfishPVBWorker.postMessage(`go depth ${depth}`);
+    }
+
+    if (line.startsWith("info") && line.includes(" pv ")) {
+      const move = line.split(" pv ")[1].split(" ")[0];
+      if (move && !window.bestMoves.includes(move)) {
+        window.bestMoves.push(move);
+      }
+    }
+
+    if (line.startsWith("bestmove")) {
+      if (line.includes("bestmove (none)")) return; // brak ruchu
+
+      let chosenMove = window.bestMoves.length ? window.bestMoves[0] : line.split(" ")[1];
+      if (!chosenMove || chosenMove.length < 4) return;
+
+      const sx = chosenMove.charCodeAt(0) - 97;
+      const sy = 8 - parseInt(chosenMove[1]);
+      const dx = chosenMove.charCodeAt(2) - 97;
+      const dy = 8 - parseInt(chosenMove[3]);
+
+      tryMove(sx, sy, dx, dy, false);
+
+      currentTurn = currentTurn === 'w' ? 'b' : 'w';
+      renderBoard();
+      updateGameStatus();
+      updateEvaluationBar();
+      if (gameMode === "pvb" && currentTurn !== playerColor) {
+        setTimeout(preparePvBBot, 400);
+      }
+    }
+  };
+}
 
 function showStartMenu() {
 	if (gameMode === "online" && currentRoomCode && socket) {
