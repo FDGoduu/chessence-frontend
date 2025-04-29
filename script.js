@@ -2071,13 +2071,49 @@ document.getElementById('startGame').addEventListener('click', function () {
   applySavedAvatar();
   applySavedBackground();
   rebindPopupButtons();
-  hasAwardedXP = false; // 🔄 Reset flagi przy nowej grze
+  hasAwardedXP = false;
 
   resetGame(false);
-  isInputLocked = false;
-  currentTurn = 'w';
 
-  // 🔁 Uaktualnij poziomy trudności botów na starcie gry
+  isInputLocked = false;
+  gameEnded = false;
+  hasLostPiece = false;
+  promotionContext = null;
+  moveLog = [];
+  currentTurn = 'w';
+  
+  // Reset planszy
+  boardState = [
+    ['r','n','b','q','k','b','n','r'],
+    ['p','p','p','p','p','p','p','p'],
+    ['','','','','','','',''],
+    ['','','','','','','',''],
+    ['','','','','','','',''],
+    ['','','','','','','',''],
+    ['P','P','P','P','P','P','P','P'],
+    ['R','N','B','Q','K','B','N','R']
+  ];
+
+  selected = null;
+  enPassantTarget = null;
+  whiteKingMoved = false;
+  blackKingMoved = false;
+  whiteRookMoved = [false, false];
+  blackRookMoved = [false, false];
+
+  capturedByWhite = { ...initialCapturedCounts };
+  capturedByBlack = { ...initialCapturedCounts };
+  previousCapturedByWhite = {};
+  previousCapturedByBlack = {};
+
+  updateCapturedDisplay();
+  clearHighlights();
+  renderBoard();
+  updateGameStatus();
+  updateBotLabels();
+  updateEvaluationBar();
+
+  // Uaktualnij poziomy trudności botów
   if (gameMode === "pvb") {
     const val = parseInt(document.getElementById("difficultyPVB").value || "5");
     if (playerColor === 'w') {
@@ -2091,36 +2127,41 @@ document.getElementById('startGame').addEventListener('click', function () {
     botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
   }
 
+  // 🔥 PVB BOT LOGIKA
   if (gameMode === "pvb") {
     stockfishPVBWorker.postMessage("uci");
 
-    stockfishPVBWorker.onmessage = (e) => {
+    stockfishPVBWorker.onmessage = function (e) {
       const line = String(e.data);
+
       if (line.includes("uciok")) {
         if (playerColor === 'b') {
-          runAIMove();
+          runAIMove(); // jeśli gracz czarny, to bot zaczyna ruchem białych
         }
       }
     };
   }
 
+  // 🔥 BVB BOT VS BOT
   if (gameMode === "bvb") {
     runBotVsBot();
     return;
   }
 
+  // 🔥 PvP hotseat
   if (gameMode === "pvp-hotseat") {
     document.getElementById("board").classList.remove("rotated");
     return;
   }
 
+  // 🔥 Ustaw rotację planszy
   if (playerColor === 'b') {
     document.getElementById("board").classList.add("rotated");
   } else {
     document.getElementById("board").classList.remove("rotated");
   }
 
-  // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
+  // 🔥 Ustaw opisy zbitych figur
   const topLabel = document.querySelector(".captured-top .capture-label");
   const bottomLabel = document.querySelector(".captured-bottom .capture-label");
 
@@ -2135,10 +2176,8 @@ document.getElementById('startGame').addEventListener('click', function () {
     bottomPlayerColor = playerColor;
   }
 
-  document.querySelector(".captured-top .capture-label").textContent =
-    `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
-  document.querySelector(".captured-bottom .capture-label").textContent =
-    `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
+  topLabel.textContent = `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
+  bottomLabel.textContent = `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
 });
 
 
