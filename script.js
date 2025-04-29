@@ -1592,9 +1592,11 @@ function runAIMove() {
 
   const depthMap = [1, 1, 2, 3, 4, 5, 6, 7, 9, 11, 13];
   const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
+  const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0];
 
   const depth = depthMap[level];
   const multiPV = multiPVMap[level];
+  errorChance = errorChanceMap[level]; // 📣 TO MUSI BYĆ!
 
   bestMoves = [];
 
@@ -1603,6 +1605,7 @@ function runAIMove() {
   stockfishPVBWorker.postMessage(`position fen ${fen}`);
   stockfishPVBWorker.postMessage(`go depth ${depth}`);
 }
+
 
 
   // Obsługa wyboru koloru
