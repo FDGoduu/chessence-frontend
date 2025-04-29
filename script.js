@@ -1537,24 +1537,112 @@ function evaluatePiece(piece) {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
-  if (gameMode === "pvp") return;
+  if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
 
   const fen = getFEN();
+
+  // Bezpieczne ograniczenie poziomu (0–10)
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
 
   const depthMap = [1, 1, 1, 2, 2, 3, 4, 6, 8, 10, 12];
-  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
+  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1]; 
+  const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0];
 
   const depth = depthMap[level];
   const multiPV = multiPVMap[level];
+  const errorChance = errorChanceMap[level];
 
-  window.bestMoves = [];
+  window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
 
-  if (!stockfishPVBWorker) return;
+  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
 
-  stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
-  stockfishPVBWorker.postMessage(`position fen ${fen}`);
-  stockfishPVBWorker.postMessage(`go depth ${depth}`);
+  stockfishPVBWorker.postMessage("uci");
+
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+
+    if (line.includes("uciok")) {
+      stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
+      stockfishPVBWorker.postMessage(`position fen ${fen}`);
+      stockfishPVBWorker.postMessage(`go depth ${depth}`);
+    }
+
+    if (line.startsWith("info") && line.includes(" pv ")) {
+      const move = line.split(" pv ")[1].split(" ")[0];
+      if (move && !window.bestMoves.includes(move)) {
+        window.bestMoves.push(move);
+      }
+    }
+
+    if (line.startsWith("bestmove")) {
+      if (line.includes("bestmove (none)")) return; // brak ruchu – partia się skończyła
+
+      let chosenMove;
+      if (window.bestMoves.length === 0) {
+        chosenMove = line.split(" ")[1]; // awaryjnie użyj bestmove, jeśli nie złapaliśmy info
+      } else {
+        const shouldMakeMistake = Math.random() < errorChance;
+        if (shouldMakeMistake) {
+          const worseMoves = window.bestMoves.slice(1);
+          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || window.bestMoves[0];
+        } else {
+          chosenMove = window.bestMoves[0];
+        }
+      }
+
+      if (!chosenMove || chosenMove.length < 4) return;
+
+      const sx = chosenMove.charCodeAt(0) - 97;
+      const sy = 8 - parseInt(chosenMove[1]);
+      const dx = chosenMove.charCodeAt(2) - 97;
+      const dy = 8 - parseInt(chosenMove[3]);
+
+      const fromSquareElem = document.querySelector(`.square[data-x="${sx}"][data-y="${sy}"]`);
+      const toSquareElem = document.querySelector(`.square[data-x="${dx}"][data-y="${dy}"]`);
+      const pieceElem = fromSquareElem?.querySelector('.piece');
+
+      const tempBoard = JSON.parse(JSON.stringify(boardState));
+      tryMove(sx, sy, dx, dy, false);
+
+      const movedPiece = boardState[dy][dx];
+      const attackerPiece = boardState[sy][sx]; 
+      const victimPiece = tempBoard[dy][dx];
+
+      if (victimPiece && pieceColor(victimPiece) === playerColor && victimPiece.toLowerCase() !== 'p') {
+        hasLostPiece = true;
+      }
+
+      const captured = victimPiece && pieceColor(victimPiece) !== pieceColor(attackerPiece) ? victimPiece : '';
+
+      if (victimPiece && victimPiece.toLowerCase() !== 'k') {
+        const color = pieceColor(attackerPiece);
+        const type = victimPiece.toUpperCase();
+        if (color === 'w') {
+          capturedByWhite[type]++;
+        } else {
+          capturedByBlack[type]++;
+        }
+        updateCapturedDisplay();
+      }
+
+      logMove(sx, sy, dx, dy, movedPiece, captured);
+      currentTurn = currentTurn === 'w' ? 'b' : 'w';
+
+      const onFinish = () => {
+        renderBoard();
+        updateGameStatus();
+        updateEvaluationBar();
+      };
+
+      if (pieceElem) {
+        animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
+          setTimeout(onFinish, 0);
+        });
+      } else {
+        onFinish();
+      }
+    }
+  };
 }
 
 
@@ -1972,8 +2060,10 @@ difficultyBVB.style.display = "none";
 
 
 document.getElementById('startGame').addEventListener('click', function () {
-  if (gameMode === "online") return;
-
+  if (gameMode === "online") {
+    // Gra online już wystartowała – nie rób nic
+    return;
+  }  
   document.getElementById("profileScreen").style.display = "none";
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("gameScreen").style.display = "block";
@@ -1981,98 +2071,78 @@ document.getElementById('startGame').addEventListener('click', function () {
   applySavedAvatar();
   applySavedBackground();
   rebindPopupButtons();
-
-  hasAwardedXP = false;
+  hasAwardedXP = false; // 🔄 Reset flagi przy nowej grze
   currentTurn = 'w';
-stockfishPVBWorker.onmessage = function (e) {
-  const line = String(e.data);
-
-  if (line.includes("uciok")) {
-    console.log("[StockfishPvB] Gotowy!");
-
-    if (gameMode === "pvb" && currentTurn !== playerColor && !gameEnded) {
-      setTimeout(runAIMove, 300);
+  // 🔁 Uaktualnij poziomy trudności botów na starcie gry
+	if (gameMode === "pvb") {
+	  const val = parseInt(document.getElementById("difficultyPVB").value || "5");
+	  if (playerColor === 'w') {
+		botDifficultyB = val;
+	  } else {
+		botDifficultyW = val;
+	  }
+	window.xpBotLevelAtEnd = getCurrentBotLevel();
+	} else if (gameMode === "bvb") {
+	  botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
+	  botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
+	}
+resetGame(false);
+isInputLocked = false;
+if (gameMode === "pvb") {
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    if (line.includes("uciok")) {
+      runAIMove();
     }
-  }
+  };
+  stockfishPVBWorker.postMessage("uci");
+}
 
-  if (line.startsWith("info") && line.includes(" pv ")) {
-    const move = line.split(" pv ")[1].split(" ")[0];
-    if (move && !window.bestMoves.includes(move)) {
-      window.bestMoves.push(move);
-    }
-  }
+if (gameMode === "bvb") {
+  runBotVsBot();
+  return;
+}
 
-  if (line.startsWith("bestmove")) {
-    if (line.includes("bestmove (none)")) return;
-    let chosenMove;
-    if (window.bestMoves.length === 0) {
-      chosenMove = line.split(" ")[1];
-    } else {
-      const shouldMakeMistake = Math.random() < errorChanceMap[botDifficultyW];
-      const worseMoves = window.bestMoves.slice(1);
-      chosenMove = shouldMakeMistake
-        ? (worseMoves[Math.floor(Math.random() * worseMoves.length)] || window.bestMoves[0])
-        : window.bestMoves[0];
-    }
-    if (!chosenMove || chosenMove.length < 4) return;
-    doActualBotMove(chosenMove); // Wywołanie TWOJEJ logiki ruchu bota
-  }
-};
+if (gameMode === "pvp-hotseat") {
+  document.getElementById("board").classList.remove("rotated");
+  return;
+}
 
-stockfishPVBWorker.postMessage("uci");
+if (playerColor === 'b') {
+  document.getElementById("board").classList.add("rotated");
 
   if (gameMode === "pvb") {
-    const val = parseInt(document.getElementById("difficultyPVB").value || "5");
-    if (playerColor === 'w') {
-      botDifficultyB = val;
-    } else {
-      botDifficultyW = val;
-    }
-    window.xpBotLevelAtEnd = getCurrentBotLevel();
-  } else if (gameMode === "bvb") {
-    botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
-    botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
-  }
-
-  resetGame(false);
-  isInputLocked = false;
-
-  // ⬇️ TERAZ najważniejsze:
-  if (gameMode === "pvb") {
-    if (stockfishPVBWorker) stockfishPVBWorker.terminate();
-    stockfishPVBWorker = new Worker("stockfish.js");
-
+    stockfishPVBWorker.postMessage("uci");
     stockfishPVBWorker.onmessage = function (e) {
       const line = String(e.data);
-      console.log("[StockfishPvB] Odpowiedź:", line);
-
       if (line.includes("uciok")) {
-        console.log("[StockfishPvB] Gotowy");
-        if (currentTurn !== playerColor && !gameEnded) {
-          setTimeout(runAIMove, 400);
-        }
+        runAIMove();
       }
     };
-    stockfishPVBWorker.postMessage("uci");
   }
+} else {
+  document.getElementById("board").classList.remove("rotated");
+}
+  // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
+const topLabel = document.querySelector(".captured-top .capture-label");
+const bottomLabel = document.querySelector(".captured-bottom .capture-label");
 
-  if (gameMode === "bvb") {
-    runBotVsBot();
-    return;
-  }
+let topPlayerColor = 'b';
+let bottomPlayerColor = 'w';
 
-  if (gameMode === "pvp-hotseat") {
-    document.getElementById("board").classList.remove("rotated");
-    return;
-  }
+if (gameMode === 'pvp' || gameMode === 'bvb') {
+  topPlayerColor = 'b';
+  bottomPlayerColor = 'w';
+} else if (gameMode === 'pvb') {
+  topPlayerColor = playerColor === 'w' ? 'b' : 'w';
+  bottomPlayerColor = playerColor;
+}
 
-  if (playerColor === 'b') {
-    document.getElementById("board").classList.add("rotated");
-  } else {
-    document.getElementById("board").classList.remove("rotated");
-  }
+document.querySelector(".captured-top .capture-label").textContent =
+  `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
+document.querySelector(".captured-bottom .capture-label").textContent =
+  `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
 });
-
 
 function showStartMenu() {
 	if (gameMode === "online" && currentRoomCode && socket) {
@@ -2096,36 +2166,6 @@ function showStartMenu() {
 	if (stockfishBVBWorker) {
 	  stockfishBVBWorker.terminate();
 	  stockfishBVBWorker = new Worker("stockfish.js");
-		stockfishPVBWorker.onmessage = function (e) {
-  const line = String(e.data);
-
-  if (line.includes("uciok")) {
-    console.log("[StockfishPvB] Gotowy!");
-    if (gameMode === "pvb" && currentTurn !== playerColor && !gameEnded) {
-      setTimeout(runAIMove, 400);
-    }
-  }
-
-  if (line.startsWith("info") && line.includes(" pv ")) {
-    const move = line.split(" pv ")[1].split(" ")[0];
-    if (move && !window.bestMoves.includes(move)) {
-      window.bestMoves.push(move);
-    }
-  }
-
-  if (line.startsWith("bestmove")) {
-    if (line.includes("bestmove (none)")) return;
-    let chosenMove;
-    if (window.bestMoves.length === 0) {
-      chosenMove = line.split(" ")[1];
-    } else {
-      chosenMove = window.bestMoves[0];
-    }
-    if (!chosenMove || chosenMove.length < 4) return;
-    doActualBotMove(chosenMove);
-  }
-};
-
 	}
 
 	if (stockfishPVBWorker) {
@@ -2143,6 +2183,11 @@ function showStartMenu() {
   document.getElementById('startScreen').style.display = 'flex';
   document.getElementById('board').classList.remove('rotated');
  
+	  // Stop botów jeśli gracz wraca do menu
+	if (stockfishPVBWorker) {
+	  stockfishPVBWorker.terminate();
+	  stockfishPVBWorker = new Worker("stockfish.js");
+	}
 
 	if (stockfishBVBWorker) {
 	  stockfishBVBWorker.terminate();
