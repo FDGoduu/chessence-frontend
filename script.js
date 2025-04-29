@@ -2081,6 +2081,14 @@ if (gameMode === "pvb") {
 
 resetGame(false);
 
+stockfishPVBWorker.onmessage = function (e) {
+  const line = String(e.data);
+
+  if (line.includes("uciok")) {
+    // Gotowe – Stockfish odpowie
+  }
+};
+
 isInputLocked = false;
 
 // 🔵 teraz po resetGame (nowe stockfishPVBWorker)
