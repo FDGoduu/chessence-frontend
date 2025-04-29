@@ -2064,7 +2064,9 @@ function preparePvBBot() {
       const dx = chosenMove.charCodeAt(2) - 97;
       const dy = 8 - parseInt(chosenMove[3]);
 
-      tryMove(sx, sy, dx, dy, false);
+      handleClick(sx, sy); // zaznacz figurę
+      setTimeout(() => handleClick(dx, dy), 100); // kliknij pole docelowe po chwili
+
 
       currentTurn = currentTurn === 'w' ? 'b' : 'w';
       renderBoard();
