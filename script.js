@@ -2096,6 +2096,36 @@ function showStartMenu() {
 	if (stockfishBVBWorker) {
 	  stockfishBVBWorker.terminate();
 	  stockfishBVBWorker = new Worker("stockfish.js");
+		stockfishPVBWorker.onmessage = function (e) {
+  const line = String(e.data);
+
+  if (line.includes("uciok")) {
+    console.log("[StockfishPvB] Gotowy!");
+    if (gameMode === "pvb" && currentTurn !== playerColor && !gameEnded) {
+      setTimeout(runAIMove, 400);
+    }
+  }
+
+  if (line.startsWith("info") && line.includes(" pv ")) {
+    const move = line.split(" pv ")[1].split(" ")[0];
+    if (move && !window.bestMoves.includes(move)) {
+      window.bestMoves.push(move);
+    }
+  }
+
+  if (line.startsWith("bestmove")) {
+    if (line.includes("bestmove (none)")) return;
+    let chosenMove;
+    if (window.bestMoves.length === 0) {
+      chosenMove = line.split(" ")[1];
+    } else {
+      chosenMove = window.bestMoves[0];
+    }
+    if (!chosenMove || chosenMove.length < 4) return;
+    doActualBotMove(chosenMove);
+  }
+};
+
 	}
 
 	if (stockfishPVBWorker) {
@@ -2113,11 +2143,6 @@ function showStartMenu() {
   document.getElementById('startScreen').style.display = 'flex';
   document.getElementById('board').classList.remove('rotated');
  
-	  // Stop botów jeśli gracz wraca do menu
-	if (stockfishPVBWorker) {
-	  stockfishPVBWorker.terminate();
-	  stockfishPVBWorker = new Worker("stockfish.js");
-	}
 
 	if (stockfishBVBWorker) {
 	  stockfishBVBWorker.terminate();
