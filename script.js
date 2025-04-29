@@ -2091,10 +2091,6 @@ document.getElementById('startGame').addEventListener('click', function () {
   resetGame(false);
   isInputLocked = false;
 
-  if (gameMode === "pvb") {
-    preparePvBBot();
-  }
-
   if (gameMode === "bvb") {
     runBotVsBot();
     return;
