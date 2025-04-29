@@ -2090,8 +2090,6 @@ if (gameMode === "pvb") {
 
 resetGame(false);
 isInputLocked = false;
-// Bot zaczyna jeśli gracz wybrał czarne
-setupStockfishPVBWorker();
 if (gameMode === "pvb" && playerColor === "b") {
   stockfishPVBWorker.postMessage("uci");
 }
