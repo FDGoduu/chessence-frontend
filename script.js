@@ -1545,14 +1545,15 @@ function setupStockfishPVBWorker() {
     const line = String(e.data);
     console.log("[StockfishPvB] Odpowiedź:", line);
 
-    if (line.includes("uciok")) {
-      console.log("[StockfishPvB] Gotowy!");
+if (line.includes("uciok")) {
+  console.log("[StockfishPvB] Gotowy!");
 
-      // Jeśli gracz wybrał czarne i to początek gry – bot zaczyna
-      if (gameMode === "pvb" && playerColor === "b" && currentTurn === 'w') {
-        setTimeout(runAIMove, 500);
-      }
-    }
+  // Jeśli to teraz tura bota – bot zaczyna
+  if (gameMode === "pvb" && currentTurn !== playerColor && !gameEnded) {
+    setTimeout(runAIMove, 300);
+  }
+}
+
 
     if (line.startsWith("info") && line.includes(" pv ")) {
       const move = line.split(" pv ")[1].split(" ")[0];
