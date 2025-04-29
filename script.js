@@ -1534,15 +1534,25 @@ function evaluatePiece(piece) {
   };
   return values[piece.toLowerCase()] || 0;
 }
+
 function setupStockfishPVBWorker() {
-  if (stockfishPVBWorker) {
-    stockfishPVBWorker.terminate();
-  }
+  if (stockfishPVBWorker) stockfishPVBWorker.terminate();
   stockfishPVBWorker = new Worker("stockfish.js");
+
+  stockfishPVBWorker.postMessage("uci");
 
   stockfishPVBWorker.onmessage = function (e) {
     const line = String(e.data);
     console.log("[StockfishPvB] Odpowiedź:", line);
+
+    if (line.includes("uciok")) {
+      console.log("[StockfishPvB] Gotowy!");
+
+      // Jeśli gracz wybrał czarne i to początek gry – bot zaczyna
+      if (gameMode === "pvb" && playerColor === "b" && currentTurn === 'w') {
+        setTimeout(runAIMove, 500);
+      }
+    }
 
     if (line.startsWith("info") && line.includes(" pv ")) {
       const move = line.split(" pv ")[1].split(" ")[0];
@@ -1557,11 +1567,7 @@ function setupStockfishPVBWorker() {
       const bestMove = window.bestMoves.length ? window.bestMoves[0] : line.split(" ")[1];
       if (!bestMove) return;
 
-      doBotMove(bestMove); // 🔥 osobna funkcja
-    }
-
-    if (line.includes("uciok")) {
-      console.log("✅ Stockfish gotowy");
+      doBotMove(bestMove);
     }
   };
 
@@ -1570,26 +1576,22 @@ function setupStockfishPVBWorker() {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
-  if (currentTurn === playerColor) return; // Nie ruszaj jeśli teraz tura gracza
+  if (currentTurn === playerColor) return;
 
   const fen = getFEN();
-
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
 
   const depthMap = [1, 1, 1, 2, 2, 3, 4, 6, 8, 10, 12];
   const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
-  const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0];
-
   const depth = depthMap[level];
   const multiPV = multiPVMap[level];
-  const errorChance = errorChanceMap[level];
 
-  const bestMoves = [];
-
+  window.bestMoves = []; // reset ruchów
   stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
   stockfishPVBWorker.postMessage(`position fen ${fen}`);
   stockfishPVBWorker.postMessage(`go depth ${depth}`);
 }
+
 
 function doBotMove(bestMove) {
   if (!bestMove || bestMove.length < 4) return;
@@ -1642,6 +1644,7 @@ function doBotMove(bestMove) {
     onFinish();
   }
 }
+
 
   // Obsługa wyboru koloru
 document.getElementById('chooseWhite').addEventListener('click', function() {
@@ -2191,6 +2194,7 @@ function showStartMenu() {
 function resetGame(showMenuAfter) {
 	if (stockfishBVBWorker) {
 	  stockfishBVBWorker.terminate();
+	  setupStockfishPVBWorker();
 	  stockfishBVBWorker = new Worker("stockfish.js");
 	}
 
