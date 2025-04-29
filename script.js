@@ -2080,13 +2080,25 @@ if (gameMode === "pvb") {
 }
 
 resetGame(false);
-stockfishPVBWorker.postMessage("uci");
-stockfishPVBWorker.onmessage = function (e) {
-  const line = String(e.data);
-  console.log("[StockfishPvB] Odpowiedź:", line);
-};
-
 isInputLocked = false;
+// Bot zaczyna jeśli gracz wybrał czarne
+if (gameMode === "pvb") {
+  stockfishPVBWorker.postMessage("uci");
+  
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    console.log("[StockfishPvB] Odpowiedź:", line);
+
+    if (line.includes("uciok")) {
+      // Stockfish gotowy — teraz dopiero odpal runAIMove
+      if (playerColor === 'b') {
+        setTimeout(runAIMove, 200); // Bot jako biały zaczyna
+      }
+    }
+  };
+}
+
+
 
 // 🔵 teraz po resetGame (nowe stockfishPVBWorker)
 
