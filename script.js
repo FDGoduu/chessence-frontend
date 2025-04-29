@@ -2080,13 +2080,10 @@ if (gameMode === "pvb") {
 }
 
 resetGame(false);
-
+stockfishPVBWorker.postMessage("uci");
 stockfishPVBWorker.onmessage = function (e) {
   const line = String(e.data);
-
-  if (line.includes("uciok")) {
-    // Gotowe – Stockfish odpowie
-  }
+  console.log("[StockfishPvB] Odpowiedź:", line);
 };
 
 isInputLocked = false;
