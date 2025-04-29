@@ -1534,6 +1534,23 @@ function evaluatePiece(piece) {
   };
   return values[piece.toLowerCase()] || 0;
 }
+function setupStockfishPVBWorker() {
+  if (stockfishPVBWorker) {
+    stockfishPVBWorker.terminate();
+  }
+  stockfishPVBWorker = new Worker("stockfish.js");
+
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    console.log("[StockfishPvB] Odpowiedź:", line);
+
+    if (line.includes("uciok")) {
+      if (playerColor === 'b' && gameMode === "pvb") {
+        setTimeout(runAIMove, 200);
+      }
+    }
+  };
+}
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
@@ -2082,21 +2099,11 @@ if (gameMode === "pvb") {
 resetGame(false);
 isInputLocked = false;
 // Bot zaczyna jeśli gracz wybrał czarne
-if (gameMode === "pvb") {
+setupStockfishPVBWorker();
+if (gameMode === "pvb" && playerColor === "b") {
   stockfishPVBWorker.postMessage("uci");
-  
-  stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
-    console.log("[StockfishPvB] Odpowiedź:", line);
-
-    if (line.includes("uciok")) {
-      // Stockfish gotowy — teraz dopiero odpal runAIMove
-      if (playerColor === 'b') {
-        setTimeout(runAIMove, 200); // Bot jako biały zaczyna
-      }
-    }
-  };
 }
+
 
 
 
@@ -2199,10 +2206,7 @@ function resetGame(showMenuAfter) {
 	  stockfishBVBWorker = new Worker("stockfish.js");
 	}
 
-	if (stockfishPVBWorker) {
-	  stockfishPVBWorker.terminate();
-	  stockfishPVBWorker = new Worker("stockfish.js");
-	}
+	setupStockfishPVBWorker();
 
 	isBotRunning = false;
   boardState = [
