@@ -2136,7 +2136,7 @@ function preparePvBBot() {
   if (!stockfishPVBWorker) return;
 
   const fen = getFEN();
-  const level = playerColor === 'w' ? botDifficultyB : botDifficultyW;
+  const level = playerColor === 'w' ? botDifficultyW : botDifficultyB;
 
   const depthMap = [1, 1, 2, 3, 4, 5, 6, 7, 9, 11, 13];
   const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
