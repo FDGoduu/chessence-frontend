@@ -1554,6 +1554,8 @@ function runAIMove() {
 
   window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
 
+  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
+
   stockfishPVBWorker.postMessage("uci");
 
   stockfishPVBWorker.onmessage = function (e) {
@@ -2087,8 +2089,14 @@ document.getElementById('startGame').addEventListener('click', function () {
 resetGame(false);
 isInputLocked = false;
 if (gameMode === "pvb") {
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    if (line.includes("uciok")) {
       runAIMove();
     }
+  };
+  stockfishPVBWorker.postMessage("uci");
+}
 
 if (gameMode === "bvb") {
   runBotVsBot();
@@ -2104,8 +2112,14 @@ if (playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
 
   if (gameMode === "pvb") {
+    stockfishPVBWorker.postMessage("uci");
+    stockfishPVBWorker.onmessage = function (e) {
+      const line = String(e.data);
+      if (line.includes("uciok")) {
         runAIMove();
+      }
     };
+  }
 } else {
   document.getElementById("board").classList.remove("rotated");
 }
