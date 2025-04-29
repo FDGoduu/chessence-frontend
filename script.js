@@ -1537,6 +1537,7 @@ function evaluatePiece(piece) {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
+  if (currentTurn === playerColor) return;
   if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
   if (!isBotTurn()) return;
 
@@ -2090,11 +2091,13 @@ resetGame(false);
 isInputLocked = false;
 if (gameMode === "pvb") {
   stockfishPVBWorker.postMessage("uci");
+
   stockfishPVBWorker.onmessage = function (e) {
     const line = String(e.data);
     if (line.includes("uciok")) {
+      // Po otrzymaniu uciok, bot zrobi ruch tylko jeśli to jego kolej
       if (currentTurn !== playerColor) {
-        setTimeout(runAIMove, 200); // małe opóźnienie żeby nie wyprzedzić Workera
+        setTimeout(runAIMove, 500);
       }
     }
   };
