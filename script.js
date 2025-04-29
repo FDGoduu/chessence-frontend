@@ -1538,6 +1538,7 @@ function evaluatePiece(piece) {
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
   if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
+  if (!isBotTurn()) return;
 
   const fen = getFEN();
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
@@ -2088,13 +2089,10 @@ document.getElementById('startGame').addEventListener('click', function () {
 resetGame(false);
 isInputLocked = false;
 if (gameMode === "pvb") {
-  stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
-    if (line.includes("uciok")) {
-      runAIMove();
-    }
-  };
   stockfishPVBWorker.postMessage("uci");
+  if (currentTurn !== playerColor) {
+    setTimeout(runAIMove, 500); // bot zaczyna tylko jeśli to jego tura
+  }
 }
 
 if (gameMode === "bvb") {
