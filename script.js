@@ -2182,6 +2182,19 @@ function showStartMenu() {
 
   document.getElementById('startScreen').style.display = 'flex';
   document.getElementById('board').classList.remove('rotated');
+ 
+	  // Stop botów jeśli gracz wraca do menu
+	if (stockfishPVBWorker) {
+	  stockfishPVBWorker.terminate();
+	  stockfishPVBWorker = new Worker("stockfish.js");
+	}
+
+	if (stockfishBVBWorker) {
+	  stockfishBVBWorker.terminate();
+	  stockfishBVBWorker = new Worker("stockfish.js");
+	}
+
+	isBotRunning = false;
 
 }
 
