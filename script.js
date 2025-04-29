@@ -1537,24 +1537,18 @@ function evaluatePiece(piece) {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
-  if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
-
   const fen = getFEN();
 
-  // Bezpieczne ograniczenie poziomu (0–10)
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
 
   const depthMap = [1, 1, 1, 2, 2, 3, 4, 6, 8, 10, 12];
-  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1]; 
+  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
   const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0];
 
   const depth = depthMap[level];
   const multiPV = multiPVMap[level];
   const errorChance = errorChanceMap[level];
-
-  window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
-
-  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
+  const bestMoves = [];
 
   stockfishPVBWorker.postMessage("uci");
 
@@ -1569,25 +1563,23 @@ function runAIMove() {
 
     if (line.startsWith("info") && line.includes(" pv ")) {
       const move = line.split(" pv ")[1].split(" ")[0];
-      if (move && !window.bestMoves.includes(move)) {
-        window.bestMoves.push(move);
+      if (move && !bestMoves.includes(move)) {
+        bestMoves.push(move);
       }
     }
 
     if (line.startsWith("bestmove")) {
-      if (line.includes("bestmove (none)")) return; // brak ruchu – partia się skończyła
-
+      if (line.includes("bestmove (none)")) return;
+      
       let chosenMove;
-      if (window.bestMoves.length === 0) {
-        chosenMove = line.split(" ")[1]; // awaryjnie użyj bestmove, jeśli nie złapaliśmy info
+      if (bestMoves.length === 0) {
+        chosenMove = line.split(" ")[1];
       } else {
         const shouldMakeMistake = Math.random() < errorChance;
-        if (shouldMakeMistake) {
-          const worseMoves = window.bestMoves.slice(1);
-          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || window.bestMoves[0];
-        } else {
-          chosenMove = window.bestMoves[0];
-        }
+        const worseMoves = bestMoves.slice(1);
+        chosenMove = shouldMakeMistake
+          ? (worseMoves[Math.floor(Math.random() * worseMoves.length)] || bestMoves[0])
+          : bestMoves[0];
       }
 
       if (!chosenMove || chosenMove.length < 4) return;
@@ -1597,54 +1589,11 @@ function runAIMove() {
       const dx = chosenMove.charCodeAt(2) - 97;
       const dy = 8 - parseInt(chosenMove[3]);
 
-      const fromSquareElem = document.querySelector(`.square[data-x="${sx}"][data-y="${sy}"]`);
-      const toSquareElem = document.querySelector(`.square[data-x="${dx}"][data-y="${dy}"]`);
-      const pieceElem = fromSquareElem?.querySelector('.piece');
-
-      const tempBoard = JSON.parse(JSON.stringify(boardState));
-      tryMove(sx, sy, dx, dy, false);
-
-      const movedPiece = boardState[dy][dx];
-      const attackerPiece = boardState[sy][sx]; 
-      const victimPiece = tempBoard[dy][dx];
-
-      if (victimPiece && pieceColor(victimPiece) === playerColor && victimPiece.toLowerCase() !== 'p') {
-        hasLostPiece = true;
-      }
-
-      const captured = victimPiece && pieceColor(victimPiece) !== pieceColor(attackerPiece) ? victimPiece : '';
-
-      if (victimPiece && victimPiece.toLowerCase() !== 'k') {
-        const color = pieceColor(attackerPiece);
-        const type = victimPiece.toUpperCase();
-        if (color === 'w') {
-          capturedByWhite[type]++;
-        } else {
-          capturedByBlack[type]++;
-        }
-        updateCapturedDisplay();
-      }
-
-      logMove(sx, sy, dx, dy, movedPiece, captured);
-      currentTurn = currentTurn === 'w' ? 'b' : 'w';
-
-      const onFinish = () => {
-        renderBoard();
-        updateGameStatus();
-        updateEvaluationBar();
-      };
-
-      if (pieceElem) {
-        animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
-          setTimeout(onFinish, 0);
-        });
-      } else {
-        onFinish();
-      }
+      handleClick(sx, sy);
+      setTimeout(() => handleClick(dx, dy), 100);
     }
   };
 }
-
 
   // Obsługa wyboru koloru
 document.getElementById('chooseWhite').addEventListener('click', function() {
