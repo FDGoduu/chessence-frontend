@@ -2115,7 +2115,7 @@ if (gameMode === "pvp-hotseat") {
 
 if (playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
-else {
+}else {
   document.getElementById("board").classList.remove("rotated");
 }
   // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
