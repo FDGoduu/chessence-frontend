@@ -2143,7 +2143,9 @@ function resetGame(showMenuAfter) {
 	  stockfishPVBWorker.terminate();
 	  stockfishPVBWorker = new Worker("stockfish.js");
 	}
-
+    if (gameMode === "pvb") {
+      preparePvBBot(); // ⬅️ DODAJ TO TUTAJ!
+    }
 	isBotRunning = false;
   boardState = [
     ['r','n','b','q','k','b','n','r'],
