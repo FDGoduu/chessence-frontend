@@ -1537,24 +1537,18 @@ function evaluatePiece(piece) {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
-  if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
 
   const fen = getFEN();
-
-  // Bezpieczne ograniczenie poziomu (0–10)
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
 
-  const depthMap = [1, 1, 1, 2, 2, 3, 4, 6, 8, 10, 12];
-  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1]; 
+  const depthMap = [1, 1, 2, 3, 4, 5, 6, 7, 9, 11, 13];
+  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
   const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0];
 
   const depth = depthMap[level];
   const multiPV = multiPVMap[level];
   const errorChance = errorChanceMap[level];
-
-  window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
-
-  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
+  const bestMoves = [];
 
   stockfishPVBWorker.postMessage("uci");
 
@@ -1569,25 +1563,23 @@ function runAIMove() {
 
     if (line.startsWith("info") && line.includes(" pv ")) {
       const move = line.split(" pv ")[1].split(" ")[0];
-      if (move && !window.bestMoves.includes(move)) {
-        window.bestMoves.push(move);
+      if (move && !bestMoves.includes(move)) {
+        bestMoves.push(move);
       }
     }
 
     if (line.startsWith("bestmove")) {
-      if (line.includes("bestmove (none)")) return; // brak ruchu – partia się skończyła
+      if (line.includes("bestmove (none)")) return;
 
       let chosenMove;
-      if (window.bestMoves.length === 0) {
-        chosenMove = line.split(" ")[1]; // awaryjnie użyj bestmove, jeśli nie złapaliśmy info
+      if (bestMoves.length === 0) {
+        chosenMove = line.split(" ")[1];
       } else {
         const shouldMakeMistake = Math.random() < errorChance;
-        if (shouldMakeMistake) {
-          const worseMoves = window.bestMoves.slice(1);
-          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || window.bestMoves[0];
-        } else {
-          chosenMove = window.bestMoves[0];
-        }
+        const worseMoves = bestMoves.slice(1);
+        chosenMove = shouldMakeMistake
+          ? (worseMoves[Math.floor(Math.random() * worseMoves.length)] || bestMoves[0])
+          : bestMoves[0];
       }
 
       if (!chosenMove || chosenMove.length < 4) return;
@@ -1644,7 +1636,6 @@ function runAIMove() {
     }
   };
 }
-
 
   // Obsługa wyboru koloru
 document.getElementById('chooseWhite').addEventListener('click', function() {
@@ -2128,19 +2119,9 @@ document.getElementById('startGame').addEventListener('click', function () {
   }
 
   // 🔥 PVB BOT LOGIKA
-  if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci");
-
-    stockfishPVBWorker.onmessage = function (e) {
-      const line = String(e.data);
-
-      if (line.includes("uciok")) {
-        if (playerColor === 'b') {
-          runAIMove(); // jeśli gracz czarny, to bot zaczyna ruchem białych
-        }
-      }
-    };
-  }
+if (gameMode === "pvb") {
+  stockfishPVBWorker.postMessage("uci");
+}
 
   // 🔥 BVB BOT VS BOT
   if (gameMode === "bvb") {
