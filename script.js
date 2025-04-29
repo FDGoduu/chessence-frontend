@@ -1537,11 +1537,10 @@ function evaluatePiece(piece) {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
-  if (currentTurn === playerColor) return;
-  if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
-  if (!isBotTurn()) return;
+  if (currentTurn === playerColor) return; // nie ruszaj, jeśli teraz tura gracza
 
   const fen = getFEN();
+
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
 
   const depthMap = [1, 1, 1, 2, 2, 3, 4, 6, 8, 10, 12];
@@ -1552,11 +1551,7 @@ function runAIMove() {
   const multiPV = multiPVMap[level];
   const errorChance = errorChanceMap[level];
 
-  const bestMoves = []; // lokalnie (nie window)
-
-  if (!stockfishPVBWorker) {
-    stockfishPVBWorker = new Worker('stockfish.js'); // jeśli nie istnieje, od razu twórz nowego
-  }
+  const bestMoves = [];
 
   stockfishPVBWorker.postMessage("uci");
 
@@ -1577,9 +1572,9 @@ function runAIMove() {
     }
 
     if (line.startsWith("bestmove")) {
+      let chosenMove;
       if (line.includes("bestmove (none)")) return;
 
-      let chosenMove;
       if (bestMoves.length === 0) {
         chosenMove = line.split(" ")[1];
       } else {
@@ -1607,32 +1602,29 @@ function runAIMove() {
       const movedPiece = boardState[dy][dx];
       const attackerPiece = boardState[sy][sx];
       const victimPiece = tempBoard[dy][dx];
-      
-      if (victimPiece && pieceColor(victimPiece) === playerColor && victimPiece.toLowerCase() !== 'p') {
-        hasLostPiece = true;
-      }
 
       const captured = victimPiece && pieceColor(victimPiece) !== pieceColor(attackerPiece) ? victimPiece : '';
 
       if (victimPiece && victimPiece.toLowerCase() !== 'k') {
         const color = pieceColor(attackerPiece);
         const type = victimPiece.toUpperCase();
-        if (color === 'w') {
-          capturedByWhite[type]++;
-        } else {
-          capturedByBlack[type]++;
-        }
+        if (color === 'w') capturedByWhite[type]++;
+        else capturedByBlack[type]++;
         updateCapturedDisplay();
       }
 
       logMove(sx, sy, dx, dy, movedPiece, captured);
+
       currentTurn = currentTurn === 'w' ? 'b' : 'w';
 
       const onFinish = () => {
         renderBoard();
         updateGameStatus();
         updateEvaluationBar();
-        isInputLocked = false; // ważne!
+
+        if (gameMode === "pvb" && currentTurn !== playerColor && !gameEnded) {
+          setTimeout(runAIMove, 500);
+        }
       };
 
       if (pieceElem) {
@@ -1645,7 +1637,6 @@ function runAIMove() {
     }
   };
 }
-
 
   // Obsługa wyboru koloru
 document.getElementById('chooseWhite').addEventListener('click', function() {
@@ -2075,33 +2066,24 @@ document.getElementById('startGame').addEventListener('click', function () {
   hasAwardedXP = false; // 🔄 Reset flagi przy nowej grze
   currentTurn = 'w';
   // 🔁 Uaktualnij poziomy trudności botów na starcie gry
-	if (gameMode === "pvb") {
-	  const val = parseInt(document.getElementById("difficultyPVB").value || "5");
-	  if (playerColor === 'w') {
-		botDifficultyB = val;
-	  } else {
-		botDifficultyW = val;
-	  }
-	window.xpBotLevelAtEnd = getCurrentBotLevel();
-	} else if (gameMode === "bvb") {
-	  botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
-	  botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
-	}
-resetGame(false);
-isInputLocked = false;
 if (gameMode === "pvb") {
-  stockfishPVBWorker.postMessage("uci");
-
-  stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
-    if (line.includes("uciok")) {
-      // Po otrzymaniu uciok, bot zrobi ruch tylko jeśli to jego kolej
-      if (currentTurn !== playerColor) {
-        setTimeout(runAIMove, 500);
-      }
-    }
-  };
+  const val = parseInt(document.getElementById("difficultyPVB").value || "5");
+  if (playerColor === 'w') {
+    botDifficultyB = val;
+  } else {
+    botDifficultyW = val;
+  }
+  window.xpBotLevelAtEnd = getCurrentBotLevel();
+} else if (gameMode === "bvb") {
+  botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
+  botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
 }
+
+resetGame(false);
+
+isInputLocked = false;
+
+// 🔵 teraz po resetGame (nowe stockfishPVBWorker)
 
 if (gameMode === "bvb") {
   runBotVsBot();
@@ -2113,21 +2095,24 @@ if (gameMode === "pvp-hotseat") {
   return;
 }
 
+// Ustaw obrót planszy
 if (playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
 
+  // TYLKO TERAZ: jeśli PvB i czarny gracz, przygotuj Stockfisha
   if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci");
-    stockfishPVBWorker.onmessage = function (e) {
-      const line = String(e.data);
-      if (line.includes("uciok")) {
-        runAIMove();
-      }
-    };
+    stockfishPVBWorker.postMessage("uci"); // tylko "uci", bez żadnego przypisania onmessage!
   }
 } else {
   document.getElementById("board").classList.remove("rotated");
 }
+
+// 🔵 TYLKO w PvB i tylko jeśli gracz jest czarny – bot zaczyna
+if (gameMode === "pvb" && playerColor === "b") {
+  setTimeout(runAIMove, 600); // bez kombinowania – runAIMove radzi sobie samo
+}
+
+
   // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
 const topLabel = document.querySelector(".captured-top .capture-label");
 const bottomLabel = document.querySelector(".captured-bottom .capture-label");
