@@ -2148,7 +2148,6 @@ document.getElementById('startGame').addEventListener('click', function () {
   bottomLabel.textContent = `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
 });
 
-
 function showStartMenu() {
 	if (gameMode === "online" && currentRoomCode && socket) {
 	  // Jeśli był tryb online, wyślij leaveRoom
