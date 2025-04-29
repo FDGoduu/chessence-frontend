@@ -1537,24 +1537,24 @@ function evaluatePiece(piece) {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
-  if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
+  if (gameMode === "pvp") return;
 
   const fen = getFEN();
-
-  // Bezpieczne ograniczenie poziomu (0–10)
   const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
 
   const depthMap = [1, 1, 1, 2, 2, 3, 4, 6, 8, 10, 12];
-  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1]; 
-  const errorChanceMap = [0.95, 0.8, 0.6, 0.45, 0.3, 0.2, 0.15, 0.1, 0.05, 0.01, 0];
+  const multiPVMap = [10, 10, 7, 6, 5, 4, 3, 2, 2, 1, 1];
 
   const depth = depthMap[level];
   const multiPV = multiPVMap[level];
-  const errorChance = errorChanceMap[level];
 
-  window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
+  window.bestMoves = [];
 
-  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
+  if (!stockfishPVBWorker) return;
+
+  stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
+  stockfishPVBWorker.postMessage(`position fen ${fen}`);
+  stockfishPVBWorker.postMessage(`go depth ${depth}`);
 }
 
 
