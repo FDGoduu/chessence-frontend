@@ -2058,12 +2058,12 @@ difficultyBVB.style.display = "none";
   const labelB = document.querySelector('label[for="difficultyBlack"]');
   if (labelB) labelB.style.display = "none";
 
-
 document.getElementById('startGame').addEventListener('click', function () {
   if (gameMode === "online") {
     // Gra online już wystartowała – nie rób nic
     return;
-  }  
+  }
+
   document.getElementById("profileScreen").style.display = "none";
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("gameScreen").style.display = "block";
@@ -2073,76 +2073,81 @@ document.getElementById('startGame').addEventListener('click', function () {
   rebindPopupButtons();
   hasAwardedXP = false; // 🔄 Reset flagi przy nowej grze
   currentTurn = 'w';
+
   // 🔁 Uaktualnij poziomy trudności botów na starcie gry
-	if (gameMode === "pvb") {
-	  const val = parseInt(document.getElementById("difficultyPVB").value || "5");
-	  if (playerColor === 'w') {
-		botDifficultyB = val;
-	  } else {
-		botDifficultyW = val;
-	  }
-	window.xpBotLevelAtEnd = getCurrentBotLevel();
-	} else if (gameMode === "bvb") {
-	  botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
-	  botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
-	}
-resetGame(false);
-isInputLocked = false;
-if (gameMode === "pvb") {
-  stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
-    if (line.includes("uciok")) {
-      runAIMove();
-    }
-  };
-  stockfishPVBWorker.postMessage("uci");
-}
-
-if (gameMode === "bvb") {
-  runBotVsBot();
-  return;
-}
-
-if (gameMode === "pvp-hotseat") {
-  document.getElementById("board").classList.remove("rotated");
-  return;
-}
-
-if (playerColor === 'b') {
-  document.getElementById("board").classList.add("rotated");
-
   if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci");
+    const val = parseInt(document.getElementById("difficultyPVB").value || "5");
+    if (playerColor === 'w') {
+      botDifficultyB = val;
+    } else {
+      botDifficultyW = val;
+    }
+    window.xpBotLevelAtEnd = getCurrentBotLevel();
+  } else if (gameMode === "bvb") {
+    botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
+    botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
+  }
+
+  resetGame(false);
+  isInputLocked = false;
+
+  // 🔥 Funkcja pomocnicza do przygotowania PvB Workera
+  function preparePvBBot() {
+    if (!stockfishPVBWorker) return;
     stockfishPVBWorker.onmessage = function (e) {
       const line = String(e.data);
       if (line.includes("uciok")) {
         runAIMove();
       }
     };
+    stockfishPVBWorker.postMessage("uci");
   }
-} else {
-  document.getElementById("board").classList.remove("rotated");
-}
-  // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
-const topLabel = document.querySelector(".captured-top .capture-label");
-const bottomLabel = document.querySelector(".captured-bottom .capture-label");
 
-let topPlayerColor = 'b';
-let bottomPlayerColor = 'w';
+  if (gameMode === "pvb") {
+    preparePvBBot();
+  }
 
-if (gameMode === 'pvp' || gameMode === 'bvb') {
-  topPlayerColor = 'b';
-  bottomPlayerColor = 'w';
-} else if (gameMode === 'pvb') {
-  topPlayerColor = playerColor === 'w' ? 'b' : 'w';
-  bottomPlayerColor = playerColor;
-}
+  if (gameMode === "bvb") {
+    runBotVsBot();
+    return;
+  }
 
-document.querySelector(".captured-top .capture-label").textContent =
-  `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
-document.querySelector(".captured-bottom .capture-label").textContent =
-  `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
+  if (gameMode === "pvp-hotseat") {
+    document.getElementById("board").classList.remove("rotated");
+    return;
+  }
+
+  // 🔄 Obsługa rotacji planszy na start
+  if (playerColor === 'b') {
+    document.getElementById("board").classList.add("rotated");
+
+    if (gameMode === "pvb") {
+      // Jeśli grasz czarnymi w PvB, bot musi zacząć
+      preparePvBBot();
+    }
+  } else {
+    document.getElementById("board").classList.remove("rotated");
+  }
+
+  // 🔄 Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
+  const topLabel = document.querySelector(".captured-top .capture-label");
+  const bottomLabel = document.querySelector(".captured-bottom .capture-label");
+
+  let topPlayerColor = 'b';
+  let bottomPlayerColor = 'w';
+
+  if (gameMode === 'pvp' || gameMode === 'bvb') {
+    topPlayerColor = 'b';
+    bottomPlayerColor = 'w';
+  } else if (gameMode === 'pvb') {
+    topPlayerColor = playerColor === 'w' ? 'b' : 'w';
+    bottomPlayerColor = playerColor;
+  }
+
+  topLabel.textContent = `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
+  bottomLabel.textContent = `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
 });
+
 
 function showStartMenu() {
 	if (gameMode === "online" && currentRoomCode && socket) {
