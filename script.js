@@ -1544,12 +1544,28 @@ function setupStockfishPVBWorker() {
     const line = String(e.data);
     console.log("[StockfishPvB] Odpowiedź:", line);
 
-    if (line.includes("uciok")) {
-      if (playerColor === 'b' && gameMode === "pvb") {
-        setTimeout(runAIMove, 200);
+    if (line.startsWith("info") && line.includes(" pv ")) {
+      const move = line.split(" pv ")[1].split(" ")[0];
+      if (move && !window.bestMoves.includes(move)) {
+        window.bestMoves.push(move);
       }
     }
+
+    if (line.startsWith("bestmove")) {
+      if (line.includes("bestmove (none)")) return;
+
+      const bestMove = window.bestMoves.length ? window.bestMoves[0] : line.split(" ")[1];
+      if (!bestMove) return;
+
+      doBotMove(bestMove); // 🔥 osobna funkcja
+    }
+
+    if (line.includes("uciok")) {
+      console.log("✅ Stockfish gotowy");
+    }
   };
+
+  window.bestMoves = [];
 }
 
 function runAIMove() {
@@ -1570,89 +1586,61 @@ function runAIMove() {
 
   const bestMoves = [];
 
-  // --- kluczowe: zawsze przygotuj workera przy każdym ruchu
-  stockfishPVBWorker.postMessage("uci");
-  stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
+  stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
+  stockfishPVBWorker.postMessage(`position fen ${fen}`);
+  stockfishPVBWorker.postMessage(`go depth ${depth}`);
+}
 
-    if (line.includes("uciok")) {
-      stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
-      stockfishPVBWorker.postMessage(`position fen ${fen}`);
-      stockfishPVBWorker.postMessage(`go depth ${depth}`);
-    }
+function doBotMove(bestMove) {
+  if (!bestMove || bestMove.length < 4) return;
 
-    if (line.startsWith("info") && line.includes(" pv ")) {
-      const move = line.split(" pv ")[1].split(" ")[0];
-      if (move && !bestMoves.includes(move)) {
-        bestMoves.push(move);
-      }
-    }
+  const sx = bestMove.charCodeAt(0) - 97;
+  const sy = 8 - parseInt(bestMove[1]);
+  const dx = bestMove.charCodeAt(2) - 97;
+  const dy = 8 - parseInt(bestMove[3]);
 
-    if (line.startsWith("bestmove")) {
-      if (line.includes("bestmove (none)")) return;
+  const fromSquareElem = document.querySelector(`.square[data-x="${sx}"][data-y="${sy}"]`);
+  const toSquareElem = document.querySelector(`.square[data-x="${dx}"][data-y="${dy}"]`);
+  const pieceElem = fromSquareElem?.querySelector('.piece');
 
-      let chosenMove;
-      if (bestMoves.length === 0) {
-        chosenMove = line.split(" ")[1];
-      } else {
-        const shouldMakeMistake = Math.random() < errorChance;
-        const worseMoves = bestMoves.slice(1);
-        chosenMove = shouldMakeMistake
-          ? (worseMoves[Math.floor(Math.random() * worseMoves.length)] || bestMoves[0])
-          : bestMoves[0];
-      }
+  const tempBoard = JSON.parse(JSON.stringify(boardState));
+  tryMove(sx, sy, dx, dy, false);
 
-      if (!chosenMove || chosenMove.length < 4) return;
+  const movedPiece = boardState[dy][dx];
+  const attackerPiece = boardState[sy][sx];
+  const victimPiece = tempBoard[dy][dx];
 
-      const sx = chosenMove.charCodeAt(0) - 97;
-      const sy = 8 - parseInt(chosenMove[1]);
-      const dx = chosenMove.charCodeAt(2) - 97;
-      const dy = 8 - parseInt(chosenMove[3]);
+  const captured = victimPiece && pieceColor(victimPiece) !== pieceColor(attackerPiece) ? victimPiece : '';
 
-      const fromSquareElem = document.querySelector(`.square[data-x="${sx}"][data-y="${sy}"]`);
-      const toSquareElem = document.querySelector(`.square[data-x="${dx}"][data-y="${dy}"]`);
-      const pieceElem = fromSquareElem?.querySelector('.piece');
+  if (victimPiece && victimPiece.toLowerCase() !== 'k') {
+    const color = pieceColor(attackerPiece);
+    const type = victimPiece.toUpperCase();
+    if (color === 'w') capturedByWhite[type]++;
+    else capturedByBlack[type]++;
+    updateCapturedDisplay();
+  }
 
-      const tempBoard = JSON.parse(JSON.stringify(boardState));
-      tryMove(sx, sy, dx, dy, false);
+  logMove(sx, sy, dx, dy, movedPiece, captured);
 
-      const movedPiece = boardState[dy][dx];
-      const attackerPiece = boardState[sy][sx];
-      const victimPiece = tempBoard[dy][dx];
+  currentTurn = currentTurn === 'w' ? 'b' : 'w';
 
-      const captured = victimPiece && pieceColor(victimPiece) !== pieceColor(attackerPiece) ? victimPiece : '';
+  const onFinish = () => {
+    renderBoard();
+    updateGameStatus();
+    updateEvaluationBar();
 
-      if (victimPiece && victimPiece.toLowerCase() !== 'k') {
-        const color = pieceColor(attackerPiece);
-        const type = victimPiece.toUpperCase();
-        if (color === 'w') capturedByWhite[type]++;
-        else capturedByBlack[type]++;
-        updateCapturedDisplay();
-      }
-
-      logMove(sx, sy, dx, dy, movedPiece, captured);
-
-      currentTurn = currentTurn === 'w' ? 'b' : 'w';
-
-      const onFinish = () => {
-        renderBoard();
-        updateGameStatus();
-        updateEvaluationBar();
-
-        if (gameMode === "pvb" && currentTurn !== playerColor && !gameEnded) {
-          setTimeout(runAIMove, 500);
-        }
-      };
-
-      if (pieceElem) {
-        animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
-          setTimeout(onFinish, 0);
-        });
-      } else {
-        onFinish();
-      }
+    if (gameMode === "pvb" && currentTurn !== playerColor && !gameEnded) {
+      setTimeout(runAIMove, 500);
     }
   };
+
+  if (pieceElem) {
+    animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
+      setTimeout(onFinish, 0);
+    });
+  } else {
+    onFinish();
+  }
 }
 
   // Obsługa wyboru koloru
