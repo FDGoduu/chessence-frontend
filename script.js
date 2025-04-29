@@ -2095,6 +2095,8 @@ if (gameMode === "pvb") {
       runAIMove();
     }
   };
+  
+  // 🔥 Najpierw przypisujemy .onmessage, dopiero potem postMessage
   stockfishPVBWorker.postMessage("uci");
 }
 
@@ -2112,13 +2114,13 @@ if (playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
 
   if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci");
     stockfishPVBWorker.onmessage = function (e) {
       const line = String(e.data);
       if (line.includes("uciok")) {
         runAIMove();
       }
     };
+    stockfishPVBWorker.postMessage("uci");
   }
 } else {
   document.getElementById("board").classList.remove("rotated");
