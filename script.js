@@ -2090,11 +2090,20 @@ if (gameMode === "pvb") {
 
 resetGame(false);
 isInputLocked = false;
-if (gameMode === "pvb" && playerColor === "b") {
-  stockfishPVBWorker.postMessage("uci");
+
+if (gameMode === "pvb" && currentTurn !== playerColor) {
+  setTimeout(runAIMove, 500);
 }
 
+if (playerColor === 'b') {
+  document.getElementById("board").classList.add("rotated");
 
+  if (gameMode === "pvb") {
+    stockfishPVBWorker.postMessage("uci");
+  }
+} else {
+  document.getElementById("board").classList.remove("rotated");
+}
 
 
 // 🔵 teraz po resetGame (nowe stockfishPVBWorker)
@@ -2107,22 +2116,6 @@ if (gameMode === "bvb") {
 if (gameMode === "pvp-hotseat") {
   document.getElementById("board").classList.remove("rotated");
   return;
-}
-
-// Ustaw obrót planszy
-if (playerColor === 'b') {
-  document.getElementById("board").classList.add("rotated");
-
-  if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci");
-  }
-} else {
-  document.getElementById("board").classList.remove("rotated");
-}
-
-// Jeśli tryb PvB i gracz jest czarny – bot rusza pierwszy
-if (gameMode === "pvb" && playerColor === "b") {
-  setTimeout(runAIMove, 600);
 }
 
 
