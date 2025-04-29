@@ -1537,7 +1537,7 @@ function evaluatePiece(piece) {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
-  if (currentTurn === playerColor) return; // nie ruszaj, jeśli teraz tura gracza
+  if (currentTurn === playerColor) return; // Nie ruszaj jeśli teraz tura gracza
 
   const fen = getFEN();
 
@@ -1553,8 +1553,8 @@ function runAIMove() {
 
   const bestMoves = [];
 
+  // --- kluczowe: zawsze przygotuj workera przy każdym ruchu
   stockfishPVBWorker.postMessage("uci");
-
   stockfishPVBWorker.onmessage = function (e) {
     const line = String(e.data);
 
@@ -1572,9 +1572,9 @@ function runAIMove() {
     }
 
     if (line.startsWith("bestmove")) {
-      let chosenMove;
       if (line.includes("bestmove (none)")) return;
 
+      let chosenMove;
       if (bestMoves.length === 0) {
         chosenMove = line.split(" ")[1];
       } else {
@@ -2099,17 +2099,16 @@ if (gameMode === "pvp-hotseat") {
 if (playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
 
-  // TYLKO TERAZ: jeśli PvB i czarny gracz, przygotuj Stockfisha
   if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci"); // tylko "uci", bez żadnego przypisania onmessage!
+    stockfishPVBWorker.postMessage("uci");
   }
 } else {
   document.getElementById("board").classList.remove("rotated");
 }
 
-// 🔵 TYLKO w PvB i tylko jeśli gracz jest czarny – bot zaczyna
+// Jeśli tryb PvB i gracz jest czarny – bot rusza pierwszy
 if (gameMode === "pvb" && playerColor === "b") {
-  setTimeout(runAIMove, 600); // bez kombinowania – runAIMove radzi sobie samo
+  setTimeout(runAIMove, 600);
 }
 
 
@@ -2158,11 +2157,6 @@ function showStartMenu() {
 	  stockfishBVBWorker = new Worker("stockfish.js");
 	}
 
-	if (stockfishPVBWorker) {
-	  stockfishPVBWorker.terminate();
-	  stockfishPVBWorker = new Worker("stockfish.js");
-	}
-
 	isBotRunning = false;
   document.getElementById('chooseWhite').classList.remove('selected');
   document.getElementById('chooseBlack').classList.remove('selected');
@@ -2172,12 +2166,6 @@ function showStartMenu() {
 
   document.getElementById('startScreen').style.display = 'flex';
   document.getElementById('board').classList.remove('rotated');
- 
-	  // Stop botów jeśli gracz wraca do menu
-	if (stockfishPVBWorker) {
-	  stockfishPVBWorker.terminate();
-	  stockfishPVBWorker = new Worker("stockfish.js");
-	}
 
 	if (stockfishBVBWorker) {
 	  stockfishBVBWorker.terminate();
