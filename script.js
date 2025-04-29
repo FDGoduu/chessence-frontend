@@ -2088,14 +2088,19 @@ document.getElementById('startGame').addEventListener('click', function () {
 	}
 resetGame(false);
 isInputLocked = false;
+
 if (gameMode === "pvb") {
+  // 1. Najpierw ustaw nasłuch
   stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
-    if (line.includes("uciok")) {
+    if (String(e.data).includes("uciok")) {
       runAIMove();
     }
   };
-  stockfishPVBWorker.postMessage("uci");
+
+  // 2. Wyślij "uci" tylko jeśli bot jest na ruchu (gracz czarny)
+  if (playerColor === 'b') {
+    stockfishPVBWorker.postMessage("uci");
+  }
 }
 
 if (gameMode === "bvb") {
@@ -2110,17 +2115,7 @@ if (gameMode === "pvp-hotseat") {
 
 if (playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
-
-  if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci");
-    stockfishPVBWorker.onmessage = function (e) {
-      const line = String(e.data);
-      if (line.includes("uciok")) {
-        runAIMove();
-      }
-    };
-  }
-} else {
+else {
   document.getElementById("board").classList.remove("rotated");
 }
   // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
