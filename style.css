@@ -3429,26 +3429,27 @@ body {
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
 }
-.player-inline-side {
+.player-inline-info {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  gap: 16px;
-  margin-top: 16px;
-  margin-left: 10px;
-  color: #eee;
+  gap: 12px;
+  margin-top: 12px;
+  padding-left: 4px;
+  color: white;
 }
 
-.player-inline-side .avatar-wrapper {
+.player-inline-info .avatar-wrapper {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   flex-shrink: 0;
 }
 
-.player-inline-side .avatar-wrapper img.avatar {
-  width: 64px;
-  height: 64px;
+.player-inline-info .avatar-wrapper img.avatar {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: 2px solid white;
   object-fit: cover;
@@ -3456,7 +3457,7 @@ body {
   z-index: 2;
 }
 
-.player-inline-side .avatar-wrapper img.frame {
+.player-inline-info .avatar-wrapper img.frame {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -3467,22 +3468,23 @@ body {
   z-index: 3;
 }
 
-.player-inline-side .info {
+.player-inline-info .info {
   display: flex;
   flex-direction: column;
   justify-content: center;
   line-height: 1.2;
 }
 
-.player-inline-side .info .nickname {
+.player-inline-info .info .nickname {
   font-weight: bold;
   font-size: 16px;
   color: #00eaff;
   text-shadow: 0 0 3px #00eaff88;
 }
 
-.player-inline-side .info .level {
-  font-size: 14px;
+.player-inline-info .info .level {
+  font-size: 13px;
   color: #ccc;
 }
+
 
