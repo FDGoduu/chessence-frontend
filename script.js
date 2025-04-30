@@ -2058,6 +2058,34 @@ difficultyBVB.style.display = "none";
   const labelB = document.querySelector('label[for="difficultyBlack"]');
   if (labelB) labelB.style.display = "none";
 
+function updatePlayerInfoDisplay() {
+  const nickname = localStorage.getItem("nickname") || "Gracz";
+  const level = localStorage.getItem("playerLevel") || 1;
+  const avatar = localStorage.getItem("activeAvatar") || "./img/avatars/avatar1.png";
+  const frame = localStorage.getItem("activeAvatarFrame") || "./img/frames/default_frame.png";
+
+  const html = `
+    <div class="profile-avatar-wrapper" style="position: relative;">
+      <img src="${avatar}" class="avatar">
+      <img src="${frame}" class="frame">
+    </div>
+    <div>
+      <div><strong>${nickname}</strong></div>
+      <div style="font-size: 13px;">Poziom ${level}</div>
+    </div>
+  `;
+
+  if (playerColor === 'w') {
+    document.getElementById("playerInfoWhite").innerHTML = html;
+    document.getElementById("playerInfoBlack").innerHTML = ""; // puste
+  } else if (playerColor === 'b') {
+    document.getElementById("playerInfoBlack").innerHTML = html;
+    document.getElementById("playerInfoWhite").innerHTML = "";
+  } else {
+    document.getElementById("playerInfoWhite").innerHTML = "";
+    document.getElementById("playerInfoBlack").innerHTML = "";
+  }
+}
 
 document.getElementById('startGame').addEventListener('click', function () {
   if (gameMode === "online") {
@@ -2073,6 +2101,9 @@ document.getElementById('startGame').addEventListener('click', function () {
   rebindPopupButtons();
   hasAwardedXP = false; // 🔄 Reset flagi przy nowej grze
   currentTurn = 'w';
+	if (gameMode === "pvb" || (gameMode === "pvp" && pvpSubmode === "online")) {
+	  updatePlayerInfoDisplay();
+	}
   // 🔁 Uaktualnij poziomy trudności botów na starcie gry
 	if (gameMode === "pvb") {
 	  const val = parseInt(document.getElementById("difficultyPVB").value || "5");
@@ -2161,6 +2192,8 @@ function showStartMenu() {
   document.getElementById("chooseWhite").classList.remove("selected");
   document.getElementById("chooseBlack").classList.remove("selected");
   document.getElementById("startGame").disabled = true;
+  document.getElementById("playerInfoWhite").innerHTML = "";
+  document.getElementById("playerInfoBlack").innerHTML = "";
 
   // 🧹 Reset rozwinięcia UI i opcji widocznych
   startShiftReset();
