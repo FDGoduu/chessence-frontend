@@ -3462,8 +3462,8 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 72px; /* zamiast 90px */
-  height: 72px;
+  width: 80px;   /* ✔️ nie 72px – to za mało optycznie */
+  height: 80px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 3;
