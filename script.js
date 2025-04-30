@@ -1552,11 +1552,9 @@ function runAIMove() {
   const multiPV = multiPVMap[level];
   const errorChance = errorChanceMap[level];
 
-  window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
+  const bestMoves = [];// Reset najlepszych ruchów przed nową analizą
 
   if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
-
-  stockfishPVBWorker.postMessage("uci");
 
   stockfishPVBWorker.onmessage = function (e) {
     const line = String(e.data);
@@ -2088,15 +2086,6 @@ document.getElementById('startGame').addEventListener('click', function () {
 	}
 resetGame(false);
 isInputLocked = false;
-if (gameMode === "pvb") {
-  stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
-    if (line.includes("uciok")) {
-      runAIMove();
-    }
-  };
-  stockfishPVBWorker.postMessage("uci");
-}
 
 if (gameMode === "bvb") {
   runBotVsBot();
@@ -2108,21 +2097,12 @@ if (gameMode === "pvp-hotseat") {
   return;
 }
 
-if (playerColor === 'b') {
-  document.getElementById("board").classList.add("rotated");
-
-  if (gameMode === "pvb") {
-    stockfishPVBWorker.postMessage("uci");
-    stockfishPVBWorker.onmessage = function (e) {
-      const line = String(e.data);
-      if (line.includes("uciok")) {
-        runAIMove();
-      }
-    };
+  if (playerColor === 'b') {
+    document.getElementById("board").classList.add("rotated");
+    setTimeout(runAIMove, 600);
+  } else {
+    document.getElementById("board").classList.remove("rotated");
   }
-} else {
-  document.getElementById("board").classList.remove("rotated");
-}
   // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
 const topLabel = document.querySelector(".captured-top .capture-label");
 const bottomLabel = document.querySelector(".captured-bottom .capture-label");
