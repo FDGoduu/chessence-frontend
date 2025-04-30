@@ -1620,10 +1620,12 @@ function runAIMove() {
   // zainicjalizuj listę najlepszych ruchów globalnie
   window._botBestMoves = [];
 
-  if (!stockfishPVBWorker) {
-    resetStockfishPVBWorker();
-  }
-
+if (!stockfishPVBWorker) {
+  resetStockfishPVBWorker();
+  setTimeout(() => {
+    stockfishPVBWorker.postMessage("uci");
+  }, 100); // 100ms bufor na zainicjalizowanie workera
+} else {
   stockfishPVBWorker.postMessage("uci");
 }
 
@@ -2135,8 +2137,6 @@ function showStartMenu() {
 
 	resetStockfishPVBWorker();
 
-
-	isBotRunning = false;
   document.getElementById('chooseWhite').classList.remove('selected');
   document.getElementById('chooseBlack').classList.remove('selected');
   document.getElementById('startGame').disabled = true;
@@ -2145,17 +2145,8 @@ function showStartMenu() {
 
   document.getElementById('startScreen').style.display = 'flex';
   document.getElementById('board').classList.remove('rotated');
- 
-	  // Stop botów jeśli gracz wraca do menu
-	resetStockfishPVBWorker();
 
-
-	if (stockfishBVBWorker) {
-	  stockfishBVBWorker.terminate();
-	  stockfishBVBWorker = new Worker("stockfish.js");
-	}
-
-	isBotRunning = false;
+  isBotRunning = false;
 
 }
 
