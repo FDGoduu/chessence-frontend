@@ -2058,34 +2058,31 @@ difficultyBVB.style.display = "none";
   const labelB = document.querySelector('label[for="difficultyBlack"]');
   if (labelB) labelB.style.display = "none";
 
-function updatePlayerInfoDisplay() {
+function updateInlinePlayerDisplay() {
+  const shouldShow = gameMode === "pvb" || (gameMode === "pvp" && pvpSubmode === "online");
+  const container = document.getElementById("playerProfileInline");
+
+  if (!shouldShow || !container) {
+    container.style.display = "none";
+    return;
+  }
+
   const nickname = localStorage.getItem("nickname") || "Gracz";
   const level = localStorage.getItem("playerLevel") || 1;
   const avatar = localStorage.getItem("activeAvatar") || "./img/avatars/avatar1.png";
   const frame = localStorage.getItem("activeAvatarFrame") || "./img/frames/default_frame.png";
 
-  const html = `
-    <div class="profile-avatar-wrapper" style="position: relative;">
+  container.innerHTML = `
+    <div class="avatar-wrapper">
       <img src="${avatar}" class="avatar">
       <img src="${frame}" class="frame">
     </div>
-    <div>
-      <div><strong>${nickname}</strong></div>
-      <div style="font-size: 13px;">Poziom ${level}</div>
-    </div>
+    <div class="nickname">${nickname}</div>
+    <div class="level">Poziom ${level}</div>
   `;
-
-  if (playerColor === 'w') {
-    document.getElementById("playerInfoWhite").innerHTML = html;
-    document.getElementById("playerInfoBlack").innerHTML = ""; // puste
-  } else if (playerColor === 'b') {
-    document.getElementById("playerInfoBlack").innerHTML = html;
-    document.getElementById("playerInfoWhite").innerHTML = "";
-  } else {
-    document.getElementById("playerInfoWhite").innerHTML = "";
-    document.getElementById("playerInfoBlack").innerHTML = "";
-  }
+  container.style.display = "flex";
 }
+
 
 document.getElementById('startGame').addEventListener('click', function () {
   if (gameMode === "online") {
@@ -2101,9 +2098,6 @@ document.getElementById('startGame').addEventListener('click', function () {
   rebindPopupButtons();
   hasAwardedXP = false; // 🔄 Reset flagi przy nowej grze
   currentTurn = 'w';
-	if (gameMode === "pvb" || (gameMode === "pvp" && pvpSubmode === "online")) {
-	  updatePlayerInfoDisplay();
-	}
   // 🔁 Uaktualnij poziomy trudności botów na starcie gry
 	if (gameMode === "pvb") {
 	  const val = parseInt(document.getElementById("difficultyPVB").value || "5");
@@ -2155,6 +2149,7 @@ document.querySelector(".captured-top .capture-label").textContent =
   `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
 document.querySelector(".captured-bottom .capture-label").textContent =
   `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
+updateInlinePlayerDisplay();
 });
 
 function showStartMenu() {
@@ -2206,6 +2201,7 @@ function showStartMenu() {
 
   document.getElementById("startScreen").style.display = "flex";
   document.getElementById("board").classList.remove("rotated");
+  document.getElementById("playerProfileInline").style.display = "none";
 }
 
 function resetGame(showMenuAfter) {
@@ -2284,8 +2280,8 @@ if (showMenuAfter) {
 
   showStartMenu();
 }
-
-document.getElementById("gameScreen").style.display = "block";
+document.getElementById("playerProfileInline").style.display = "none";
+document.getElementById("gameScreen").style.display = "block";	
 }
 
 const difficultyNames = [
