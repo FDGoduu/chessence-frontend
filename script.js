@@ -2157,7 +2157,7 @@ function showStartMenu() {
   isBotRunning = false;
 
   // 🧹 Reset UI wyboru trybu i koloru
-  document.querySelectorAll(".mode-button").forEach(btn => btn.classList.remove("selected"));
+  document.querySelectorAll(".button-group.selected").forEach(btn => btn.classList.remove("selected"));
   document.getElementById("chooseWhite").classList.remove("selected");
   document.getElementById("chooseBlack").classList.remove("selected");
   document.getElementById("startGame").disabled = true;
