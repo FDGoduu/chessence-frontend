@@ -1628,7 +1628,7 @@ if (!stockfishPVBWorker) {
 } else {
   stockfishPVBWorker.postMessage("uci");
 }
-
+}
   // Obsługa wyboru koloru
 document.getElementById('chooseWhite').addEventListener('click', function() {
   playerColor = 'w';
