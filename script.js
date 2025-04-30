@@ -2242,14 +2242,19 @@ if (showMenuAfter) {
     delete window.previousLevelBeforeAward;
   }
 
-  // 🧹 Reset stanu menu
+  // 🧹 Reset pełnego stanu menu głównego
   gameMode = null;
   pvpSubmode = null;
   playerColor = null;
   botColor = null;
+
+  document.querySelectorAll(".mode-button").forEach(btn => btn.classList.remove("selected"));
   document.getElementById('chooseWhite').classList.remove('selected');
   document.getElementById('chooseBlack').classList.remove('selected');
-  document.getElementById('startGame').disabled = true;
+  document.getElementById("startGame").disabled = true;
+
+  // 📦 Reset UI przesunięcia startBoxa
+  startShiftReset();
 
   showStartMenu();
 }
