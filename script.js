@@ -2230,16 +2230,26 @@ const botInfo = document.getElementById("botDifficultyDisplay");
 
 
   // Jeżeli chcemy powrócić do menu, to je pokażemy
-  if (showMenuAfter) {
-  if (showMenuAfter && typeof window.previousLevelBeforeAward !== "undefined" && playerLevel > window.previousLevelBeforeAward) {
-  triggerLevelUpAnimation();
-  // tylko raz!
-  delete window.previousLevelBeforeAward;
-	}
-    showStartMenu();
+if (showMenuAfter) {
+  if (typeof window.previousLevelBeforeAward !== "undefined" && playerLevel > window.previousLevelBeforeAward) {
+    triggerLevelUpAnimation();
+    delete window.previousLevelBeforeAward;
   }
-  document.getElementById("gameScreen").style.display = "block";
+
+  // 🧹 Reset stanu menu
+  gameMode = null;
+  pvpSubmode = null;
+  playerColor = null;
+  botColor = null;
+  document.getElementById('chooseWhite').classList.remove('selected');
+  document.getElementById('chooseBlack').classList.remove('selected');
+  document.getElementById('startGame').disabled = true;
+
+  showStartMenu();
 }
+
+document.getElementById("gameScreen").style.display = "block";
+
 
 const difficultyNames = [
   "Beginner", "Novice", "Easy", "Normal", "Skilled", "Dread",
