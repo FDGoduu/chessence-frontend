@@ -2150,8 +2150,6 @@ function showStartMenu() {
   document.getElementById('chooseWhite').classList.remove('selected');
   document.getElementById('chooseBlack').classList.remove('selected');
   document.getElementById('startGame').disabled = true;
-  playerColor = null;
-  botColor = null;
 
   document.getElementById('startScreen').style.display = 'flex';
   document.getElementById('board').classList.remove('rotated');
