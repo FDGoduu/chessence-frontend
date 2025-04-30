@@ -1536,14 +1536,17 @@ function evaluatePiece(piece) {
 }
 
 function resetStockfishPVBWorker() {
+  console.log("🔁 [resetStockfishPVBWorker] Restartuję worker PvB");
   if (stockfishPVBWorker) stockfishPVBWorker.terminate();
   stockfishPVBWorker = new Worker("stockfish.js");
 
   stockfishPVBWorker.onmessage = function (e) {
     const line = String(e.data);
+	  console.log("📨 [Stockfish PvB] Odebrano:", line);
     const bestMoves = window._botBestMoves ?? [];
 
     if (line.includes("uciok")) {
+	    console.log("✅ [Stockfish PvB] Gotowy – wysyłam pozycję i go");
       const fen = getFEN();
       const level = botColor === 'w' ? botDifficultyW : botDifficultyB;
       const depthMap = [1,1,1,2,2,3,4,6,8,10,12];
@@ -1565,6 +1568,7 @@ function resetStockfishPVBWorker() {
     }
 
     if (line.startsWith("bestmove")) {
+	    console.log("✅ [Stockfish PvB] bestmove:", line);
       const move = bestMoves[0] || line.split(" ")[1];
       if (!move || move === "(none)") return;
 
@@ -1623,7 +1627,7 @@ function resetStockfishPVBWorker() {
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
-
+console.log("🤖 [runAIMove] Wywołano – gameEnded:", gameEnded, "| currentTurn:", currentTurn, "| playerColor:", playerColor, "| botColor:", botColor);
   // zainicjalizuj listę najlepszych ruchów globalnie
   window._botBestMoves = [];
 
