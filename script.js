@@ -2147,7 +2147,7 @@ function showStartMenu() {
   document.getElementById('board').classList.remove('rotated');
 
   isBotRunning = false;
-
+  window._botBestMoves = []; // 🛠️ koniecznie resetuj między partiami
 }
 
 function resetGame(showMenuAfter) {
@@ -2210,6 +2210,7 @@ const botInfo = document.getElementById("botDifficultyDisplay");
     showStartMenu();
   }
   document.getElementById("gameScreen").style.display = "block";
+  window._botBestMoves = []; // 🛠️ koniecznie resetuj między partiami
 }
 
 const difficultyNames = [
