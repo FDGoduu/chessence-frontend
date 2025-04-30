@@ -2152,7 +2152,8 @@ function showStartMenu() {
 	  gameMode = null;
 	  pvpSubmode = null;
 	}
-
+  playerColor = null; // 🔥 DODANE
+  botColor = null;    // 🔥 DODANE
 	// 🎯 Przyznaj zaległy XP tylko przy wejściu do menu
 	if (!hasAwardedXP && typeof window.xpPendingResult !== "undefined") {
 	  awardXP(window.xpPendingResult);
