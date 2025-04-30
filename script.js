@@ -2076,16 +2076,15 @@ document.getElementById('startGame').addEventListener('click', function () {
 	  botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
 	  botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
 	}
-resetGame(false);
+resetGame(false);             // tylko reset planszy
 isInputLocked = false;
 
 if (gameMode === "pvb") {
-  console.log("🔁 [startGame] runAIMove() po starcie gry PvB");
+  resetStockfishPVBWorker();  // teraz tworzymy workera
   setTimeout(() => {
-    runAIMove();
+    runAIMove();              // teraz już ma listener!
   }, 200);
 }
-
 
 if (gameMode === "bvb") {
   runBotVsBot();
@@ -2097,7 +2096,7 @@ if (gameMode === "pvp-hotseat") {
   return;
 }
 
-if (playerColor === 'b') {
+if (gameMode === "pvb" && playerColor === 'b') {
   document.getElementById("board").classList.add("rotated");
   setTimeout(() => {
     runAIMove();
