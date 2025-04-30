@@ -2249,7 +2249,7 @@ if (showMenuAfter) {
 }
 
 document.getElementById("gameScreen").style.display = "block";
-
+}
 
 const difficultyNames = [
   "Beginner", "Novice", "Easy", "Normal", "Skilled", "Dread",
