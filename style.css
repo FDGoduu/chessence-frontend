@@ -3429,6 +3429,9 @@ body {
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
 }
+#playerProfileInlineSide {
+  margin-left: 0;
+}
 .player-inline-side {
   display: flex;
   align-items: center;
