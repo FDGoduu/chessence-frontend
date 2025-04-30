@@ -1544,7 +1544,7 @@ function resetStockfishPVBWorker() {
     const bestMoves = window._botBestMoves ?? [];
 
     if (line.includes("uciok")) {
-      const level = currentTurn === 'w' ? botDifficultyW : botDifficultyB;
+      const level = botColor === 'w' ? botDifficultyW : botDifficultyB;
       const fen = getFEN();
       const depthMap = [1,1,1,2,2,3,4,6,8,10,12];
       const multiPVMap = [10,10,7,6,5,4,3,2,2,1,1];
