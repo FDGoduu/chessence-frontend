@@ -1540,6 +1540,7 @@ function resetStockfishPVBWorker() {
   if (stockfishPVBWorker) stockfishPVBWorker.terminate();
   window._botBestMoves = [];
   stockfishPVBWorker = new Worker("stockfish.js");
+  stockfishPVBWorker.postMessage("uci"); // ✅ ← TO DODAJ
 }
 
 
