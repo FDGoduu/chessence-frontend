@@ -1610,6 +1610,7 @@ function resetStockfishPVBWorker() {
           setTimeout(onFinish, 0);
         });
       } else {
+	      console.warn("❌ [Bot] Nie znaleziono figury do animacji – wykonuję bez animacji");
         onFinish();
       }
 
