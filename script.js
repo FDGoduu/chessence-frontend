@@ -1442,6 +1442,8 @@ if (gameMode === "online") {
     }
 
     logMove(sx, sy, x, y, movedPiece, victimPiece || '');
+    currentTurn = currentTurn === 'w' ? 'b' : 'w';
+
 
 const onFinish = async () => {
   renderBoard();
