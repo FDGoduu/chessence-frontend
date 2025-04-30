@@ -1539,87 +1539,7 @@ function resetStockfishPVBWorker() {
   console.log("🔁 [resetStockfishPVBWorker] Restartuję worker PvB");
   if (stockfishPVBWorker) stockfishPVBWorker.terminate();
   window._botBestMoves = [];
-
-
   stockfishPVBWorker = new Worker("stockfish.js");
-
-  stockfishPVBWorker.onmessage = function (e) {
-    const line = String(e.data);
-    console.log("📨 [Stockfish PvB] Odebrano:", line);
-    const bestMoves = window._botBestMoves ?? [];
-
-    if (line.includes("uciok")) {
-      console.log("✅ [Stockfish PvB] Gotowy – wysyłam pozycję i go");
-      const fen = getFEN();
-      const level = botColor === 'w' ? botDifficultyW : botDifficultyB;
-      const depthMap = [1,1,1,2,2,3,4,6,8,10,12];
-      const multiPVMap = [10,10,7,6,5,4,3,2,2,1,1];
-      const depth = depthMap[level];
-      const multiPV = multiPVMap[level];
-
-      stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
-      stockfishPVBWorker.postMessage(`position fen ${fen}`);
-      stockfishPVBWorker.postMessage(`go depth ${depth}`);
-    }
-
-    if (line.startsWith("info") && line.includes(" pv ")) {
-      const move = line.split(" pv ")[1].split(" ")[0];
-      if (move && !bestMoves.includes(move)) {
-        bestMoves.push(move);
-        isInputLocked = false;
-      }
-    }
-
-    if (line.startsWith("bestmove")) {
-      console.log("✅ [Stockfish PvB] bestmove:", line);
-      const move = bestMoves[0] || line.split(" ")[1];
-      if (!move || move === "(none)") return;
-
-      const sx = move.charCodeAt(0) - 97;
-      const sy = 8 - parseInt(move[1]);
-      const dx = move.charCodeAt(2) - 97;
-      const dy = 8 - parseInt(move[3]);
-
-      const fromSquareElem = document.querySelector(`.square[data-x="${sx}"][data-y="${sy}"]`);
-      const toSquareElem = document.querySelector(`.square[data-x="${dx}"][data-y="${dy}"]`);
-      const pieceElem = fromSquareElem?.querySelector('.piece');
-
-      const tempBoard = JSON.parse(JSON.stringify(boardState));
-      tryMove(sx, sy, dx, dy, false);
-
-      const movedPiece = boardState[dy][dx];
-      const attackerPiece = tempBoard[sy][sx];
-      const victimPiece = tempBoard[dy][dx];
-
-      if (victimPiece && victimPiece.toLowerCase() !== 'k') {
-        const color = pieceColor(attackerPiece);
-        const type = victimPiece.toUpperCase();
-        if (color === 'w') capturedByWhite[type]++;
-        else capturedByBlack[type]++;
-        updateCapturedDisplay();
-      }
-
-      logMove(sx, sy, dx, dy, movedPiece, victimPiece || '');
-      currentTurn = currentTurn === 'w' ? 'b' : 'w';
-
-      const onFinish = () => {
-        renderBoard();
-        updateGameStatus();
-        updateEvaluationBar();
-      };
-
-      if (pieceElem) {
-        animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
-          setTimeout(onFinish, 0);
-        });
-      } else {
-        console.warn("❌ [Bot] Nie znaleziono figury do animacji – wykonuję bez animacji");
-        onFinish();
-      }
-
-      window._botBestMoves = [];
-    }
-  };
 }
 
 
@@ -2100,8 +2020,85 @@ if (gameMode === "pvb" && playerColor === 'b') {
 if (gameMode === "pvb") {
   resetStockfishPVBWorker();
 
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    console.log("📨 [Stockfish PvB] Odebrano:", line);
+    const bestMoves = window._botBestMoves ?? [];
+
+    if (line.includes("uciok")) {
+      console.log("✅ [Stockfish PvB] Gotowy – wysyłam pozycję i go");
+      const fen = getFEN();
+      const level = botColor === 'w' ? botDifficultyW : botDifficultyB;
+      const depthMap = [1,1,1,2,2,3,4,6,8,10,12];
+      const multiPVMap = [10,10,7,6,5,4,3,2,2,1,1];
+      const depth = depthMap[level];
+      const multiPV = multiPVMap[level];
+
+      stockfishPVBWorker.postMessage(`setoption name MultiPV value ${multiPV}`);
+      stockfishPVBWorker.postMessage(`position fen ${fen}`);
+      stockfishPVBWorker.postMessage(`go depth ${depth}`);
+    }
+
+    if (line.startsWith("info") && line.includes(" pv ")) {
+      const move = line.split(" pv ")[1].split(" ")[0];
+      if (move && !bestMoves.includes(move)) {
+        bestMoves.push(move);
+        isInputLocked = false;
+      }
+    }
+
+    if (line.startsWith("bestmove")) {
+      console.log("✅ [Stockfish PvB] bestmove:", line);
+      const move = bestMoves[0] || line.split(" ")[1];
+      if (!move || move === "(none)") return;
+
+      const sx = move.charCodeAt(0) - 97;
+      const sy = 8 - parseInt(move[1]);
+      const dx = move.charCodeAt(2) - 97;
+      const dy = 8 - parseInt(move[3]);
+
+      const fromSquareElem = document.querySelector(`.square[data-x="${sx}"][data-y="${sy}"]`);
+      const toSquareElem = document.querySelector(`.square[data-x="${dx}"][data-y="${dy}"]`);
+      const pieceElem = fromSquareElem?.querySelector('.piece');
+
+      const tempBoard = JSON.parse(JSON.stringify(boardState));
+      tryMove(sx, sy, dx, dy, false);
+
+      const movedPiece = boardState[dy][dx];
+      const attackerPiece = tempBoard[sy][sx];
+      const victimPiece = tempBoard[dy][dx];
+
+      if (victimPiece && victimPiece.toLowerCase() !== 'k') {
+        const color = pieceColor(attackerPiece);
+        const type = victimPiece.toUpperCase();
+        if (color === 'w') capturedByWhite[type]++;
+        else capturedByBlack[type]++;
+        updateCapturedDisplay();
+      }
+
+      logMove(sx, sy, dx, dy, movedPiece, victimPiece || '');
+      currentTurn = currentTurn === 'w' ? 'b' : 'w';
+
+      const onFinish = () => {
+        renderBoard();
+        updateGameStatus();
+        updateEvaluationBar();
+      };
+
+      if (pieceElem) {
+        animatePieceMove(pieceElem, fromSquareElem, toSquareElem, 500, () => {
+          setTimeout(onFinish, 0);
+        });
+      } else {
+        console.warn("❌ [Bot] Nie znaleziono figury do animacji – wykonuję bez animacji");
+        onFinish();
+      }
+
+      window._botBestMoves = [];
+    }
+  };
+
   setTimeout(() => {
-    // Uruchom bota tylko jeśli to jego tura
     if (currentTurn !== playerColor) {
       runAIMove();
     }
