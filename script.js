@@ -1554,8 +1554,8 @@ function runAIMove() {
 
   const bestMoves = [];// Reset najlepszych ruchów przed nową analizą
 
-  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
-
+  stockfishPVBWorker.postMessage("uci");
+	
   stockfishPVBWorker.onmessage = function (e) {
     const line = String(e.data);
 
