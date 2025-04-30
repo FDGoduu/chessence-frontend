@@ -3443,8 +3443,8 @@ body {
 
 .player-inline-side .avatar-wrapper {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 68px; /* 64 avatar + 2px border * 2 */
+  height: 68px;
   flex-shrink: 0;
 }
 
@@ -3455,15 +3455,15 @@ body {
   border: 2px solid white;
   object-fit: cover;
   background: #111;
-  z-index: 2;
+  display: block;
 }
 
 .player-inline-side .avatar-wrapper img.frame {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 120%;
-  height: 120%;
+  width: 88px; /* 68 + 20 (10px optycznego marginesu) */
+  height: 88px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 3;
