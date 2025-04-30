@@ -1617,12 +1617,6 @@ function resetStockfishPVBWorker() {
       window._botBestMoves = [];
     }
   };
-
-  // 🔥 Tu dodaj automatyczny start, jeśli bot ma teraz ruch
-  if (gameMode === "pvb" && currentTurn !== playerColor) {
-    window._botBestMoves = [];
-    stockfishPVBWorker.postMessage("uci");
-  }
 }
 
 
@@ -2083,6 +2077,10 @@ document.getElementById('startGame').addEventListener('click', function () {
 	}
 resetGame(false);
 isInputLocked = false;
+
+if (gameMode === "pvb" && currentTurn !== playerColor) {
+  runAIMove();
+}
 
 if (gameMode === "bvb") {
   runBotVsBot();
