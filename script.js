@@ -2085,9 +2085,14 @@ document.getElementById('startGame').addEventListener('click', function () {
 resetGame(false);
 isInputLocked = false;
 
+// ⬇️ DODAJ TUTAJ
 if (gameMode === "pvb" && currentTurn !== playerColor) {
-  runAIMove();
+  console.log("🎯 [StartGame] Bot ma pierwszy ruch – uruchamiam runAIMove()");
+  setTimeout(() => {
+    runAIMove();
+  }, 200);
 }
+
 
 if (gameMode === "bvb") {
   runBotVsBot();
