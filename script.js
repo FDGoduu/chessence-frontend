@@ -2077,12 +2077,17 @@ function updateInlinePlayerDisplay() {
       <img src="${avatar}" class="avatar">
       <img src="${frame}" class="frame">
     </div>
-    <div class="nickname">${nickname}</div>
-    <div class="level">Poziom ${level}</div>
+    <div class="info">
+      <div class="nickname">${nickname}</div>
+      <div class="level">Poziom ${level}</div>
+    </div>
   `;
   container.style.display = "flex";
-}
 
+  // 📦 Dostosuj położenie
+  container.style.marginTop = playerColor === 'w' ? '16px' : '0px';
+  container.style.marginBottom = playerColor === 'b' ? '16px' : '0px';
+}
 
 document.getElementById('startGame').addEventListener('click', function () {
   if (gameMode === "online") {
