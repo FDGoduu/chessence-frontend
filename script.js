@@ -1538,6 +1538,8 @@ function evaluatePiece(piece) {
 function resetStockfishPVBWorker() {
   console.log("🔁 [resetStockfishPVBWorker] Restartuję worker PvB");
   if (stockfishPVBWorker) stockfishPVBWorker.terminate();
+  window._botBestMoves = [];
+
 
   stockfishPVBWorker = new Worker("stockfish.js");
 
