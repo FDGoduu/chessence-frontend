@@ -2076,16 +2076,37 @@ document.getElementById('startGame').addEventListener('click', function () {
 	  botDifficultyW = parseInt(document.getElementById("difficultyWhite").value || "5");
 	  botDifficultyB = parseInt(document.getElementById("difficultyBlack").value || "5");
 	}
-resetGame(false);             // tylko reset planszy
+resetGame(false);
 isInputLocked = false;
 
+// 🔁 Odśwież poziomy trudności
+const val = parseInt(document.getElementById("difficultyPVB").value || "5");
 if (gameMode === "pvb") {
-  resetStockfishPVBWorker();  // teraz tworzymy workera
+  if (playerColor === 'w') botDifficultyB = val;
+  else botDifficultyW = val;
+  window.xpBotLevelAtEnd = getCurrentBotLevel();
+}
+
+// 🔁 Ustaw rotację planszy
+if (gameMode === "pvb" && playerColor === 'b') {
+  document.getElementById("board").classList.add("rotated");
+} else {
+  document.getElementById("board").classList.remove("rotated");
+}
+
+// 🔁 Restartuj bota i logikę
+if (gameMode === "pvb") {
+  resetStockfishPVBWorker();
+
   setTimeout(() => {
-    runAIMove();              // teraz już ma listener!
+    // Uruchom bota tylko jeśli to jego tura
+    if (currentTurn !== playerColor) {
+      runAIMove();
+    }
   }, 200);
 }
 
+// 🔁 BvB
 if (gameMode === "bvb") {
   runBotVsBot();
   return;
@@ -2096,14 +2117,6 @@ if (gameMode === "pvp-hotseat") {
   return;
 }
 
-if (gameMode === "pvb" && playerColor === 'b') {
-  document.getElementById("board").classList.add("rotated");
-  setTimeout(() => {
-    runAIMove();
-  }, 600);
-} else {
-  document.getElementById("board").classList.remove("rotated");
-}
   // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
 const topLabel = document.querySelector(".captured-top .capture-label");
 const bottomLabel = document.querySelector(".captured-bottom .capture-label");
