@@ -2150,6 +2150,7 @@ function showStartMenu() {
 	if (stockfishPVBWorker) {
 	  stockfishPVBWorker.terminate();
 	  stockfishPVBWorker = new Worker("stockfish.js");
+	  stockfishPVBWorker.onmessage = () => {};
 	}
 
 	isBotRunning = false;
@@ -2166,6 +2167,7 @@ function showStartMenu() {
 	if (stockfishPVBWorker) {
 	  stockfishPVBWorker.terminate();
 	  stockfishPVBWorker = new Worker("stockfish.js");
+	  stockfishPVBWorker.onmessage = () => {};
 	}
 
 	if (stockfishBVBWorker) {
@@ -2186,6 +2188,7 @@ function resetGame(showMenuAfter) {
 	if (stockfishPVBWorker) {
 	  stockfishPVBWorker.terminate();
 	  stockfishPVBWorker = new Worker("stockfish.js");
+          stockfishPVBWorker.onmessage = () => {};
 	}
 
 	isBotRunning = false;
