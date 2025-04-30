@@ -1443,36 +1443,33 @@ if (gameMode === "online") {
 
     logMove(sx, sy, x, y, movedPiece, victimPiece || '');
 
-const onFinish = () => {
-  currentTurn = currentTurn === 'w' ? 'b' : 'w';
+const onFinish = async () => {
   renderBoard();
+  updateTurnStatus?.(); // jeśli masz taką funkcję
   updateGameStatus();
-  
-  // 🔥 DODAJ TEN FRAGMENT:
-  if (gameMode === "pvb") {
-    (async () => {
-      const users = await getUsers();
-
-      if (window.castlingCaptured) {
-        unlockAchievement("castling", users);
-        window.castlingCaptured = false;
-      }
-      if (window.enPassantCaptured) {
-        unlockAchievement("enpassant", users);
-        window.enPassantCaptured = false;
-      }
-    })();
-  }
-
   updateEvaluationBar();
   isInputLocked = false;
 
-  if (gameMode === "pvb" && currentTurn !== playerColor) {
-    setTimeout(runAIMove, 500);
+  if (gameMode === "pvb") {
+    const users = await getUsers();
+
+    if (window.castlingCaptured) {
+      unlockAchievement("castling", users);
+      window.castlingCaptured = false;
+    }
+    if (window.enPassantCaptured) {
+      unlockAchievement("enpassant", users);
+      window.enPassantCaptured = false;
+    }
+
+    if (currentTurn !== playerColor) {
+      setTimeout(runAIMove, 500);
+    }
   } else if (gameMode === "bvb") {
     setTimeout(runBotVsBot, 500);
   }
 };
+
 
     if (pieceElem && fromSquare && toSquare) {
       animatePieceMove(pieceElem, fromSquare, toSquare, 500, onFinish);
