@@ -1538,7 +1538,6 @@ function evaluatePiece(piece) {
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
   if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
-
   const fen = getFEN();
 
   // Bezpieczne ograniczenie poziomu (0–10)
