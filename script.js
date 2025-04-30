@@ -2192,8 +2192,7 @@ function showStartMenu() {
   document.getElementById("chooseWhite").classList.remove("selected");
   document.getElementById("chooseBlack").classList.remove("selected");
   document.getElementById("startGame").disabled = true;
-  document.getElementById("playerInfoWhite").innerHTML = "";
-  document.getElementById("playerInfoBlack").innerHTML = "";
+  document.getElementById("playerProfileInlineSide").innerHTML = "";
 
   // 🧹 Reset rozwinięcia UI i opcji widocznych
   startShiftReset();
