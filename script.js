@@ -1537,6 +1537,9 @@ function evaluatePiece(piece) {
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
   if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
+  if (!stockfishPVBWorker || typeof stockfishPVBWorker.postMessage !== 'function') {
+  stockfishPVBWorker = new Worker('stockfish.js');
+}
   const fen = getFEN();
 
   // Bezpieczne ograniczenie poziomu (0–10)
