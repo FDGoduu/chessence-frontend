@@ -1565,26 +1565,27 @@ function runAIMove() {
       stockfishPVBWorker.postMessage(`go depth ${depth}`);
     }
 
-    if (line.startsWith("info") && line.includes(" pv ")) {
+   if (line.startsWith("info") && line.includes(" pv ")) {
       const move = line.split(" pv ")[1].split(" ")[0];
-      if (move && !window.bestMoves.includes(move)) {
-        window.bestMoves.push(move);
+      if (move && !bestMoves.includes(move)) {
+        bestMoves.push(move);
+	isInputLocked = false;
       }
     }
 
     if (line.startsWith("bestmove")) {
-      if (line.includes("bestmove (none)")) return; // brak ruchu – partia się skończyła
-
       let chosenMove;
-      if (window.bestMoves.length === 0) {
+      if (line.includes("bestmove (none)")) return; // brak ruchu – partia się skończyła
+      if (bestMoves.length === 0) {
         chosenMove = line.split(" ")[1]; // awaryjnie użyj bestmove, jeśli nie złapaliśmy info
       } else {
         const shouldMakeMistake = Math.random() < errorChance;
         if (shouldMakeMistake) {
-          const worseMoves = window.bestMoves.slice(1);
-          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || window.bestMoves[0];
+          // Wybierz losowy słabszy ruch
+          const worseMoves = bestMoves.slice(1);
+          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || bestMoves[0];
         } else {
-          chosenMove = window.bestMoves[0];
+          chosenMove = bestMoves[0]; // najlepszy
         }
       }
 
