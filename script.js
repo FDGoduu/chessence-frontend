@@ -1544,8 +1544,8 @@ function resetStockfishPVBWorker() {
     const bestMoves = window._botBestMoves ?? [];
 
     if (line.includes("uciok")) {
-      const level = botColor === 'w' ? botDifficultyW : botDifficultyB;
       const fen = getFEN();
+      const level = botColor === 'w' ? botDifficultyW : botDifficultyB;
       const depthMap = [1,1,1,2,2,3,4,6,8,10,12];
       const multiPVMap = [10,10,7,6,5,4,3,2,2,1,1];
       const depth = depthMap[level];
@@ -1609,10 +1609,17 @@ function resetStockfishPVBWorker() {
         onFinish();
       }
 
-      window._botBestMoves = []; // resetuj po ruchu
+      window._botBestMoves = [];
     }
   };
+
+  // 🔥 Tu dodaj automatyczny start, jeśli bot ma teraz ruch
+  if (gameMode === "pvb" && currentTurn !== playerColor) {
+    window._botBestMoves = [];
+    stockfishPVBWorker.postMessage("uci");
+  }
 }
+
 
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
