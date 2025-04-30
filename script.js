@@ -2127,59 +2127,52 @@ document.querySelector(".captured-bottom .capture-label").textContent =
 });
 
 function showStartMenu() {
-	if (gameMode === "online" && currentRoomCode && socket) {
-	  // Jeśli był tryb online, wyślij leaveRoom
-	  socket.emit("leaveRoom", { roomCode: currentRoomCode });
-	  currentRoomCode = null;
-	  gameMode = null;
-	  pvpSubmode = null;
-	} else {
-	  // Jeśli był tryb offline, po prostu resetuj dane gry
-	  gameMode = null;
-	  pvpSubmode = null;
-	}
+  if (gameMode === "online" && currentRoomCode && socket) {
+    socket.emit("leaveRoom", { roomCode: currentRoomCode });
+    currentRoomCode = null;
+    gameMode = null;
+    pvpSubmode = null;
+  } else {
+    gameMode = null;
+    pvpSubmode = null;
+  }
 
-	// 🎯 Przyznaj zaległy XP tylko przy wejściu do menu
-	if (!hasAwardedXP && typeof window.xpPendingResult !== "undefined") {
-	  awardXP(window.xpPendingResult);
-	  delete window.xpPendingResult;
-	  hasAwardedXP = true; // ✅ Zabezpieczenie
-	}
-	if (stockfishBVBWorker) {
-	  stockfishBVBWorker.terminate();
-	  stockfishBVBWorker = new Worker("stockfish.js");
-	}
+  if (!hasAwardedXP && typeof window.xpPendingResult !== "undefined") {
+    awardXP(window.xpPendingResult);
+    delete window.xpPendingResult;
+    hasAwardedXP = true;
+  }
 
-	if (stockfishPVBWorker) {
-	  stockfishPVBWorker.terminate();
-	  stockfishPVBWorker = new Worker("stockfish.js");
-	  stockfishPVBWorker.onmessage = () => {};
-	}
+  if (stockfishBVBWorker) {
+    stockfishBVBWorker.terminate();
+    stockfishBVBWorker = new Worker("stockfish.js");
+  }
 
-	isBotRunning = false;
-  document.getElementById('chooseWhite').classList.remove('selected');
-  document.getElementById('chooseBlack').classList.remove('selected');
-  document.getElementById('startGame').disabled = true;
-  playerColor = null;
-  botColor = null;
+  if (stockfishPVBWorker) {
+    stockfishPVBWorker.terminate();
+    stockfishPVBWorker = new Worker("stockfish.js");
+    stockfishPVBWorker.onmessage = () => {};
+  }
 
-  document.getElementById('startScreen').style.display = 'flex';
-  document.getElementById('board').classList.remove('rotated');
- 
-	  // Stop botów jeśli gracz wraca do menu
-	if (stockfishPVBWorker) {
-	  stockfishPVBWorker.terminate();
-	  stockfishPVBWorker = new Worker("stockfish.js");
-	  stockfishPVBWorker.onmessage = () => {};
-	}
+  isBotRunning = false;
 
-	if (stockfishBVBWorker) {
-	  stockfishBVBWorker.terminate();
-	  stockfishBVBWorker = new Worker("stockfish.js");
-	}
+  // 🧹 Reset UI wyboru trybu i koloru
+  document.querySelectorAll(".mode-button").forEach(btn => btn.classList.remove("selected"));
+  document.getElementById("chooseWhite").classList.remove("selected");
+  document.getElementById("chooseBlack").classList.remove("selected");
+  document.getElementById("startGame").disabled = true;
 
-	isBotRunning = false;
+  // 🧹 Reset rozwinięcia UI i opcji widocznych
+  startShiftReset();
 
+  document.getElementById("colorButtons").style.display = "none";
+  document.getElementById("difficultyPVBContainer").style.display = "none";
+  document.getElementById("difficultyBVBContainer").style.display = "none";
+  document.getElementById("pvpSubmodeButtons").style.display = "none";
+  document.getElementById("onlineUI").style.display = "none";
+
+  document.getElementById("startScreen").style.display = "flex";
+  document.getElementById("board").classList.remove("rotated");
 }
 
 function resetGame(showMenuAfter) {
