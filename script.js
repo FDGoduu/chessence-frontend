@@ -2060,7 +2060,7 @@ difficultyBVB.style.display = "none";
 
 function updateInlinePlayerDisplay() {
   const shouldShow = gameMode === "pvb" || (gameMode === "pvp" && pvpSubmode === "online");
-  const container = document.getElementById("playerProfileInline");
+  const container = document.getElementById("playerProfileInlineSide");
 
   if (!shouldShow || !container) {
     container.style.display = "none";
@@ -2201,7 +2201,7 @@ function showStartMenu() {
 
   document.getElementById("startScreen").style.display = "flex";
   document.getElementById("board").classList.remove("rotated");
-  document.getElementById("playerProfileInline").style.display = "none";
+  document.getElementById("playerProfileInlineSide").style.display = "none";
 }
 
 function resetGame(showMenuAfter) {
@@ -2280,7 +2280,7 @@ if (showMenuAfter) {
 
   showStartMenu();
 }
-document.getElementById("playerProfileInline").style.display = "none";
+document.getElementById("playerProfileInlineSide").style.display = "none";
 document.getElementById("gameScreen").style.display = "block";	
 }
 
