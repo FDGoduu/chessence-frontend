@@ -3462,8 +3462,8 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 88px; /* 68 + 20 (10px optycznego marginesu) */
-  height: 88px;
+  width: 100px; /* 68 + 20 (10px optycznego marginesu) */
+  height: 100px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 3;
