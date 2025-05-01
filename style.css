@@ -3487,6 +3487,13 @@ body {
   font-size: 14px;
   color: #ccc;
 }
+#opponentProfileInlineSide {
+  margin-bottom: 24px; /* Dodatkowy odstęp od planszy u góry */
+}
+
+#playerProfileInlineSide {
+  margin-top: 16px;
+}
 
 
 
