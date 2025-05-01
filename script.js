@@ -2068,7 +2068,8 @@ function updateInlinePlayerDisplay() {
   }
 
   const nickname = localStorage.getItem("currentUser") || "Gracz";
-  const level = localStorage.getItem("playerLevel") || 1;
+  const currentUser = localStorage.getItem("currentUser");
+  const level = localStorage.getItem(`playerLevel_${currentUser}`) || 1;
   const avatarName = localStorage.getItem("selectedAvatar") || "avatar1.png";
   const frameName = localStorage.getItem("selectedFrame") || "default_frame";
 
