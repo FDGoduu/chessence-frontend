@@ -4048,7 +4048,7 @@ function applySavedFrame() {
 }
 
 // ⚠️ Ta funkcja nie istnieje w Twoim kodzie – wklej ją jako nową
-function startGameOnline(color) {
+async function startGameOnline(color) {
   isOnlineGame = true;
   console.log("🎯 Multiplayer start jako", color);
 if (!currentRoomCode) {
@@ -4085,6 +4085,8 @@ if (!currentRoomCode) {
     updateStatus("Tura przeciwnika");
   }
   updateCapturedDisplay();
+  await updateInlinePlayerDisplay();
+  updateOpponentInlineDisplay();
 }
 
 function updateTurnStatus() {
