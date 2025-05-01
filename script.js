@@ -4161,34 +4161,31 @@ if (socket) {
     setOnlineStatus(`❌ Błąd: ${message}`);
   });
 
-socket.on("startGame", ({ colorMap, roomCode }) => {
-// 🔥 Ukryj overlay szukania przeciwnika
-const matchmakingOverlay = document.getElementById('matchmakingOverlay');
-if (matchmakingOverlay) matchmakingOverlay.classList.add('popup-hidden');
-  const myColor = colorMap[socket.id];
-  startGameOnline(myColor);
+socket.on("startGame", ({ colorMap, roomCode, players }) => {
   const myId = socket.id;
-  const opponent = players.find(p => p.id !== myId);
-
-  window.currentlyViewedOpponent = opponent;
-  startGameOnline(myColor);
+  const myColor = colorMap[myId];
   currentRoomCode = roomCode;
-  // ✅ Ustaw currentRoomCode na podstawie danych od serwera
-  console.log("📝 currentRoomCode ustawione na podstawie servera:", currentRoomCode);
 
-  // ✅ Jeśli jesteś w profilu – zamknij profil
- if (document.getElementById("profileScreen").style.display === "block") {
+  // 🔥 Ukryj overlay szukania przeciwnika
+  const matchmakingOverlay = document.getElementById('matchmakingOverlay');
+  if (matchmakingOverlay) matchmakingOverlay.classList.add('popup-hidden');
+
+  // ✅ Pobierz dane przeciwnika z przesłanej tablicy
+  const opponent = players?.find(p => p.id !== myId);
+  if (opponent) {
+    window.currentlyViewedOpponent = opponent;
+  }
+
+  // ✅ Zamknij profil jeśli otwarty
+  if (document.getElementById("profileScreen").style.display === "block") {
     closeProfileScreen();
-}
+  }
 
-  // ✅ Przejdź do gry
+  // ✅ Rozpocznij grę
+  startGameOnline(myColor);
   document.getElementById("startGame").click();
-  // ✅ TU DODAJ
-  const opponentSocketId = Object.keys(colorMap).find(id => id !== socket.id);
-  const opponentNick = Object.keys(window.cachedUsers).find(nick =>
-    window.cachedUsers[nick]?.id === opponentSocketId
-  );
-  window.currentlyViewedOpponent = window.cachedUsers[opponentNick];
+
+  console.log("📝 currentRoomCode ustawione na podstawie servera:", currentRoomCode);
 });
 
   socket.on("opponentMove", ({ from, to, promotion, senderId, newTurn }) => {
