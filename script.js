@@ -2069,8 +2069,11 @@ function updateInlinePlayerDisplay() {
 
   const nickname = localStorage.getItem("currentUser") || "Gracz";
   const level = localStorage.getItem("playerLevel") || 1;
-  const avatar = localStorage.getItem("selectedAvatar") || "./img/avatars/avatar1.png";
-  const frame = localStorage.getItem("selectedFrame") || "./img/frames/default_frame.png";
+  const avatarName = localStorage.getItem("selectedAvatar") || "avatar1.png";
+  const frameName = localStorage.getItem("selectedFrame") || "default_frame";
+
+  const avatar = `./img/avatars/${avatarName}`;
+  const frame = `./img/frames/${frameName}.png`;
 
   container.innerHTML = `
     <div class="avatar-wrapper">
@@ -2083,11 +2086,10 @@ function updateInlinePlayerDisplay() {
     </div>
   `;
   container.style.display = "flex";
-
-  // 📦 Dostosuj położenie
   container.style.marginTop = playerColor === 'w' ? '16px' : '0px';
   container.style.marginBottom = playerColor === 'b' ? '16px' : '0px';
 }
+
 
 document.getElementById('startGame').addEventListener('click', function () {
   if (gameMode === "online") {
