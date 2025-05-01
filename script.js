@@ -2093,7 +2093,7 @@ async function updateInlinePlayerDisplay() {
 }
 
 
-document.getElementById('startGame').addEventListener('click', function () {
+document.getElementById('startGame').addEventListener('click', async function () {
   if (gameMode === "online") {
     // Gra online już wystartowała – nie rób nic
     return;
