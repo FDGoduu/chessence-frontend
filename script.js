@@ -2088,8 +2088,13 @@ async function updateInlinePlayerDisplay() {
     </div>
   `;
   container.style.display = "flex";
-  container.style.marginTop = playerColor === 'w' ? '16px' : '0px';
-  container.style.marginBottom = playerColor === 'b' ? '16px' : '0px';
+if (playerColor === 'w') {
+  container.style.marginTop = '16px';
+  container.style.marginBottom = '0px';
+} else if (playerColor === 'b') {
+  container.style.marginTop = '0px';
+  container.style.marginBottom = '24px'; // 🔧 więcej luzu od góry planszy
+}
 }
 
 
