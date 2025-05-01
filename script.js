@@ -4177,6 +4177,12 @@ if (matchmakingOverlay) matchmakingOverlay.classList.add('popup-hidden');
 
   // ✅ Przejdź do gry
   document.getElementById("startGame").click();
+  // ✅ TU DODAJ
+  const opponentSocketId = Object.keys(colorMap).find(id => id !== socket.id);
+  const opponentNick = Object.keys(window.cachedUsers).find(nick =>
+    window.cachedUsers[nick]?.id === opponentSocketId
+  );
+  window.currentlyViewedOpponent = window.cachedUsers[opponentNick];
 });
 
   socket.on("opponentMove", ({ from, to, promotion, senderId, newTurn }) => {
