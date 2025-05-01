@@ -4167,9 +4167,13 @@ const matchmakingOverlay = document.getElementById('matchmakingOverlay');
 if (matchmakingOverlay) matchmakingOverlay.classList.add('popup-hidden');
   const myColor = colorMap[socket.id];
   startGameOnline(myColor);
+  const myId = socket.id;
+  const opponent = players.find(p => p.id !== myId);
 
-  // ✅ Ustaw currentRoomCode na podstawie danych od serwera
+  window.currentlyViewedOpponent = opponent;
+  startGameOnline(myColor);
   currentRoomCode = roomCode;
+  // ✅ Ustaw currentRoomCode na podstawie danych od serwera
   console.log("📝 currentRoomCode ustawione na podstawie servera:", currentRoomCode);
 
   // ✅ Jeśli jesteś w profilu – zamknij profil
