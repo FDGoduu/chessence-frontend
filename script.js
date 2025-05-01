@@ -2067,7 +2067,7 @@ function updateInlinePlayerDisplay() {
     return;
   }
 
-  const nickname = localStorage.getItem("nickname") || "Gracz";
+  const nickname = localStorage.getItem("currentUser") || "Gracz";
   const level = localStorage.getItem("playerLevel") || 1;
   const avatar = localStorage.getItem("activeAvatar") || "./img/avatars/avatar1.png";
   const frame = localStorage.getItem("activeAvatarFrame") || "./img/frames/default_frame.png";
