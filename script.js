@@ -2058,7 +2058,7 @@ difficultyBVB.style.display = "none";
   const labelB = document.querySelector('label[for="difficultyBlack"]');
   if (labelB) labelB.style.display = "none";
 
-function updateInlinePlayerDisplay() {
+async function updateInlinePlayerDisplay() {
   const shouldShow = gameMode === "pvb" || (gameMode === "pvp" && pvpSubmode === "online");
   const container = document.getElementById("playerProfileInlineSide");
 
@@ -2069,7 +2069,8 @@ function updateInlinePlayerDisplay() {
 
   const nickname = localStorage.getItem("currentUser") || "Gracz";
   const currentUser = localStorage.getItem("currentUser");
-  const level = localStorage.getItem(`playerLevel_${currentUser}`) || 1;
+  const users = await getUsers();
+  const level = users[currentUser]?.level ?? 1;
   const avatarName = localStorage.getItem("selectedAvatar") || "avatar1.png";
   const frameName = localStorage.getItem("selectedFrame") || "default_frame";
 
@@ -2157,7 +2158,7 @@ document.querySelector(".captured-top .capture-label").textContent =
   `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
 document.querySelector(".captured-bottom .capture-label").textContent =
   `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
-updateInlinePlayerDisplay();
+await updateInlinePlayerDisplay();
 });
 
 function showStartMenu() {
