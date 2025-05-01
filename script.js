@@ -2058,6 +2058,35 @@ difficultyBVB.style.display = "none";
   const labelB = document.querySelector('label[for="difficultyBlack"]');
   if (labelB) labelB.style.display = "none";
 
+function updateOpponentInlineDisplay() {
+  const shouldShow = gameMode === "pvp" && pvpSubmode === "online";
+  const container = document.getElementById("opponentProfileInlineSide");
+
+  if (!shouldShow || !container || !window.currentlyViewedOpponent) {
+    container.style.display = "none";
+    return;
+  }
+
+  const opponent = window.currentlyViewedOpponent;
+  const nickname = opponent.username || "Przeciwnik";
+  const level = opponent.level ?? 1;
+  const avatar = `./img/avatars/${opponent.avatar || "avatar1.png"}`;
+  const frame = `./img/frames/${opponent.frame || "default_frame"}.png`;
+
+  container.innerHTML = `
+    <div class="avatar-wrapper">
+      <img src="${avatar}" class="avatar">
+      <img src="${frame}" class="frame">
+    </div>
+    <div class="info">
+      <div class="nickname">${nickname}</div>
+      <div class="level">Poziom ${level}</div>
+    </div>
+  `;
+
+  container.style.display = "flex";
+}
+
 async function updateInlinePlayerDisplay() {
   const shouldShow = gameMode === "pvb" || (gameMode === "pvp" && pvpSubmode === "online");
   const container = document.getElementById("playerProfileInlineSide");
@@ -2165,6 +2194,7 @@ document.querySelector(".captured-top .capture-label").textContent =
 document.querySelector(".captured-bottom .capture-label").textContent =
   `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
 await updateInlinePlayerDisplay();
+updateOpponentInlineDisplay();
 });
 
 function showStartMenu() {
