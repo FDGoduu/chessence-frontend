@@ -185,34 +185,22 @@ async function loginUser(nick, password) {
   console.log(`📨 Odpowiedź z loginu, status HTTP:`, response.status);
 
   if (response.status === 409) {
-    showPopup("To konto jest już zalogowane w innym miejscu.");
+    showPopupAdvanced({ message: "To konto jest już zalogowane w innym miejscu.", confirm: false });
     return null;
   }
 
   if (!response.ok) {
-    showPopup("Błąd logowania. Sprawdź dane.");
+    showPopupAdvanced({ message: "Błąd logowania. Sprawdź dane.", confirm: false });
     return null;
   }
 
   const data = await response.json();
   console.log(`📋 Dane po zalogowaniu:`, data);
 
-  // 🔥 Zarejestruj sesję na serwerze
   socket.emit("registerSession", nick);
-
-  // 💾 Zapisz dane lokalnie
   localStorage.setItem("userData", JSON.stringify(data.user));
 
   return data.user;
-}
-
-function logoutUser() {
-  const userData = JSON.parse(localStorage.getItem("userData"));
-  if (userData?.nick) {
-    socket.emit("logoutSession", userData.nick); // 🔁 powiadom serwer
-  }
-  localStorage.clear();
-  location.reload();
 }
 
 async function getProfile(nick) {
@@ -2817,11 +2805,20 @@ async function saveProfile() {
   showNotification("Zapisano zmiany profilu!");
 }
 
-
 function logout() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  const nick = userData?.nick || localStorage.getItem("currentUser");
+
+  if (nick) {
+    socket.emit("logoutSession", nick); // 🔥 informuj serwer
+  }
+
+  // 🧹 czyść dane lokalne
   window.cachedUsers = null;
-  activeUserNick = null; // 🧠 wyczyść sesję w pamięci
-  localStorage.removeItem("currentUser");
+  activeUserNick = null;
+  localStorage.clear();
+
+  // 🧭 powrót do logowania
   showScreen("loginScreen");
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("profileScreen").style.display = "none";
