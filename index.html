@@ -290,6 +290,7 @@
       <div class="profile-tabs-buttons">
 		<button class="avatar-tab-button active" onclick="switchAvatarTab('avatars')">Awatary</button>
 		<button class="avatar-tab-button" onclick="switchAvatarTab('frames')">Ramki</button>
+	        <button class="avatar-tab-button" onclick="showAvatarTab('titleTab')">🎖 Tytuły gracza</button>
       </div>
     </div>
 
@@ -300,6 +301,9 @@
     <div id="frameTab" class="tab-content" style="display: none;">
       <div class="avatar-grid avatar-grid-avatar" id="frameGridContainer"></div>
     </div>
+   <div id="titleTab" class="tab-content" style="display: none;">
+     <div class="avatar-grid avatar-grid-title" id="titleGridContainer"></div>
+   </div>
 
     <button onclick="closeAvatarSelector()">Zamknij</button>
   </div>
