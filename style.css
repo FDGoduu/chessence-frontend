@@ -2506,38 +2506,42 @@ body {
 /* 🔹 Tytuły gracza */
 .avatar-grid-title {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 20px;
   justify-items: center;
   margin-bottom: 20px;
 }
 
-.avatar-grid-title .title-option {
-  background-color: #222;
-  color: #ddd;
-  border: 2px solid transparent;
-  border-radius: 6px;
-  padding: 12px 16px;
+.title-choice {
+  font-size: 16px;
+  font-weight: 600;
+  background: #2d2d2d;
+  color: #ccc;
+  padding: 10px 16px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
   text-align: center;
-  transition: transform 0.2s, border-color 0.2s;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 4px rgba(255,255,255,0.1);
 }
 
-.avatar-grid-title .title-option:hover {
+.title-choice:hover {
   transform: scale(1.05);
-  border-color: gold;
+  box-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
 
-.avatar-grid-title .title-option.locked {
+.title-choice.locked {
   opacity: 0.25;
   filter: grayscale(100%);
   pointer-events: none;
-  border-color: #555;
+  background: #444;
+}
+
+.profile-title {
+  font-size: 14px;
+  color: #aaa;
+  margin-top: -4px;
+  margin-bottom: 4px;
 }
 
 /* Wspólne */
