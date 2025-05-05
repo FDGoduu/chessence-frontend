@@ -4465,7 +4465,7 @@ loginButton.addEventListener('click', async () => {
 
   if (!loggedUser) {
     showPopupAdvanced({
-  message: "Nie udało się zalogować. Spróbuj ponownie.",
+  message: "To konto jest już aktywne na innym urządzeniu. Wyloguj się z innej sesji i spróbuj ponownie.",
   confirm: false,
   onConfirm: () => {
     document.getElementById("loginPassword").value = ""; // 🔥 czyścimy hasło
