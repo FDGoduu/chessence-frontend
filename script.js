@@ -2058,77 +2058,8 @@ difficultyBVB.style.display = "none";
   const labelB = document.querySelector('label[for="difficultyBlack"]');
   if (labelB) labelB.style.display = "none";
 
-function updateOpponentInlineDisplay() {
-  const shouldShow = gameMode === "pvp" && pvpSubmode === "online";
-  const container = document.getElementById("opponentProfileInlineSide");
 
-  if (!shouldShow || !container || !window.currentlyViewedOpponent) {
-    container.style.display = "none";
-    return;
-  }
-
-  const opponent = window.currentlyViewedOpponent;
-  const nickname = opponent.username || "Przeciwnik";
-  const level = opponent.level ?? 1;
-  const avatar = `./img/avatars/${opponent.avatar || "avatar1.png"}`;
-  const frame = `./img/frames/${opponent.frame || "default_frame"}.png`;
-
-  container.innerHTML = `
-    <div class="avatar-wrapper">
-      <img src="${avatar}" class="avatar">
-      <img src="${frame}" class="frame">
-    </div>
-    <div class="info">
-      <div class="nickname">${nickname}</div>
-      <div class="level">Poziom ${level}</div>
-    </div>
-  `;
-
-  container.style.display = "flex";
-}
-
-async function updateInlinePlayerDisplay() {
-  const shouldShow = gameMode === "pvb" || (gameMode === "pvp" && pvpSubmode === "online");
-  const container = document.getElementById("playerProfileInlineSide");
-
-  if (!shouldShow || !container) {
-    container.style.display = "none";
-    return;
-  }
-
-  const nickname = localStorage.getItem("currentUser") || "Gracz";
-  const currentUser = localStorage.getItem("currentUser");
-  const users = await getUsers();
-  const level = users[currentUser]?.level ?? 1;
-  const avatarName = localStorage.getItem("selectedAvatar") || "avatar1.png";
-  const frameName = localStorage.getItem("selectedFrame") || "default_frame";
-
-  const avatar = `./img/avatars/${avatarName}`;
-  const frame = `./img/frames/${frameName}.png`;
-
-  container.innerHTML = `
-    <div class="avatar-wrapper">
-      <img src="${avatar}" class="avatar">
-      <img src="${frame}" class="frame">
-    </div>
-    <div class="info">
-      <div class="nickname">${nickname}</div>
-      <div class="level">Poziom ${level}</div>
-    </div>
-  `;
-  container.style.display = "flex";
-const boardWrapper = document.getElementById("boardWrapper");
-if (playerColor === 'b') {
-  boardWrapper.style.paddingBottom = "36px"; // lub 40px – zależnie od optycznego efektu
-} else {
-  boardWrapper.style.paddingBottom = "0px";
-}
-container.style.marginTop = playerColor === 'w' ? '16px' : '0px';
-container.style.marginBottom = playerColor === 'b' ? '16px' : '0px';
-}
-
-
-document.getElementById('startGame').addEventListener('click', async function () {
+document.getElementById('startGame').addEventListener('click', function () {
   if (gameMode === "online") {
     // Gra online już wystartowała – nie rób nic
     return;
@@ -2193,8 +2124,6 @@ document.querySelector(".captured-top .capture-label").textContent =
   `Zbite przez ${topPlayerColor === 'w' ? "białe" : "czarne"}`;
 document.querySelector(".captured-bottom .capture-label").textContent =
   `Zbite przez ${bottomPlayerColor === 'w' ? "białe" : "czarne"}`;
-await updateInlinePlayerDisplay();
-updateOpponentInlineDisplay();
 });
 
 function showStartMenu() {
@@ -2232,7 +2161,6 @@ function showStartMenu() {
   document.getElementById("chooseWhite").classList.remove("selected");
   document.getElementById("chooseBlack").classList.remove("selected");
   document.getElementById("startGame").disabled = true;
-  document.getElementById("playerProfileInlineSide").innerHTML = "";
 
   // 🧹 Reset rozwinięcia UI i opcji widocznych
   startShiftReset();
@@ -2245,7 +2173,6 @@ function showStartMenu() {
 
   document.getElementById("startScreen").style.display = "flex";
   document.getElementById("board").classList.remove("rotated");
-  document.getElementById("playerProfileInlineSide").style.display = "none";
 }
 
 function resetGame(showMenuAfter) {
@@ -2324,8 +2251,8 @@ if (showMenuAfter) {
 
   showStartMenu();
 }
-document.getElementById("playerProfileInlineSide").style.display = "none";
-document.getElementById("gameScreen").style.display = "block";	
+
+document.getElementById("gameScreen").style.display = "block";
 }
 
 const difficultyNames = [
@@ -4048,7 +3975,7 @@ function applySavedFrame() {
 }
 
 // ⚠️ Ta funkcja nie istnieje w Twoim kodzie – wklej ją jako nową
-async function startGameOnline(color) {
+function startGameOnline(color) {
   isOnlineGame = true;
   console.log("🎯 Multiplayer start jako", color);
 if (!currentRoomCode) {
@@ -4085,8 +4012,6 @@ if (!currentRoomCode) {
     updateStatus("Tura przeciwnika");
   }
   updateCapturedDisplay();
-  await updateInlinePlayerDisplay();
-  updateOpponentInlineDisplay();
 }
 
 function updateTurnStatus() {
@@ -4161,31 +4086,24 @@ if (socket) {
     setOnlineStatus(`❌ Błąd: ${message}`);
   });
 
-socket.on("startGame", ({ colorMap, roomCode, players }) => {
-  const myId = socket.id;
-  const myColor = colorMap[myId];
-  currentRoomCode = roomCode;
-
-  // 🔥 Ukryj overlay szukania przeciwnika
-  const matchmakingOverlay = document.getElementById('matchmakingOverlay');
-  if (matchmakingOverlay) matchmakingOverlay.classList.add('popup-hidden');
-
-  // ✅ Pobierz dane przeciwnika z przesłanej tablicy
-  const opponent = players?.find(p => p.id !== myId);
-  if (opponent) {
-    window.currentlyViewedOpponent = opponent;
-  }
-
-  // ✅ Zamknij profil jeśli otwarty
-  if (document.getElementById("profileScreen").style.display === "block") {
-    closeProfileScreen();
-  }
-
-  // ✅ Rozpocznij grę
+socket.on("startGame", ({ colorMap, roomCode }) => {
+// 🔥 Ukryj overlay szukania przeciwnika
+const matchmakingOverlay = document.getElementById('matchmakingOverlay');
+if (matchmakingOverlay) matchmakingOverlay.classList.add('popup-hidden');
+  const myColor = colorMap[socket.id];
   startGameOnline(myColor);
-  document.getElementById("startGame").click();
 
+  // ✅ Ustaw currentRoomCode na podstawie danych od serwera
+  currentRoomCode = roomCode;
   console.log("📝 currentRoomCode ustawione na podstawie servera:", currentRoomCode);
+
+  // ✅ Jeśli jesteś w profilu – zamknij profil
+ if (document.getElementById("profileScreen").style.display === "block") {
+    closeProfileScreen();
+}
+
+  // ✅ Przejdź do gry
+  document.getElementById("startGame").click();
 });
 
   socket.on("opponentMove", ({ from, to, promotion, senderId, newTurn }) => {
