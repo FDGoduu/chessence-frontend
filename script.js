@@ -2123,6 +2123,7 @@ document.getElementById('startGame').addEventListener('click', function () {
 
   applySavedAvatar();
   applySavedBackground();
+  applySavedTitle();
   rebindPopupButtons();
   hasAwardedXP = false; // 🔄 Reset flagi przy nowej grze
   currentTurn = 'w';
@@ -2896,6 +2897,7 @@ async function loadProfile() {
   updateProfileUI();
   applySavedAvatar();
   applySavedFrame();
+  applySavedTitle();
 }
 
 function isRewardUnlocked(type, id) {
@@ -3129,6 +3131,7 @@ if (!user) return;
     applySavedAvatar();
     applySavedBackground();
     applySavedFrame();
+    applySavedTitle();
   }
 }
 
@@ -4473,6 +4476,7 @@ async function startGameWithUser(nick) {
     updateProfileUI();
     applySavedAvatar();
     applySavedFrame();
+    applySavedTitle();
 
     await validateUnlockedRewards();
     await enforceLocksByLevel();
