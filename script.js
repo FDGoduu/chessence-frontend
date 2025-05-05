@@ -152,6 +152,50 @@ const defaultUnlockedRewards = [
   { type: "frame", id: "default_frame" }
 ];
 
+const titles = [
+  { id: "rookie", label: "Nowicjusz" },
+  { id: "champion", label: "Czempion" },
+  { id: "master", label: "Arcymistrz" },
+  { id: "veteran", label: "Weteran" },
+  { id: "strategist", label: "Strateg" }
+];
+
+const titleGrid = document.getElementById("titleGridContainer");
+titleGrid.innerHTML = "";
+
+titles.forEach(({ id, label }) => {
+  const isUnlocked = isRewardUnlocked("title", id);
+  const reward = levelRewards.find(r => r.type === "title" && r.id === id);
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "avatar-grid-entry";
+
+  const div = document.createElement("div");
+  div.innerText = label;
+  div.className = "title-choice";
+  div.dataset.id = id;
+  if (!isUnlocked) div.classList.add("locked");
+
+  div.onclick = async () => {
+    if (!div.classList.contains("locked")) {
+      localStorage.setItem("selectedTitle", id);
+      applySavedTitle();
+      closeAvatarSelector();
+      await saveProfile();
+    }
+  };
+
+  wrapper.appendChild(div);
+
+  if (!isUnlocked && reward) {
+    const note = document.createElement("div");
+    note.className = "reward-note";
+    note.innerText = `Odblokuj na poziomie ${reward.level}`;
+    wrapper.appendChild(note);
+  }
+
+  titleGrid.appendChild(wrapper);
+});
 
 const colorButtons = document.getElementById("colorButtons");
 const difficultyPVB = document.getElementById("difficultyPVBContainer");
@@ -3492,6 +3536,29 @@ async function renderFriendsList() {
   });
 }
 
+function renderTitleOptions() {
+  const container = document.getElementById("titleGridContainer");
+  container.innerHTML = "";
+
+  availableTitles.forEach(title => {
+    const btn = document.createElement("div");
+    btn.className = "title-option";
+    btn.textContent = title.label;
+    if (!title.unlocked) btn.classList.add("locked");
+    if (userData.selectedTitle === title.id) btn.style.borderColor = "gold";
+
+    btn.addEventListener("click", () => {
+      if (!title.unlocked) return;
+      userData.selectedTitle = title.id;
+      localStorage.setItem("userData", JSON.stringify(userData));
+      renderTitleOptions();
+      updateProfileUI();
+    });
+
+    container.appendChild(btn);
+  });
+}
+
 async function renderInvites() {
   const inviteList = document.getElementById("inviteList");
   const users = await getUsers();
@@ -3923,6 +3990,17 @@ function applySavedBackground() {
   }
 }
 
+function applySavedTitle() {
+  const titleId = localStorage.getItem("selectedTitle");
+  const title = titles.find(t => t.id === titleId);
+  const titleEl = document.getElementById("profileTitle");
+  if (title && titleEl) {
+    titleEl.innerText = title.label;
+  } else if (titleEl) {
+    titleEl.innerText = "";
+  }
+}
+
 function switchAvatarTab(tab) {
   document.querySelectorAll('.avatar-tab-button').forEach(btn => {
     btn.classList.remove('active');
@@ -3935,10 +4013,13 @@ function switchAvatarTab(tab) {
   if (tab === 'avatars') {
     document.getElementById('avatarTab').style.display = 'block';
     document.querySelector('.avatar-tab-button:nth-child(1)').classList.add('active');
-  } else {
-    document.getElementById('frameTab').style.display = 'block';
-    document.querySelector('.avatar-tab-button:nth-child(2)').classList.add('active');
-  }
+  } } else if (tab === 'frames') {
+  document.getElementById('frameTab').style.display = 'block';
+  document.querySelector('.avatar-tab-button:nth-child(2)').classList.add('active');
+} else if (tab === 'title') {
+  document.getElementById('titleTab').style.display = 'block';
+  document.querySelector('.avatar-tab-button:nth-child(3)').classList.add('active');
+}
 }
 
 
