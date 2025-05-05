@@ -3947,7 +3947,48 @@ function openBackgroundSelector() {
   document.getElementById("backgroundSelector").style.display = "flex";
 }
 
-     
+function openTitleSelector() {
+  const container = document.getElementById("titleGridContainer");
+  container.innerHTML = "";
+
+  titles.forEach(title => {
+    const isUnlocked = isRewardUnlocked("title", title.id);
+    const reward = levelRewards.find(r => r.type === "title" && r.id === title.id);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "avatar-grid-entry";
+
+    const div = document.createElement("div");
+    div.className = "avatar-grid avatar-grid-title";
+    div.innerText = title.label;
+    div.dataset.type = "title";
+    div.dataset.id = title.id;
+
+    if (!isUnlocked) div.classList.add("locked");
+
+    div.onclick = async () => {
+      if (!div.classList.contains("locked")) {
+        localStorage.setItem("selectedTitle", title.id);
+        applySavedTitle();
+        closeAvatarSelector();
+        await saveProfile();
+      }
+    };
+
+    wrapper.appendChild(div);
+
+    if (!isUnlocked && reward) {
+      const note = document.createElement("div");
+      note.className = "reward-note";
+      note.innerText = `Odblokuj na poziomie ${reward.level}`;
+      wrapper.appendChild(note);
+    }
+
+    container.appendChild(wrapper);
+  });
+
+  document.getElementById("avatarSelector").style.display = "flex";
+}
 
 function refreshAvatarSelector() {
   document.querySelectorAll('.avatar-choice').forEach(option => {
