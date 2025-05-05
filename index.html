@@ -122,6 +122,7 @@
 	  </div>
 	  <div class="profile-info">
 	    <div class="player-nickname" id="playerNickname">FDGod</div>
+		<div id="profileTitle" class="profile-title"></div>
 		<div class="profile-name" id="playerLevel">Poziom 1</div>
 		<div id="xpCounter" class="xp-counter">0 / 80 XP</div>
 		<div class="profile-xp-bar">
@@ -290,7 +291,7 @@
       <div class="profile-tabs-buttons">
 		<button class="avatar-tab-button active" onclick="switchAvatarTab('avatars')">Awatary</button>
 		<button class="avatar-tab-button" onclick="switchAvatarTab('frames')">Ramki</button>
-	        <button class="avatar-tab-button" onclick="showAvatarTab('titleTab')">🎖 Tytuły gracza</button>
+	        <button class="avatar-tab-button" onclick="switchAvatarTab('title')">Tytuły gracza</button>
       </div>
     </div>
 
@@ -302,8 +303,8 @@
       <div class="avatar-grid avatar-grid-avatar" id="frameGridContainer"></div>
     </div>
    <div id="titleTab" class="tab-content" style="display: none;">
-     <div class="avatar-grid avatar-grid-title" id="titleGridContainer"></div>
-   </div>
+  <div class="avatar-grid avatar-grid-title" id="titleGridContainer"></div>
+</div>
 
     <button onclick="closeAvatarSelector()">Zamknij</button>
   </div>
