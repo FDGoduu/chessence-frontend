@@ -4014,10 +4014,10 @@ function switchAvatarTab(tab) {
     tabEl.style.display = 'none';
   });
 
-  if (tab === 'avatars') {
-    document.getElementById('avatarTab').style.display = 'block';
-    document.querySelector('.avatar-tab-button:nth-child(1)').classList.add('active');
-  } } else if (tab === 'frames') {
+if (tab === 'avatars') {
+  document.getElementById('avatarTab').style.display = 'block';
+  document.querySelector('.avatar-tab-button:nth-child(1)').classList.add('active');
+} else if (tab === 'frames') {
   document.getElementById('frameTab').style.display = 'block';
   document.querySelector('.avatar-tab-button:nth-child(2)').classList.add('active');
 } else if (tab === 'title') {
