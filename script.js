@@ -3094,10 +3094,11 @@ async function validateUnlockedRewards() {
     const requiredLevel = reward.level;
     const isUnlocked = localStorage.getItem(key) === "true";
 
-const user = users[currentUser];
-if (!user) return;
+    const user = users[currentUser];
+    if (!user) return;
 
-	if (isUnlocked && user.level < requiredLevel) {
+    // 🔽 Cofnięcie odblokowania, jeśli poziom spadł
+    if (isUnlocked && user.level < requiredLevel) {
       localStorage.removeItem(key);
       console.log(`❌ Cofnięto odblokowanie: ${key}`);
 
@@ -3113,9 +3114,14 @@ if (!user) return;
         localStorage.setItem("selectedFrame", "default_frame");
         changed = true;
       }
+      if (reward.type === "title" && localStorage.getItem("selectedTitle") === reward.id) {
+        localStorage.removeItem("selectedTitle");
+        changed = true;
+      }
     }
 
-	if (!isUnlocked && user.level >= requiredLevel) {
+    // 🔼 Przyznanie nagrody
+    if (!isUnlocked && user.level >= requiredLevel) {
       localStorage.setItem(key, "true");
       console.log(`✅ Przyznano zaległą nagrodę: ${key}`);
       changed = true;
@@ -3126,7 +3132,8 @@ if (!user) return;
     users[currentUser].ui = {
       avatar: localStorage.getItem("selectedAvatar") || "avatar1.png",
       background: localStorage.getItem("selectedBackground") || "bg0.png",
-      frame: localStorage.getItem("selectedFrame") || "default_frame"
+      frame: localStorage.getItem("selectedFrame") || "default_frame",
+      title: localStorage.getItem("selectedTitle") || ""
     };
     await saveUsers(users);
     applySavedAvatar();
