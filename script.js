@@ -132,6 +132,7 @@ const levelRewards = [
   { level: 5, type: "background", id: "bg3.png" },
   { level: 5, type: "frame", id: "bronze_frame" },
   { level: 6, type: "avatar", id: "avatar8.png" },
+  { level: 6, type: "title", id: "rookie" },
   { level: 7, type: "avatar", id: "avatar9.png" },
   { level: 8, type: "avatar", id: "avatar10.png" },
   { level: 9, type: "avatar", id: "avatar11.png" },
