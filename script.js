@@ -4490,26 +4490,28 @@ function showScreen(screenId) {
 
 async function startGameWithUser(nick) {
   try {
-    // 🔥 Najpierw na pewno pobierz aktualnych użytkowników
-    await refreshUsers();
+    // 🔥 Spróbuj pobrać użytkowników bezpośrednio z API
+    const response = await fetch(`${API_BASE}/api/users`);
+    if (!response.ok) throw new Error("Nie udało się pobrać użytkowników");
 
-    // 🔥 Pobierz dane gracza z aktualnych users
-    const users = await getUsers();
+    const data = await response.json();
+    const users = data.users;
     const user = users[nick];
 
     if (!user) {
       console.error('Nie znaleziono użytkownika w users po zalogowaniu.');
       showPopupAdvanced({
-	  message: "Błąd ładowania danych użytkownika. Spróbuj zalogować się ponownie.",
-	  confirm: false
-	});
+        message: "Błąd ładowania danych użytkownika. Spróbuj zalogować się ponownie.",
+        confirm: false
+      });
       showScreen("loginScreen");
       return;
     }
 
+    // 🔄 Zapisz do lokalnego cache
+    window.cachedUsers = users;
     activeUserNick = nick;
     localStorage.setItem("currentUser", nick);
-
     document.getElementById("playerNickname").textContent = nick;
 
     showScreen("startScreen");
@@ -4518,6 +4520,7 @@ async function startGameWithUser(nick) {
     localStorage.setItem("selectedAvatar", user.ui?.avatar || "avatar1.png");
     localStorage.setItem("selectedBackground", user.ui?.background || "bg0.png");
     localStorage.setItem("selectedFrame", user.ui?.frame || "default_frame");
+    localStorage.setItem("selectedTitle", user.ui?.title || "");
 
     unlockedFrames = user.unlockedFrames || [];
     currentFrame = user.ui?.frame || "default_frame";
@@ -4540,13 +4543,12 @@ async function startGameWithUser(nick) {
   } catch (error) {
     console.error('❌ Błąd startu gry:', error);
     showPopupAdvanced({
-	  message: "Wystąpił błąd podczas uruchamiania gry.",
-	  confirm: false
-	});
+      message: "Wystąpił błąd podczas uruchamiania gry.",
+      confirm: false
+    });
     showScreen("loginScreen");
   }
 }
-
 
 window.addEventListener("DOMContentLoaded", () => {
   // wymuś logowanie
