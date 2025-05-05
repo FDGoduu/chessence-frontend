@@ -7,15 +7,6 @@ let activeUserNick = null; // 🧠 aktualnie zalogowany użytkownik w tej karcie
 try {
   socket = io(API_BASE);
   socket.on("connect", () => {
-	const connectionOverlay = document.getElementById("connectionOverlay");
-	if (connectionOverlay) {
-	  connectionOverlay.classList.add("hidden");
-	
-	  // Opcjonalnie całkowicie usuń z DOM po animacji:
-	  setTimeout(() => {
-	    connectionOverlay.style.display = "none";
-	  }, 600); // Daj czas na fade-out (500ms + trochę zapasu)
-	}
     socketId = socket.id;
     console.log("🆔 Moje socket.id:", socketId);
   });  
@@ -1442,36 +1433,37 @@ if (gameMode === "online") {
     }
 
     logMove(sx, sy, x, y, movedPiece, victimPiece || '');
-    currentTurn = currentTurn === 'w' ? 'b' : 'w';
 
-
-const onFinish = async () => {
+const onFinish = () => {
+  currentTurn = currentTurn === 'w' ? 'b' : 'w';
   renderBoard();
-  updateTurnStatus?.(); // jeśli masz taką funkcję
   updateGameStatus();
+  
+  // 🔥 DODAJ TEN FRAGMENT:
+  if (gameMode === "pvb") {
+    (async () => {
+      const users = await getUsers();
+
+      if (window.castlingCaptured) {
+        unlockAchievement("castling", users);
+        window.castlingCaptured = false;
+      }
+      if (window.enPassantCaptured) {
+        unlockAchievement("enpassant", users);
+        window.enPassantCaptured = false;
+      }
+    })();
+  }
+
   updateEvaluationBar();
   isInputLocked = false;
 
-  if (gameMode === "pvb") {
-    const users = await getUsers();
-
-    if (window.castlingCaptured) {
-      unlockAchievement("castling", users);
-      window.castlingCaptured = false;
-    }
-    if (window.enPassantCaptured) {
-      unlockAchievement("enpassant", users);
-      window.enPassantCaptured = false;
-    }
-
-    if (currentTurn !== playerColor) {
-      setTimeout(runAIMove, 500);
-    }
+  if (gameMode === "pvb" && currentTurn !== playerColor) {
+    setTimeout(runAIMove, 500);
   } else if (gameMode === "bvb") {
     setTimeout(runBotVsBot, 500);
   }
 };
-
 
     if (pieceElem && fromSquare && toSquare) {
       animatePieceMove(pieceElem, fromSquare, toSquare, 500, onFinish);
@@ -1537,9 +1529,7 @@ function evaluatePiece(piece) {
 function runAIMove() {
   if (gameEnded || gameMode !== "pvb") return;
   if (gameMode === "pvp") return; // W trybie gracz vs gracz AI się nie wtrąca
-  if (!stockfishPVBWorker || typeof stockfishPVBWorker.postMessage !== 'function') {
-  stockfishPVBWorker = new Worker('stockfish.js');
-}
+
   const fen = getFEN();
 
   // Bezpieczne ograniczenie poziomu (0–10)
@@ -1553,10 +1543,12 @@ function runAIMove() {
   const multiPV = multiPVMap[level];
   const errorChance = errorChanceMap[level];
 
-  const bestMoves = [];// Reset najlepszych ruchów przed nową analizą
+  window.bestMoves = []; // Reset najlepszych ruchów przed nową analizą
+
+  if (!stockfishPVBWorker) return; // Bezpiecznik – jeśli stockfish padł
 
   stockfishPVBWorker.postMessage("uci");
-	
+
   stockfishPVBWorker.onmessage = function (e) {
     const line = String(e.data);
 
@@ -1566,27 +1558,26 @@ function runAIMove() {
       stockfishPVBWorker.postMessage(`go depth ${depth}`);
     }
 
-   if (line.startsWith("info") && line.includes(" pv ")) {
+    if (line.startsWith("info") && line.includes(" pv ")) {
       const move = line.split(" pv ")[1].split(" ")[0];
-      if (move && !bestMoves.includes(move)) {
-        bestMoves.push(move);
-	isInputLocked = false;
+      if (move && !window.bestMoves.includes(move)) {
+        window.bestMoves.push(move);
       }
     }
 
     if (line.startsWith("bestmove")) {
-      let chosenMove;
       if (line.includes("bestmove (none)")) return; // brak ruchu – partia się skończyła
-      if (bestMoves.length === 0) {
+
+      let chosenMove;
+      if (window.bestMoves.length === 0) {
         chosenMove = line.split(" ")[1]; // awaryjnie użyj bestmove, jeśli nie złapaliśmy info
       } else {
         const shouldMakeMistake = Math.random() < errorChance;
         if (shouldMakeMistake) {
-          // Wybierz losowy słabszy ruch
-          const worseMoves = bestMoves.slice(1);
-          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || bestMoves[0];
+          const worseMoves = window.bestMoves.slice(1);
+          chosenMove = worseMoves[Math.floor(Math.random() * worseMoves.length)] || window.bestMoves[0];
         } else {
-          chosenMove = bestMoves[0]; // najlepszy
+          chosenMove = window.bestMoves[0];
         }
       }
 
@@ -2088,6 +2079,15 @@ document.getElementById('startGame').addEventListener('click', function () {
 	}
 resetGame(false);
 isInputLocked = false;
+if (gameMode === "pvb") {
+  stockfishPVBWorker.onmessage = function (e) {
+    const line = String(e.data);
+    if (line.includes("uciok")) {
+      runAIMove();
+    }
+  };
+  stockfishPVBWorker.postMessage("uci");
+}
 
 if (gameMode === "bvb") {
   runBotVsBot();
@@ -2099,12 +2099,21 @@ if (gameMode === "pvp-hotseat") {
   return;
 }
 
-  if (playerColor === 'b') {
-    document.getElementById("board").classList.add("rotated");
-    setTimeout(runAIMove, 600);
-  } else {
-    document.getElementById("board").classList.remove("rotated");
+if (playerColor === 'b') {
+  document.getElementById("board").classList.add("rotated");
+
+  if (gameMode === "pvb") {
+    stockfishPVBWorker.postMessage("uci");
+    stockfishPVBWorker.onmessage = function (e) {
+      const line = String(e.data);
+      if (line.includes("uciok")) {
+        runAIMove();
+      }
+    };
   }
+} else {
+  document.getElementById("board").classList.remove("rotated");
+}
   // Dynamiczne przypisanie etykiet boxów w zależności od koloru gracza
 const topLabel = document.querySelector(".captured-top .capture-label");
 const bottomLabel = document.querySelector(".captured-bottom .capture-label");
@@ -2127,52 +2136,57 @@ document.querySelector(".captured-bottom .capture-label").textContent =
 });
 
 function showStartMenu() {
-  if (gameMode === "online" && currentRoomCode && socket) {
-    socket.emit("leaveRoom", { roomCode: currentRoomCode });
-    currentRoomCode = null;
-    gameMode = null;
-    pvpSubmode = null;
-  } else {
-    gameMode = null;
-    pvpSubmode = null;
-  }
+	if (gameMode === "online" && currentRoomCode && socket) {
+	  // Jeśli był tryb online, wyślij leaveRoom
+	  socket.emit("leaveRoom", { roomCode: currentRoomCode });
+	  currentRoomCode = null;
+	  gameMode = null;
+	  pvpSubmode = null;
+	} else {
+	  // Jeśli był tryb offline, po prostu resetuj dane gry
+	  gameMode = null;
+	  pvpSubmode = null;
+	}
 
-  if (!hasAwardedXP && typeof window.xpPendingResult !== "undefined") {
-    awardXP(window.xpPendingResult);
-    delete window.xpPendingResult;
-    hasAwardedXP = true;
-  }
+	// 🎯 Przyznaj zaległy XP tylko przy wejściu do menu
+	if (!hasAwardedXP && typeof window.xpPendingResult !== "undefined") {
+	  awardXP(window.xpPendingResult);
+	  delete window.xpPendingResult;
+	  hasAwardedXP = true; // ✅ Zabezpieczenie
+	}
+	if (stockfishBVBWorker) {
+	  stockfishBVBWorker.terminate();
+	  stockfishBVBWorker = new Worker("stockfish.js");
+	}
 
-  if (stockfishBVBWorker) {
-    stockfishBVBWorker.terminate();
-    stockfishBVBWorker = new Worker("stockfish.js");
-  }
+	if (stockfishPVBWorker) {
+	  stockfishPVBWorker.terminate();
+	  stockfishPVBWorker = new Worker("stockfish.js");
+	}
 
-  if (stockfishPVBWorker) {
-    stockfishPVBWorker.terminate();
-    stockfishPVBWorker = new Worker("stockfish.js");
-    stockfishPVBWorker.onmessage = () => {};
-  }
+	isBotRunning = false;
+  document.getElementById('chooseWhite').classList.remove('selected');
+  document.getElementById('chooseBlack').classList.remove('selected');
+  document.getElementById('startGame').disabled = true;
+  playerColor = null;
+  botColor = null;
 
-  isBotRunning = false;
+  document.getElementById('startScreen').style.display = 'flex';
+  document.getElementById('board').classList.remove('rotated');
+ 
+	  // Stop botów jeśli gracz wraca do menu
+	if (stockfishPVBWorker) {
+	  stockfishPVBWorker.terminate();
+	  stockfishPVBWorker = new Worker("stockfish.js");
+	}
 
-  // 🧹 Reset UI wyboru trybu i koloru
-  toggleModeButtons(null);
-  document.getElementById("chooseWhite").classList.remove("selected");
-  document.getElementById("chooseBlack").classList.remove("selected");
-  document.getElementById("startGame").disabled = true;
+	if (stockfishBVBWorker) {
+	  stockfishBVBWorker.terminate();
+	  stockfishBVBWorker = new Worker("stockfish.js");
+	}
 
-  // 🧹 Reset rozwinięcia UI i opcji widocznych
-  startShiftReset();
+	isBotRunning = false;
 
-  document.getElementById("colorButtons").style.display = "none";
-  document.getElementById("difficultyPVBContainer").style.display = "none";
-  document.getElementById("difficultyBVBContainer").style.display = "none";
-  document.getElementById("pvpSubmodeButtons").style.display = "none";
-  document.getElementById("onlineUI").style.display = "none";
-
-  document.getElementById("startScreen").style.display = "flex";
-  document.getElementById("board").classList.remove("rotated");
 }
 
 function resetGame(showMenuAfter) {
@@ -2184,7 +2198,6 @@ function resetGame(showMenuAfter) {
 	if (stockfishPVBWorker) {
 	  stockfishPVBWorker.terminate();
 	  stockfishPVBWorker = new Worker("stockfish.js");
-          stockfishPVBWorker.onmessage = () => {};
 	}
 
 	isBotRunning = false;
@@ -2229,30 +2242,15 @@ const botInfo = document.getElementById("botDifficultyDisplay");
 
 
   // Jeżeli chcemy powrócić do menu, to je pokażemy
-if (showMenuAfter) {
-  if (typeof window.previousLevelBeforeAward !== "undefined" && playerLevel > window.previousLevelBeforeAward) {
-    triggerLevelUpAnimation();
-    delete window.previousLevelBeforeAward;
+  if (showMenuAfter) {
+  if (showMenuAfter && typeof window.previousLevelBeforeAward !== "undefined" && playerLevel > window.previousLevelBeforeAward) {
+  triggerLevelUpAnimation();
+  // tylko raz!
+  delete window.previousLevelBeforeAward;
+	}
+    showStartMenu();
   }
-
-  // 🧹 Reset pełnego stanu menu głównego
-  gameMode = null;
-  pvpSubmode = null;
-  playerColor = null;
-  botColor = null;
-
-  document.querySelectorAll(".mode-button").forEach(btn => btn.classList.remove("selected"));
-  document.getElementById('chooseWhite').classList.remove('selected');
-  document.getElementById('chooseBlack').classList.remove('selected');
-  document.getElementById("startGame").disabled = true;
-
-  // 📦 Reset UI przesunięcia startBoxa
-  startShiftReset();
-
-  showStartMenu();
-}
-
-document.getElementById("gameScreen").style.display = "block";
+  document.getElementById("gameScreen").style.display = "block";
 }
 
 const difficultyNames = [
