@@ -184,14 +184,35 @@ async function loginUser(nick, password) {
 
   console.log(`📨 Odpowiedź z loginu, status HTTP:`, response.status);
 
+  if (response.status === 409) {
+    showPopup("To konto jest już zalogowane w innym miejscu.");
+    return null;
+  }
+
   if (!response.ok) {
-    throw new Error('Błąd logowania');
+    showPopup("Błąd logowania. Sprawdź dane.");
+    return null;
   }
 
   const data = await response.json();
   console.log(`📋 Dane po zalogowaniu:`, data);
 
+  // 🔥 Zarejestruj sesję na serwerze
+  socket.emit("registerSession", nick);
+
+  // 💾 Zapisz dane lokalnie
+  localStorage.setItem("userData", JSON.stringify(data.user));
+
   return data.user;
+}
+
+function logoutUser() {
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  if (userData?.nick) {
+    socket.emit("logoutSession", userData.nick); // 🔁 powiadom serwer
+  }
+  localStorage.clear();
+  location.reload();
 }
 
 async function getProfile(nick) {
