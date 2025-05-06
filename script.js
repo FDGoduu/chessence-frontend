@@ -234,13 +234,18 @@ async function loginUser(nick, password) {
 
   console.log(`📨 Odpowiedź z loginu, status HTTP:`, response.status);
 
+  if (response.status === 401) {
+    showPopupAdvanced({ message: "Nieprawidłowy nick lub hasło.", confirm: false });
+    return null;
+  }
+
   if (response.status === 409) {
     showPopupAdvanced({ message: "To konto jest już zalogowane w innym miejscu.", confirm: false });
     return null;
   }
 
   if (!response.ok) {
-    showPopupAdvanced({ message: "Błąd logowania. Sprawdź dane.", confirm: false });
+    showPopupAdvanced({ message: "Błąd logowania. Spróbuj ponownie później.", confirm: false });
     return null;
   }
 
@@ -422,6 +427,10 @@ async function tryRegister() {
 
     const result = await response.json();
 
+    if (response.status === 409) {
+      return showPopupAdvanced({ message: "Taki użytkownik już istnieje.", confirm: false });
+    }
+
     if (!response.ok) {
       return showPopupAdvanced({ message: result.error || "Błąd rejestracji.", confirm: false });
     }
@@ -434,7 +443,7 @@ async function tryRegister() {
   } catch (error) {
     console.error("❌ Błąd rejestracji:", error);
     showPopupAdvanced({
-      message: "Wystąpił błąd połączenia z serwerem.",
+      message: "Błąd połączenia z serwerem.",
       confirm: false
     });
   }
