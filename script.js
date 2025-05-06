@@ -234,24 +234,24 @@ async function loginUser(nick, password) {
 
   console.log(`📨 Odpowiedź z loginu, status HTTP:`, response.status);
 
+  const result = await response.json();
+
   if (response.status === 401) {
-    showPopupAdvanced({ message: "Nieprawidłowy nick lub hasło.", confirm: false });
+    showPopupAdvanced({ message: result.error || "Nieprawidłowy nick lub hasło.", confirm: false });
     return null;
   }
 
   if (response.status === 409) {
-    showPopupAdvanced({ message: "To konto jest już zalogowane w innym miejscu.", confirm: false });
+    showPopupAdvanced({ message: result.error || "To konto jest już zalogowane w innym miejscu.", confirm: false });
     return null;
   }
 
   if (!response.ok) {
-    showPopupAdvanced({ message: "Błąd logowania. Spróbuj ponownie później.", confirm: false });
+    showPopupAdvanced({ message: result.error || "Błąd logowania. Spróbuj ponownie później.", confirm: false });
     return null;
   }
 
-  const data = await response.json();
-  console.log(`📋 Dane po zalogowaniu:`, data);
-
+  const data = result;
   socket.emit("registerSession", nick);
   localStorage.setItem("userData", JSON.stringify(data.user));
 
@@ -428,7 +428,7 @@ async function tryRegister() {
     const result = await response.json();
 
     if (response.status === 409) {
-      return showPopupAdvanced({ message: "Taki użytkownik już istnieje.", confirm: false });
+      return showPopupAdvanced({ message: result.error || "Taki użytkownik już istnieje.", confirm: false });
     }
 
     if (!response.ok) {
