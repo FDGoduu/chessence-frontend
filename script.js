@@ -3536,7 +3536,10 @@ async function renderFriendsList() {
           <img src="img/frames/${frame}.png" class="profile-avatar-frame">
         </div>
         <div class="friend-info">
-          <div class="nickname">${friendNick}</div>
+          <div class="nickname-wrapper">
+	  <div class="nickname">${friendNick}</div>
+	  <div class="status-dot ${friend.online ? 'online' : 'offline'}"></div>
+	</div>
           <div class="id-label">ID: ${friend.id}</div>
           <div class="level">Poziom ${level}</div>
         </div>
