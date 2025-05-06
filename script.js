@@ -3,7 +3,7 @@ const loginButton = document.getElementById("loginSubmit"); // 🔥 DODANE!
 let socket = null;
 const API_BASE = "https://chessence-backend.onrender.com";
 
-const socket = io("https://chessence-backend.onrender.com", {
+socket = io("https://chessence-backend.onrender.com", {
   withCredentials: true,
   transports: ["websocket", "polling"]
 });
