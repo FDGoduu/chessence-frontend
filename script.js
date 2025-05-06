@@ -2417,12 +2417,9 @@ document.getElementById("difficultyBlack").addEventListener("input", (e) => {
   document.getElementById("difficultyBlackValue").innerText = e.target.value;
 });
 
-
 function evaluateWithStockfish(callback) {
   const fen = getFEN();
   let bestScore = null;
-  const isWhitePerspective = true; // zawsze pokazujemy przewagę białych
-  const adjustedScore = isWhitePerspective ? bestScore : -bestScore;
 
   const worker = stockfishEvalWorker;
   worker.postMessage("uci");
@@ -2444,12 +2441,11 @@ function evaluateWithStockfish(callback) {
     }
 
     if (line.startsWith("info") && line.includes("score")) {
-      // Sprawdzamy czy to ocena mata czy centypionów
       if (line.includes("score mate")) {
         const match = line.match(/score mate (-?\d+)/);
         if (match) {
           const mateIn = parseInt(match[1], 10);
-          // Przekształcamy mat w wysoką wartość (np. mate in 1 = ±1000, mate in 5 = ±950)
+          // Mate na korzyść aktualnego gracza
           bestScore = (mateIn > 0 ? 1000 - mateIn * 10 : -1000 - mateIn * 10);
         }
       } else if (line.includes("score cp")) {
@@ -2461,7 +2457,9 @@ function evaluateWithStockfish(callback) {
     }
 
     if (line.startsWith("bestmove") && bestScore !== null) {
-      callback(bestScore);
+      const turn = getCurrentTurn(); // "w" lub "b"
+      const adjustedScore = turn === "b" ? -bestScore : bestScore; // Zawsze z perspektywy białych
+      callback(adjustedScore);
     }
   };
 }
