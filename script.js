@@ -3533,27 +3533,24 @@ async function renderFriendsList() {
     div.style.backgroundSize = "cover";
     div.style.backgroundPosition = "center";
 
-    div.innerHTML = `
-      <div class="friend-card-top">
-        <div class="profile-avatar-wrapper">
-          <img src="img/avatars/${avatar}" class="profile-avatar">
-          <img src="img/frames/${frame}.png" class="profile-avatar-frame">
-        </div>
-        <div class="friend-info">
-          <div class="nickname-wrapper">
-	  <div class="nickname">${friendNick}</div>
-	  <div class="status-dot ${friend.isLoggedIn ? 'online' : 'offline'}"></div>
-	</div>
-          <div class="id-label">ID: ${friend.id}</div>
-          <div class="level">Poziom ${level}</div>
-        </div>
+div.innerHTML = `
+  <div class="friend-card-top">
+    <div class="profile-avatar-wrapper">
+      <img src="img/avatars/${avatar}" class="profile-avatar">
+      <img src="img/frames/${frame}.png" class="profile-avatar-frame">
+    </div>
+    <div class="friend-info">
+      <div class="nickname-wrapper">
+        <div class="nickname">${friendNick}</div>
+        <div class="status-dot ${friend.isLoggedIn ? "online" : "offline"}"></div>
       </div>
-      <div class="friend-card-bottom">
-        <button onclick="inviteToGame('${friend.id}')">Zaproś do gry</button>
-        <button onclick="viewFriendProfile('${friend.id}')">Profil</button>
-        <button onclick="removeFriend('${friendNick}')">Usuń</button>
+      <div class="friend-meta">
+        <div class="friend-title">${friend.ui?.title || ""}</div>
+        <div class="friend-level">Poziom ${level}</div>
       </div>
-    `;
+    </div>
+  </div>
+`;
 
     container.appendChild(div);
   });
@@ -3616,23 +3613,24 @@ async function renderInvites() {
     const inviteDiv = document.createElement("div");
     inviteDiv.className = "invite-entry styled-invite";
     inviteDiv.style.backgroundImage = `url('img/backgrounds/${background}')`;
-    inviteDiv.innerHTML = `
-      <div class="friend-card-top">
-        <div class="profile-avatar-wrapper">
-          <img src="img/avatars/${avatar}" class="profile-avatar">
-          <img src="img/frames/${frame}.png" class="profile-avatar-frame">
-        </div>
-        <div class="friend-info">
-          <div class="nickname">${senderNick}</div>
-          <div class="id-label">ID: ${sender.id}</div>
-          <div class="level">Poziom: ${level}</div>
-        </div>
+div.innerHTML = `
+  <div class="friend-card-top">
+    <div class="profile-avatar-wrapper">
+      <img src="img/avatars/${avatar}" class="profile-avatar">
+      <img src="img/frames/${frame}.png" class="profile-avatar-frame">
+    </div>
+    <div class="friend-info">
+      <div class="nickname-wrapper">
+        <div class="nickname">${friendNick}</div>
+        <div class="status-dot ${friend.isLoggedIn ? "online" : "offline"}"></div>
       </div>
-      <div class="friend-card-bottom">
-        <button onclick="acceptInvite('${senderNick}')">Akceptuj</button>
-        <button onclick="rejectInvite('${senderNick}')">Odrzuć</button>
+      <div class="friend-meta">
+        <div class="friend-title">${friend.ui?.title || ""}</div>
+        <div class="friend-level">Poziom ${level}</div>
       </div>
-    `;
+    </div>
+  </div>
+`;
     inviteList.appendChild(inviteDiv);
   });
 
