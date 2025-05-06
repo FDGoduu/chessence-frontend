@@ -4332,7 +4332,12 @@ if (matchmakingOverlay) matchmakingOverlay.classList.add('popup-hidden');
 socket.on("opponentLeft", () => {
   showDisconnectedPopup("Przeciwnik opuścił grę 😢");
 });
-  
+	// ⚠️ Wklej w sekcji nasłuchów socket.io
+socket.on("refreshFriends", async () => {
+  console.log("🔄 Otrzymano refreshFriends – odświeżam listę znajomych");
+  await refreshUsers(); // pobiera najnowszych z backendu
+  await renderFriendsList(); // renderuje je na nowo z aktualnym online/offline
+});
 }
 
 function rebindPopupButtons() {
