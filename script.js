@@ -3282,14 +3282,20 @@ while (true) {
   totalXP -= requiredXP;
   level++;
 
-  if (level >= 100) {
-    level = 0;
-    user.prestige++;
-    showPopupAdvanced({
-      message: `🎉 Gratulacje! Osiągnięto prestiż ${user.prestige}.`,
-      confirm: false
-    });
-  }
+if ((user.level || 0) >= 100) {
+  user.level = 0;
+  user.prestige = (user.prestige || 0) + 1;
+
+  users[currentUser] = user; // aktualizacja globalna
+
+  saveUserData(currentUser, user);
+
+  showPopupAdvanced({
+    message: `🎉 Gratulacje! Osiągnięto PRESTIŻ ${user.prestige}`,
+    confirm: false
+  });
+}
+
 
   checkLevelRewards(level);
   triggerLevelUpAnimation();
