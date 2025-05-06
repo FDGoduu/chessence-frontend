@@ -3526,7 +3526,9 @@ async function renderFriendsList() {
     const frame = friend.ui?.frame || "default_frame";
     const background = friend.ui?.background || "bg0.png";
     const level = typeof friend.level === "number" ? friend.level : 0;
-    const title = friend.ui?.title ? `<div class="friend-title">${friend.ui.title}</div>` : "";
+    const titleLabel = titles.find(t => t.id === friend.ui?.title)?.label || "";
+    const title = titleLabel ? `<div class="friend-title">${titleLabel}</div>` : "";
+
 
     const div = document.createElement("div");
     div.className = "friend-entry";
@@ -3609,7 +3611,9 @@ async function renderInvites() {
     const frame = sender.ui?.frame || "default_frame";
     const background = sender.ui?.background || "bg0.png";
     const level = sender.level || 0;
-    const title = sender.ui?.title ? `<div class="friend-title">${sender.ui.title}</div>` : "";
+    const titleLabel = titles.find(t => t.id === sender.ui?.title)?.label || "";
+    const title = titleLabel ? `<div class="friend-title">${titleLabel}</div>` : "";
+
 
     const inviteDiv = document.createElement("div");
     inviteDiv.className = "invite-entry styled-invite";
