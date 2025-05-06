@@ -2834,25 +2834,27 @@ async function saveProfile() {
   const selectedAvatar = localStorage.getItem("selectedAvatar") || "avatar1.png";
   const selectedBackground = localStorage.getItem("selectedBackground") || "bg0.png";
   const selectedFrame = localStorage.getItem("selectedFrame") || "default_frame";
-  
+  const selectedTitle = localStorage.getItem("selectedTitle") || "";
+
   const profileData = {
     ui: {
       avatar: selectedAvatar,
       background: selectedBackground,
-      frame: selectedFrame
+      frame: selectedFrame,
+      title: selectedTitle
     }
   };
 
-  const nick = localStorage.getItem("currentUser"); // <-- pobieramy nick
+  const nick = localStorage.getItem("currentUser");
   if (!nick) {
     showNotification("Nie jesteś zalogowany!");
     return;
   }
 
   await saveProfileToServer(nick, profileData);
-
   showNotification("Zapisano zmiany profilu!");
 }
+
 
 function logout() {
   const userData = JSON.parse(localStorage.getItem("userData"));
@@ -2877,7 +2879,8 @@ async function loadProfile() {
   if (!activeUserNick) {
     console.warn("Brak aktywnego użytkownika – nie wczytuję profilu.");
     return;
-  }  
+  }
+
   const currentUser = activeUserNick || localStorage.getItem("currentUser");
   const users = await getUsers();
   const userData = users[currentUser];
@@ -2890,10 +2893,12 @@ async function loadProfile() {
   const savedAvatar = ui.avatar || "avatar1.png";
   const savedBackground = ui.background || "bg0.png";
   const savedFrame = ui.frame || "default_frame";
+  const savedTitle = ui.title || "";
 
   localStorage.setItem("selectedAvatar", savedAvatar);
   localStorage.setItem("selectedBackground", savedBackground);
   localStorage.setItem("selectedFrame", savedFrame);
+  localStorage.setItem("selectedTitle", savedTitle);
 
   unlockedFrames = JSON.parse(localStorage.getItem("unlockedFrames") || "[]");
   currentFrame = savedFrame;
@@ -2934,8 +2939,10 @@ showPopupAdvanced({
     users[currentUser].ui = {
       avatar: "avatar1.png",
       background: "bg0.png",
-      frame: "default_frame"
+      frame: "default_frame",
+      title: ""
     };
+
 
     // ✅ Dodatkowe czyszczenie globalnych danych powiązanych z osiągnięciami
     localStorage.setItem("winStreak", "0");
