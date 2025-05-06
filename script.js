@@ -3621,11 +3621,11 @@ div.innerHTML = `
     </div>
     <div class="friend-info">
       <div class="nickname-wrapper">
-        <div class="nickname">${friendNick}</div>
-        <div class="status-dot ${friend.isLoggedIn ? "online" : "offline"}"></div>
+        <div class="nickname">${invite}</div>
+        <div class="friend-title">${users[invite]?.ui?.title || ""}</div>
+        <div class="status-dot offline"></div>
       </div>
       <div class="friend-meta">
-        <div class="friend-title">${friend.ui?.title || ""}</div>
         <div class="friend-level">Poziom ${level}</div>
       </div>
     </div>
