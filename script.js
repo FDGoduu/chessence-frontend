@@ -2457,7 +2457,7 @@ function evaluateWithStockfish(callback) {
     }
 
     if (line.startsWith("bestmove") && bestScore !== null) {
-      const turn = getCurrentTurn(); // "w" lub "b"
+      const turn = fen.split(" ")[1]; // 2. element FEN-a to "w" lub "b"
       const adjustedScore = turn === "b" ? -bestScore : bestScore; // Zawsze z perspektywy białych
       callback(adjustedScore);
     }
