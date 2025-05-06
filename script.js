@@ -2670,7 +2670,9 @@ async function enforceLocksByLevel() {
 async function updateProfileUI() {
   const users = await getUsers();
   const currentUser = activeUserNick || localStorage.getItem("currentUser");
-  document.getElementById("playerPrestige").textContent = user.prestige || 0;
+  const me = JSON.parse(localStorage.getItem("userData") || "{}");
+  document.getElementById("playerPrestige").textContent = me.prestige || 0;
+
   
   let viewedUser = null;
 
@@ -2995,7 +2997,9 @@ async function openProfileScreen(friendId = null) {
   await renderFriendsList();
 
 document.getElementById("resetProgressBtn").style.display = isOwnProfile ? "inline-block" : "none";
-document.getElementById("playerPrestige").textContent = user.prestige || 0;
+const me = JSON.parse(localStorage.getItem("userData") || "{}");
+document.getElementById("playerPrestige").textContent = me.prestige || 0;
+
 
 if (isOwnProfile) {
   document.getElementById("backGeneralBtn").style.display = "inline-block";
