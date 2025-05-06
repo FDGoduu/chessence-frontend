@@ -2445,7 +2445,6 @@ function evaluateWithStockfish(callback) {
         const match = line.match(/score mate (-?\d+)/);
         if (match) {
           const mateIn = parseInt(match[1], 10);
-          // Mate na korzyść aktualnego gracza
           bestScore = (mateIn > 0 ? 1000 - mateIn * 10 : -1000 - mateIn * 10);
         }
       } else if (line.includes("score cp")) {
@@ -2457,12 +2456,13 @@ function evaluateWithStockfish(callback) {
     }
 
     if (line.startsWith("bestmove") && bestScore !== null) {
-      const turn = fen.split(" ")[1]; // 2. element FEN-a to "w" lub "b"
-      const adjustedScore = turn === "b" ? -bestScore : bestScore; // Zawsze z perspektywy białych
-      callback(adjustedScore);
+      const turn = fen.split(" ")[1]; // "w" lub "b"
+      const whitePerspectiveScore = turn === "w" ? bestScore : -bestScore;
+      callback(whitePerspectiveScore);
     }
   };
 }
+
 
 function updateEvaluationBar() {
   const tooltip = document.getElementById("evalTooltip");
