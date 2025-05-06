@@ -420,26 +420,21 @@ async function tryRegister() {
       body: JSON.stringify({ nick, password })
     });
 
-    if (response.ok) {
-      // PO FETCHU pokazujemy OSOBNY popup sukcesu
-      showPopupAdvanced({
-        message: "✅ Rejestracja zakończona sukcesem! Kliknij OK aby przejść do logowania.",
-        confirm: false,
-        onConfirm: () => {
-          showScreen("loginScreen");
-        }
-      });
-    } else {
-      const data = await response.json();
-      showPopupAdvanced({
-        message: data.error || "Rejestracja nie powiodła się. Być może nick już istnieje.",
-        confirm: false
-      });
+    const result = await response.json();
+
+    if (!response.ok) {
+      return showPopupAdvanced({ message: result.error || "Błąd rejestracji.", confirm: false });
     }
-  } catch (error) {
-    console.error(error);
+
     showPopupAdvanced({
-      message: "Błąd połączenia z serwerem.",
+      message: "Rejestracja zakończona sukcesem! Możesz się teraz zalogować.",
+      confirm: false
+    });
+    showScreen("loginScreen");
+  } catch (error) {
+    console.error("❌ Błąd rejestracji:", error);
+    showPopupAdvanced({
+      message: "Wystąpił błąd połączenia z serwerem.",
       confirm: false
     });
   }
