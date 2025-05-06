@@ -4782,7 +4782,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerBtn = document.getElementById("registerSubmit");
 
   if (loginNick && loginPassword && loginSubmit) {
-    loginNick.addEventListener("keydown", e => {
+    loginNickname.addEventListener("keydown", e => {
       if (e.key === "Enter") loginSubmit.click();
     });
     loginPassword.addEventListener("keydown", e => {
@@ -4790,12 +4790,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (registerNick && registerPassword && registerBtn) {
-    registerNick.addEventListener("keydown", e => {
-      if (e.key === "Enter") registerBtn.click();
+  if (registerNick && registerPassword && registerSubmit) {
+    registerNickname.addEventListener("keydown", e => {
+      if (e.key === "Enter") registerSubmit.click();
     });
     registerPassword.addEventListener("keydown", e => {
-      if (e.key === "Enter") registerBtn.click();
+      if (e.key === "Enter") registerSubmit.click();
     });
   }
 });
