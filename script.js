@@ -4771,25 +4771,34 @@ function showDisconnectedPopup(message) {
     showStartMenu();
   });
 }
-let currentVersion = "0.6.0"; // 🚀 Ustawiona wersja gry
+// 🔐 Obsługa Entera przy logowaniu i rejestracji
+document.addEventListener("DOMContentLoaded", () => {
+  const loginNick = document.getElementById("registerNickname");
+  const loginPassword = document.getElementById("loginPassword");
+  const loginSubmit = document.getElementById("loginSubmit");
 
-socket.on('serverVersionUpdate', (data) => {
-  if (!data || !data.version) return;
+  const registerNick = document.getElementById("registerNickname");
+  const registerPassword = document.getElementById("registerPassword");
+  const registerBtn = document.getElementById("registerSubmit");
 
-  if (data.version !== currentVersion) {
-    const updatePopup = document.getElementById("updatePopup");
-    const reloadBtn = document.getElementById("reloadGameBtn");
+  if (loginNick && loginPassword && loginSubmit) {
+    loginNick.addEventListener("keydown", e => {
+      if (e.key === "Enter") loginSubmit.click();
+    });
+    loginPassword.addEventListener("keydown", e => {
+      if (e.key === "Enter") loginSubmit.click();
+    });
+  }
 
-    if (updatePopup && reloadBtn) {
-      updatePopup.classList.remove("popup-hidden");
-
-      // Odblokuj guzik
-      reloadBtn.disabled = false;
-      reloadBtn.classList.add("active");
-
-      reloadBtn.onclick = () => {
-        location.reload(true); // Pełny reload strony
-      };
-    }
+  if (registerNick && registerPassword && registerBtn) {
+    registerNick.addEventListener("keydown", e => {
+      if (e.key === "Enter") registerBtn.click();
+    });
+    registerPassword.addEventListener("keydown", e => {
+      if (e.key === "Enter") registerBtn.click();
+    });
   }
 });
+
+
+
