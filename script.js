@@ -4471,6 +4471,17 @@ async function getUsers() {
   return {}; // Brak danych
 }
 
+// ⚠️ Ta funkcja nie istnieje w Twoim kodzie – wklej ją jako nową
+async function getFriendsListWithStatus(nick) {
+  const response = await fetch(`${API_BASE}/api/friends/${nick}`);
+  if (!response.ok) {
+    console.error("❌ Błąd pobierania znajomych:", await response.text());
+    return [];
+  }
+  const data = await response.json();
+  return data.friends || [];
+}
+
 async function saveUsers(users) {
   await fetch(`${API_BASE}/api/users/save`, {
     method: "POST",
