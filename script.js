@@ -2855,7 +2855,6 @@ async function saveProfile() {
   showNotification("Zapisano zmiany profilu!");
 }
 
-
 function logout() {
   const userData = JSON.parse(localStorage.getItem("userData"));
   const nick = userData?.nick || localStorage.getItem("currentUser");
