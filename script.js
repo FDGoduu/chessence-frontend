@@ -425,7 +425,12 @@ async function tryRegister() {
       body: JSON.stringify({ nick, password })
     });
 
-    const result = await response.json();
+    let result = {};
+    try {
+      result = await response.json();
+    } catch (e) {
+      console.warn("❌ Nie udało się sparsować JSON z rejestracji");
+    }
 
     if (response.status === 409) {
       return showPopupAdvanced({ message: result.error || "Taki użytkownik już istnieje.", confirm: false });
@@ -441,13 +446,14 @@ async function tryRegister() {
     });
     showScreen("loginScreen");
   } catch (error) {
-    console.error("❌ Błąd rejestracji:", error);
+    console.error("❌ Błąd połączenia przy rejestracji:", error);
     showPopupAdvanced({
       message: "Błąd połączenia z serwerem.",
       confirm: false
     });
   }
 }
+
 
 function promotePawn(isWhite, isBot) {
   newPieceElem.dataset.promotion = "true";
