@@ -3538,7 +3538,7 @@ async function renderFriendsList() {
         <div class="friend-info">
           <div class="nickname-wrapper">
 	  <div class="nickname">${friendNick}</div>
-	  <div class="status-dot ${friend.online ? 'online' : 'offline'}"></div>
+	  <div class="status-dot ${friend.isLoggedIn ? 'online' : 'offline'}"></div>
 	</div>
           <div class="id-label">ID: ${friend.id}</div>
           <div class="level">Poziom ${level}</div>
