@@ -4773,32 +4773,34 @@ function showDisconnectedPopup(message) {
 }
 // 🔐 Obsługa Entera przy logowaniu i rejestracji
 document.addEventListener("DOMContentLoaded", () => {
-  const loginNick = document.getElementById("registerNickname");
+  // Logowanie
+  const loginNick = document.getElementById("loginNickname");
   const loginPassword = document.getElementById("loginPassword");
   const loginSubmit = document.getElementById("loginSubmit");
 
-  const registerNick = document.getElementById("registerNickname");
-  const registerPassword = document.getElementById("registerPassword");
-  const registerBtn = document.getElementById("registerSubmit");
-
   if (loginNick && loginPassword && loginSubmit) {
-    loginNickname.addEventListener("keydown", e => {
-      if (e.key === "Enter") loginSubmit.click();
-    });
-    loginPassword.addEventListener("keydown", e => {
-      if (e.key === "Enter") loginSubmit.click();
+    [loginNick, loginPassword].forEach(input => {
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter") loginSubmit.click();
+      });
     });
   }
 
-  if (registerNick && registerPassword && registerSubmit) {
-    registerNickname.addEventListener("keydown", e => {
-      if (e.key === "Enter") registerSubmit.click();
-    });
-    registerPassword.addEventListener("keydown", e => {
-      if (e.key === "Enter") registerSubmit.click();
+  // Rejestracja
+  const registerNick = document.getElementById("registerNickname");
+  const registerPassword = document.getElementById("registerPassword");
+  const registerConfirm = document.getElementById("registerConfirmPassword");
+  const registerSubmit = document.getElementById("registerSubmit");
+
+  if (registerNick && registerPassword && registerConfirm && registerSubmit) {
+    [registerNick, registerPassword, registerConfirm].forEach(input => {
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter") registerSubmit.click();
+      });
     });
   }
 });
+
 
 
 
