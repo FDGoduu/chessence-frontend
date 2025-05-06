@@ -3039,6 +3039,19 @@ if (isOwnProfile) {
   document.querySelector(".player-nickname").textContent = userData.nick || "Brak";
   document.getElementById("playerLevel").textContent = `Poziom ${userData.level || 0}`;
 
+// 🟦 Dodajemy tytuł gracza
+const titleContainer = document.getElementById("profileTitle");
+if (titleContainer) {
+  const titleId = userData.ui?.title;
+  const titleObj = titles.find(t => t.id === titleId);
+  if (titleObj) {
+    titleContainer.innerText = titleObj.label;
+  } else {
+    titleContainer.innerText = "";
+  }
+}
+
+
   updateAchievementsUI();
   showProfileTabs();
   updateProfileUI();
