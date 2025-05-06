@@ -2830,28 +2830,29 @@ function triggerLevelUpAnimation() {
   }, 2500);
 }
 
-function saveProfile() {
-  const currentUser = localStorage.getItem("currentUser");
+async function saveProfile() {
   const selectedAvatar = localStorage.getItem("selectedAvatar") || "avatar1.png";
-  const selectedFrame = localStorage.getItem("selectedFrame") || "default_frame";
   const selectedBackground = localStorage.getItem("selectedBackground") || "bg0.png";
-  const selectedTitle = localStorage.getItem("selectedTitle") || "Brak";
-
-  fetch(`${API_BASE}/api/profile`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      nick: currentUser,
+  const selectedFrame = localStorage.getItem("selectedFrame") || "default_frame";
+  
+  const profileData = {
+    ui: {
       avatar: selectedAvatar,
-      frame: selectedFrame,
       background: selectedBackground,
-      title: selectedTitle
-    })
-  }).then(res => res.json()).then(data => {
-    console.log("✅ Zapisano ustawienia profilu:", data);
-  });
-}
+      frame: selectedFrame
+    }
+  };
 
+  const nick = localStorage.getItem("currentUser"); // <-- pobieramy nick
+  if (!nick) {
+    showNotification("Nie jesteś zalogowany!");
+    return;
+  }
+
+  await saveProfileToServer(nick, profileData);
+
+  showNotification("Zapisano zmiany profilu!");
+}
 
 function logout() {
   const userData = JSON.parse(localStorage.getItem("userData"));
