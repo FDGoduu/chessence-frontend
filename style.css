@@ -3461,3 +3461,8 @@ body {
 .status-dot.offline {
   background: #555;
 }
+.friend-title {
+  font-size: 0.8em;
+  color: #ccc;
+  margin-bottom: 2px;
+}
