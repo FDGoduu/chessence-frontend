@@ -3439,3 +3439,19 @@ body {
 #matchmakingBox button:hover {
   background: #c9302c;
 }
+/* ⚪ Kropka online przy znajomym */
+.online-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: 8px;
+  display: inline-block;
+  vertical-align: middle;
+  box-shadow: 0 0 4px rgba(0,0,0,0.3);
+}
+.online-indicator.online {
+  background-color: #4caf50;
+}
+.online-indicator.offline {
+  background-color: #777;
+}
