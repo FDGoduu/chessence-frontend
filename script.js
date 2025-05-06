@@ -2626,7 +2626,11 @@ document.querySelectorAll(".promotion-option").forEach(button => {
 });
 
 function getXpThreshold(level) {
-  return baseXP + (Number.isFinite(level) ? level : 0) * 20;
+  if (level < 10) return 100 + level * 20;
+  if (level < 30) return 300 + (level - 10) * 40;
+  if (level < 60) return 1100 + (level - 30) * 60;
+  if (level < 100) return 2900 + (level - 60) * 80;
+  return 999999; // blokada – do prestiżu i tak dojdziemy wcześniej
 }
 
 
@@ -2666,6 +2670,7 @@ async function enforceLocksByLevel() {
 async function updateProfileUI() {
   const users = await getUsers();
   const currentUser = activeUserNick || localStorage.getItem("currentUser");
+  document.getElementById("playerPrestige").textContent = user.prestige || 0;
   
   let viewedUser = null;
 
@@ -2945,6 +2950,7 @@ showPopupAdvanced({
     users[currentUser].level = 0;
     users[currentUser].achievements = {};
     users[currentUser].stats = { wins: 0 };
+    users[currentUser].prestige = 0;
     users[currentUser].ui = {
       avatar: "avatar1.png",
       background: "bg0.png",
@@ -2989,6 +2995,7 @@ async function openProfileScreen(friendId = null) {
   await renderFriendsList();
 
 document.getElementById("resetProgressBtn").style.display = isOwnProfile ? "inline-block" : "none";
+document.getElementById("playerPrestige").textContent = user.prestige || 0;
 
 if (isOwnProfile) {
   document.getElementById("backGeneralBtn").style.display = "inline-block";
@@ -3257,28 +3264,40 @@ async function awardXP(resultType) {
     return; // ⛔ zakończ bez XP
   }
 
-  // 📋 XP i awans poziomu
-  let previousLevel = user.level ?? 0;
-  let level = user.level ?? 0;
-  let totalXP = user.xp + xpGained;
-  window.previousLevelBeforeAward = previousLevel;
+// 📋 XP i awans poziomu + PRESTIŻ
+let previousLevel = user.level ?? 0;
+let level = user.level ?? 0;
+let totalXP = user.xp + xpGained;
+user.prestige = user.prestige || 0;
 
-  while (true) {
-    const requiredXP = getXpThreshold(level);
-    if (totalXP < requiredXP) break;
-    totalXP -= requiredXP;
-    level++;
-    checkLevelRewards(level);
-    triggerLevelUpAnimation();
-    setTimeout(() => {
-      showLevelRewardsPopup(level);
-      enforceLocksByLevel();
-      updateProfileUI();
-    }, 2500);
+window.previousLevelBeforeAward = previousLevel;
+
+while (true) {
+  const requiredXP = getXpThreshold(level);
+  if (totalXP < requiredXP) break;
+  totalXP -= requiredXP;
+  level++;
+
+  if (level >= 100) {
+    level = 0;
+    user.prestige++;
+    showPopupAdvanced({
+      message: `🎉 Gratulacje! Osiągnięto prestiż ${user.prestige}.`,
+      confirm: false
+    });
   }
 
-  user.xp = totalXP;
-  user.level = level;
+  checkLevelRewards(level);
+  triggerLevelUpAnimation();
+  setTimeout(() => {
+    showLevelRewardsPopup(level);
+    enforceLocksByLevel();
+    updateProfileUI();
+  }, 2500);
+}
+
+user.level = level;
+user.xp = totalXP;
   await saveUsers(users);
 
   await saveProfile();
