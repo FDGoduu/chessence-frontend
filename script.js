@@ -3506,7 +3506,7 @@ async function showFriendsTab() {
 }
 
 async function renderFriendsList() {
-  await refreshUsers(); // 🔥 pobieramy najnowsze users.json
+  await refreshUsers();
   const users = await getUsers();
   const currentUser = localStorage.getItem("currentUser");
   if (!currentUser || !users[currentUser]) return;
@@ -3516,7 +3516,7 @@ async function renderFriendsList() {
   if (!container) return;
   container.innerHTML = "";
 
-  const uniqueFriends = [...new Set(myUser.friends || [])]; // 🔥 upewniamy się, że istnieje lista
+  const uniqueFriends = [...new Set(myUser.friends || [])];
 
   uniqueFriends.forEach(friendNick => {
     const friend = users[friendNick];
@@ -3526,6 +3526,7 @@ async function renderFriendsList() {
     const frame = friend.ui?.frame || "default_frame";
     const background = friend.ui?.background || "bg0.png";
     const level = typeof friend.level === "number" ? friend.level : 0;
+    const title = friend.ui?.title ? `<div class="friend-title">${friend.ui.title}</div>` : "";
 
     const div = document.createElement("div");
     div.className = "friend-entry";
@@ -3533,24 +3534,29 @@ async function renderFriendsList() {
     div.style.backgroundSize = "cover";
     div.style.backgroundPosition = "center";
 
-div.innerHTML = `
-  <div class="friend-card-top">
-    <div class="profile-avatar-wrapper">
-      <img src="img/avatars/${avatar}" class="profile-avatar">
-      <img src="img/frames/${frame}.png" class="profile-avatar-frame">
-    </div>
-    <div class="friend-info">
-      <div class="nickname-wrapper">
-        <div class="nickname">${friendNick}</div>
-        <div class="status-dot ${friend.isLoggedIn ? "online" : "offline"}"></div>
+    div.innerHTML = `
+      <div class="friend-card-top">
+        <div class="profile-avatar-wrapper">
+          <img src="img/avatars/${avatar}" class="profile-avatar">
+          <img src="img/frames/${frame}.png" class="profile-avatar-frame">
+        </div>
+        <div class="friend-info">
+          <div class="nickname-wrapper">
+            <div class="nickname">${friendNick}</div>
+            ${title}
+            <div class="status-dot ${friend.isLoggedIn ? "online" : "offline"}"></div>
+          </div>
+          <div class="friend-meta">
+            <div class="friend-level">Poziom ${level}</div>
+          </div>
+        </div>
       </div>
-      <div class="friend-meta">
-        <div class="friend-title">${friend.ui?.title || ""}</div>
-        <div class="friend-level">Poziom ${level}</div>
+      <div class="friend-card-bottom">
+        <button onclick="inviteToGame('${friend.id}')">Zaproś do gry</button>
+        <button onclick="viewFriendProfile('${friend.id}')">Profil</button>
+        <button onclick="removeFriend('${friendNick}')">Usuń</button>
       </div>
-    </div>
-  </div>
-`;
+    `;
 
     container.appendChild(div);
   });
@@ -3590,17 +3596,11 @@ async function renderInvites() {
     return;
   }
 
-  const incoming = me.pendingFriends || [];  // odebrane zaproszenia
-  const outgoing = me.pendingInvites || [];  // wysłane zaproszenia
-
-  if (incoming.length === 0 && outgoing.length === 0) {
-    inviteList.innerHTML = "<div class='friend-status-text'>Brak zaproszeń</div>";
-    return;
-  }
+  const incoming = me.pendingFriends || [];
+  const outgoing = me.pendingInvites || [];
 
   inviteList.innerHTML = "";
 
-  // 🔵 Odebrane zaproszenia — pełna karta
   incoming.forEach(senderNick => {
     const sender = users[senderNick];
     if (!sender) return;
@@ -3609,32 +3609,35 @@ async function renderInvites() {
     const frame = sender.ui?.frame || "default_frame";
     const background = sender.ui?.background || "bg0.png";
     const level = sender.level || 0;
+    const title = sender.ui?.title ? `<div class="friend-title">${sender.ui.title}</div>` : "";
 
     const inviteDiv = document.createElement("div");
     inviteDiv.className = "invite-entry styled-invite";
     inviteDiv.style.backgroundImage = `url('img/backgrounds/${background}')`;
-div.innerHTML = `
-  <div class="friend-card-top">
-    <div class="profile-avatar-wrapper">
-      <img src="img/avatars/${avatar}" class="profile-avatar">
-      <img src="img/frames/${frame}.png" class="profile-avatar-frame">
-    </div>
-    <div class="friend-info">
-      <div class="nickname-wrapper">
-        <div class="nickname">${invite}</div>
-        <div class="friend-title">${users[invite]?.ui?.title || ""}</div>
-        <div class="status-dot offline"></div>
+    inviteDiv.innerHTML = `
+      <div class="friend-card-top">
+        <div class="profile-avatar-wrapper">
+          <img src="img/avatars/${avatar}" class="profile-avatar">
+          <img src="img/frames/${frame}.png" class="profile-avatar-frame">
+        </div>
+        <div class="friend-info">
+          <div class="nickname-wrapper">
+            <div class="nickname">${senderNick}</div>
+            ${title}
+          </div>
+          <div class="friend-meta">
+            <div class="friend-level">Poziom ${level}</div>
+          </div>
+        </div>
       </div>
-      <div class="friend-meta">
-        <div class="friend-level">Poziom ${level}</div>
+      <div class="friend-card-bottom">
+        <button onclick="acceptInvite('${senderNick}')">Akceptuj</button>
+        <button onclick="rejectInvite('${senderNick}')">Odrzuć</button>
       </div>
-    </div>
-  </div>
-`;
+    `;
     inviteList.appendChild(inviteDiv);
   });
 
-  // 🟡 Wysłane zaproszenia — uproszczona informacja
   outgoing.forEach(receiverNick => {
     const receiver = users[receiverNick];
     if (!receiver) return;
