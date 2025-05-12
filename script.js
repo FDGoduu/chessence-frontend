@@ -2952,7 +2952,7 @@ showPopupAdvanced({
     users[currentUser].level = 0;
     users[currentUser].achievements = {};
     users[currentUser].stats = { wins: 0 };
-    users[currentUser].prestige = 0;
+    users[currentUser].prestige = 3;
     users[currentUser].ui = {
       avatar: "avatar1.png",
       background: "bg0.png",
